@@ -2,5 +2,5 @@
 
 export enum Routes {
   INDEX = '/',
-  AUDIO_STREAM_UPGRADE = '/audio/stream/upgrade',
+  AUDIO_STREAM_UPGRADE = '/ws/audio',
 }

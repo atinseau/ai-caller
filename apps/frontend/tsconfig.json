@@ -27,6 +27,7 @@
     "paths": {
       "@/styles/*": ["./src/styles/*"],
       "@/shared/*": ["./src/shared/*"],
+      "@/adapters/*": ["./src/adapters/*"],
       "@/types/*": ["./src/types/*"],
       "@/interfaces/*": ["./src/interfaces/*"],
       "@/config/*": ["./src/config/*"],
