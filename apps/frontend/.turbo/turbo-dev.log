@@ -1,130 +1,19 @@
 [0m[2m[35m$[0m [2m[1mbunx --bun react-router dev[0m
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
-[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-[2m[32m  ➜[39m[22m[2m  press [22m[1mh + enter[22m[2m to show help[22m
-[B[A[A
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:41:39 AM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:41:39 AM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m [33m(x2)[39m
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:41:51 AM[22m [36m[1m[vite][22m[39m [32m.env changed, restarting server...[39m [33m(x3)[39m
-[2m12:41:51 AM[22m [36m[1m[vite][22m[39m server restarted.
-
-  [32m➜[39m  [1mLocal[22m:   [36mhttp://localhost:[1m5173[22m/[39m
-[2m  [32m➜[39m  [1mNetwork[22m[2m: use [22m[1m--host[22m[2m to expose[22m
-{
-  [0mTERM_PROGRAM[2m:[0m [0m[32m[0m[32m"zed"[0m[0m[0m[2m,[0m
-  [0mNODE[2m:[0m [0m[32m[0m[32m"/private/tmp/bun-node-cf1367137"[0m[0m[0m[2m,[0m
-  [0mTERM[2m:[0m [0m[32m[0m[32m"xterm-256color"[0m[0m[0m[2m,[0m
-  [0mSHELL[2m:[0m [0m[32m[0m[32m"/bin/zsh"[0m[0m[0m[2m,[0m
-  [0mTURBO_IS_TUI[2m:[0m [0m[32m[0m[32m"true"[0m[0m[0m[2m,[0m
-  [0mnpm_config_local_prefix[2m:[0m [0m[32m[0m[32m"/Users/arthur/Documents/Dev/ai-caller/apps/frontend"[0m[0m[0m[2m,[0m
-  [0mPNPM_HOME[2m:[0m [0m[32m[0m[32m"/Users/arthur/Library/pnpm"[0m[0m[0m[2m,[0m
-  [0mUSER[2m:[0m [0m[32m[0m[32m"arthur"[0m[0m[0m[2m,[0m
-  [0mnpm_execpath[2m:[0m [0m[32m[0m[32m"/Users/arthur/.bun/bin/bun"[0m[0m[0m[2m,[0m
-  [0mPATH[2m:[0m [0m[32m[0m[32m"/private/tmp/bunx-501-react-router@latest/node_modules/.bin:/private/tmp/bun-node-cf1367137:/Users/arthur/Documents/Dev/ai-caller/apps/frontend/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/apps/frontend/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/apps/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/node_modules/.bin:/Users/arthur/Documents/Dev/node_modules/.bin:/Users/arthur/Documents/node_modules/.bin:/Users/arthur/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/apps/frontend/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/apps/frontend/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/apps/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/node_modules/.bin:/Users/arthur/Documents/Dev/node_modules/.bin:/Users/arthur/Documents/node_modules/.bin:/Users/arthur/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/node_modules/.bin:/Users/arthur/Documents/Dev/ai-caller/node_modules/.bin:/Users/arthur/Documents/Dev/node_modules/.bin:/Users/arthur/Documents/node_modules/.bin:/Users/arthur/node_modules/.bin:/Users/node_modules/.bin:/node_modules/.bin:/Users/arthur/.pyenv/shims:/Users/arthur/.bun/bin:/Users/arthur/.nvm/versions/node/v22.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/opt/X11/bin:/Users/arthur/.deno/bin:/Users/arthur/.local/bin:/Users/arthur/Library/pnpm:/Users/arthur/.bun/bin:/Users/arthur/.nvm/versions/node/v22.15.0/bin:/Users/arthur/.cargo/bin"[0m[0m[0m[2m,[0m
-  [0mnpm_package_json[2m:[0m [0m[32m[0m[32m"/Users/arthur/Documents/Dev/ai-caller/apps/frontend/package.json"[0m[0m[0m[2m,[0m
-  [0mnpm_command[2m:[0m [0m[32m[0m[32m"exec"[0m[0m[0m[2m,[0m
-  [0mPWD[2m:[0m [0m[32m[0m[32m"/Users/arthur/Documents/Dev/ai-caller/apps/frontend"[0m[0m[0m[2m,[0m
-  [0mnpm_lifecycle_event[2m:[0m [0m[32m[0m[32m"bunx"[0m[0m[0m[2m,[0m
-  [0mnpm_package_name[2m:[0m [0m[32m[0m[32m"@culture-live/frontend"[0m[0m[0m[2m,[0m
-  [0mLANG[2m:[0m [0m[32m[0m[32m"en_US.UTF-8"[0m[0m[0m[2m,[0m
-  [0mTURBO_HASH[2m:[0m [0m[32m[0m[32m"e16929a1545d7f83"[0m[0m[0m[2m,[0m
-  [0mSHLVL[2m:[0m [0m[32m[0m[32m"1"[0m[0m[0m[2m,[0m
-  [0mHOME[2m:[0m [0m[32m[0m[32m"/Users/arthur"[0m[0m[0m[2m,[0m
-  [0mnpm_lifecycle_script[2m:[0m [0m[32m[0m[32m"react-router"[0m[0m[0m[2m,[0m
-  [0mnpm_config_user_agent[2m:[0m [0m[32m[0m[32m"bun/1.2.23 npm/? node/v24.3.0 darwin arm64"[0m[0m[0m[2m,[0m
-  [0mDISPLAY[2m:[0m [0m[32m[0m[32m"/private/tmp/com.apple.launchd.ie74zaiYJZ/org.xquartz:0"[0m[0m[0m[2m,[0m
-  [0mnpm_node_execpath[2m:[0m [0m[32m[0m[32m"/private/tmp/bun-node-cf1367137"[0m[0m[0m[2m,[0m
-  [0m_[2m:[0m [0m[32m[0m[32m"/Users/arthur/.bun/bin/bunx"[0m[0m[0m[2m,[0m
-  [0mTZ[2m:[0m [0m[2mundefined[0m[0m[2m,[0m
-  [0mNODE_TLS_REJECT_UNAUTHORIZED[2m:[0m [0m[2mundefined[0m[0m[2m,[0m
-  [0mBUN_CONFIG_VERBOSE_FETCH[2m:[0m [0m[2mundefined[0m[0m[2m,[0m
-  [0mNODE_ENV[2m:[0m [0m[32m[0m[32m"development"[0m[0m[0m[2m,[0m
-  [0mVITE_API_URL[2m:[0m [0m[32m[0m[32m"http://localhost:8000"[0m[0m[0m[2m,[0m
-}
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:42:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/app/routes/home.tsx[22m
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:42:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/app/routes/home.tsx[22m [33m(x2)[39m
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:42:18 AM[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/app/app.css, /app/routes/home.tsx[22m
-
-
-
-
-
-
-
-
-
-
-
-
-[1;1H[0J[2m12:42:18 AM[22m [36m[1m[vite][22m[39m [34m[2m(ssr)[22m[39m [32mpage reload [39m[2mapp/routes/home.tsx[22m
+[0m[1m599 |[0m     validateConfig
+[0m[1m600 |[0m   })[0m[2m;[0m
+[0m[1m601 |[0m   [0m[35mlet[0m appDirectory[0m[2m;[0m
+[0m[1m602 |[0m   [0m[35mlet[0m initialConfigResult = [0m[35mawait[0m getConfig()[0m[2m;[0m
+[0m[1m603 |[0m   [0m[35mif[0m (!initialConfigResult.ok) {
+[0m[1m604 |[0m     [0m[35mthrow[0m [0m[35mnew[0m [0m[1mError[0m(initialConfigResult.error)[0m[2m;[0m
+                    [31m[1m^[0m
+[0m[31merror[0m[2m:[0m [1mCould not find a root route module in the app directory as "src/root.tsx"[0m
+[0m      [2mat [0m[0m[1m[3mcreateConfigLoader[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/@react-router/dev/dist/vite.js[0m[2m:[0m[33m604[0m[2m:[33m15[0m[2m)[0m
+[0m      [2mat [0m[0m[2masync <anonymous>[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/@react-router/dev/dist/vite.js[0m[2m:[0m[33m3117[0m[2m:[33m41[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync runConfigHook[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js[0m[2m:[0m[33m36258[0m[2m:[33m42[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync resolveConfig[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js[0m[2m:[0m[33m35758[0m[2m:[33m19[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync _createServer[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/vite/dist/node/chunks/dep-Bm2ujbhY.js[0m[2m:[0m[33m28008[0m[2m:[33m73[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync dev[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/@react-router/dev/dist/cli/index.js[0m[2m:[0m[33m2058[0m[2m:[33m28[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync dev2[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/@react-router/dev/dist/cli/index.js[0m[2m:[0m[33m2230[0m[2m:[33m9[0m[2m)[0m
+[0m      [2mat [0m[0m[1m[3masync run2[0m[2m ([0m[0m[36m/Users/arthur/Documents/Dev/ai-caller/node_modules/@react-router/dev/dist/cli/index.js[0m[2m:[0m[33m2529[0m[2m:[33m13[0m[2m)[0m
+
+[0m[31merror[0m[2m:[0m script [1m"dev"[0m exited with code 1[0m
