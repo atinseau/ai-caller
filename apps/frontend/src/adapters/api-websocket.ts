@@ -30,7 +30,11 @@ export class ApiWebSocket {
   }
 
   close() {
-    this.socket?.close()
+    if (!this.isOpen || !this.socket) {
+      console.warn("WebSocket is not open or already closed.");
+      return;
+    }
+    this.socket.close()
   }
 
   on(event: string, callback: (data: Event) => void) {

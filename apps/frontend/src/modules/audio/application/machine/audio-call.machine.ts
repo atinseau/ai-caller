@@ -28,10 +28,7 @@ export const audioCallMachine = setup({
       webSocket.once('error', () => sendBack({ type: 'WS_ERROR' }))
       webSocket.once('close', () => sendBack({ type: 'WS_CLOSE' }))
 
-      return () => {
-        console.log('Closing audio WebSocket')
-        webSocket.close()
-      }
+      return () => webSocket.close()
     })
   },
   actions: {
@@ -99,6 +96,7 @@ export const audioCallMachine = setup({
       }
     },
     failure: {
+      entry: "stopAudioStream",
       type: "final"
     },
     ending: {
