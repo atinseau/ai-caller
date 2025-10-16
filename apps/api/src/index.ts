@@ -17,8 +17,8 @@ const router = app.get(HttpRouter)
 Bun.serve({
   port: PORT,
   routes: {
-    [Routes.INDEX]: router.createHandler(ApplicationHandler, 'handle'),
-    [Routes.AUDIO_STREAM_UPGRADE]: bind(app.get(AudioStreamUpgradeHandler), 'handle')
+    [Routes.INDEX]: await router.createHandler(ApplicationHandler, 'handle'),
+    [Routes.AUDIO_STREAM_UPGRADE]: await router.createHandler(AudioStreamUpgradeHandler, 'handle')
   },
   websocket: {
     message(ws, message) { },

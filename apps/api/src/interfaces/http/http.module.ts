@@ -1,18 +1,12 @@
 import { Module } from "@nestjs/common";
 import { HttpRouter } from "./http-router";
-import { RequestMiddleware } from "./middlewares/request.middleware";
 
 const SERVICES = [
   HttpRouter
 ]
 
-const MIDDLEWARES = [
-  RequestMiddleware
-]
-
 const PROVIDERS = [
-  ...SERVICES,
-  ...MIDDLEWARES
+  ...SERVICES
 ]
 
 @Module({
