@@ -1,0 +1,34 @@
+{
+  "name": "nest-bun",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./common": {
+      "import": "./src/nest/common/index.ts",
+      "require": "./src/nest/common/index.ts",
+      "types": "./src/nest/common/index.ts"
+    },
+    "./core": {
+      "import": "./src/nest/core/index.ts",
+      "require": "./src/nest/core/index.ts",
+      "types": "./src/nest/core/index.ts"
+    },
+    "./types": {
+      "types": "./src/index.d.ts"
+    }
+  },
+  "dependencies": {
+    "@nestjs/common": "11.1.6",
+    "@nestjs/core": "11.1.6",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

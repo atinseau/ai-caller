@@ -6,7 +6,8 @@
     "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock"
   },
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*"
   ],
   "dependencies": {
     "turbo": "2.5.8"

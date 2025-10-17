@@ -1,3 +1,0 @@
-
-
-export const MIDDLEWARE_METADATA_KEY = Symbol("MIDDLEWARE_METADATA_KEY");

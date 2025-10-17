@@ -6,8 +6,8 @@
     "module": "Preserve",
     "moduleDetection": "force",
     "jsx": "react-jsx",
+    "types": ["./src/index.d.ts"],
     "allowJs": true,
-    "types": ["nest-bun/types"],
 
     // Dependency injection
     "emitDecoratorMetadata": true,
@@ -25,11 +25,6 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
-
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
 
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,

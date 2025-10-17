@@ -1,14 +1,9 @@
-import { Module } from "@nestjs/common";
-import { HandlersModule } from "../handlers/handlers.module";
-import { HttpModule } from "../http/http.module";
-import { Logger } from "@/utils/services/logger";
-import { UtilsModule } from "@/utils/utils.module";
+import { Module } from "nest-bun/common";
+import { ApplicationController } from "../controllers/application.controller";
+
 
 @Module({
-  imports: [
-    HandlersModule,
-    HttpModule,
-    UtilsModule
-  ]
+  controllers: [ApplicationController],
+  providers: []
 })
 export class ApplicationModule { }
