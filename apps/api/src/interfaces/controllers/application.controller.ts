@@ -1,10 +1,9 @@
-import { Controller, Get, Post, UseInterceptors } from "nest-bun/common";
-import { UseMiddleware } from "nest-bun";
+import { Controller, Get, Post, UseInterceptors, UseMiddleware } from "nest-bun/common";
 import { RequestInterceptor } from "@/interfaces/http/interceptors/request.interceptor";
 import { RequestMiddleware } from "../http/middlewares/request.middleware";
 
 @Controller()
-@UseMiddleware(RequestMiddleware)
+// @UseMiddleware(RequestMiddleware)
 export class ApplicationController {
   @Get('/')
   @UseInterceptors(RequestInterceptor)

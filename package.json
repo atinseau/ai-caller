@@ -12,5 +12,8 @@
   "dependencies": {
     "turbo": "2.5.8"
   },
-  "packageManager": "bun@1.2.23"
+  "packageManager": "bun@1.2.23",
+  "patchedDependencies": {
+    "@nestjs/core@11.1.6": "patches/@nestjs%2Fcore@11.1.6.patch"
+  }
 }

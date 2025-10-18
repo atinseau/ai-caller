@@ -7,6 +7,4 @@ export * from "./infrastructure/factories/bun-factory"
 // Types
 export * from "./types/methods-of.types"
 
-
 // Decorators
-export * from "./decorators/use-middleware.decorator"

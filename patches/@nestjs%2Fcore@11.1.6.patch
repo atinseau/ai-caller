@@ -1,0 +1,12 @@
+diff --git a/scanner.js b/scanner.js
+index 20247a6e17ed3c68cc20b74feeea9a8e93ffb79f..9dbffcdad7cee4d0632af1d5d4c5e6e2694239b9 100644
+--- a/scanner.js
++++ b/scanner.js
+@@ -142,6 +142,7 @@ class DependenciesScanner {
+         this.reflectInjectables(cls, token, constants_1.INTERCEPTORS_METADATA);
+         this.reflectInjectables(cls, token, constants_1.EXCEPTION_FILTERS_METADATA);
+         this.reflectInjectables(cls, token, constants_1.PIPES_METADATA);
++        this.reflectInjectables(cls, token, "MIDDLEWARE_METADATA_KEY")
+         this.reflectParamInjectables(cls, token, constants_1.ROUTE_ARGS_METADATA);
+     }
+     reflectExports(module, token) {
