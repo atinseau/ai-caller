@@ -1,6 +1,6 @@
 import { Injectable, Logger, Optional, type ExecutionContext, type NestInterceptor, type OnApplicationBootstrap, type Type } from "@nestjs/common";
 import { ModuleRef } from "@nestjs/core";
-import { INTERCEPTORS_METADATA } from "@nestjs/common/constants";
+import { INTERCEPTORS_METADATA, ROUTE_ARGS_METADATA } from "@nestjs/common/constants";
 import { MIDDLEWARE_METADATA_KEY } from "../lib/constants";
 import { Observable, Subscriber } from "rxjs";
 import { bind } from "../lib/functions/bind";
@@ -55,14 +55,14 @@ export class RouterHandler implements OnApplicationBootstrap {
           context as ExecutionContext, // TODO: fix this cast
           next
         ),
-        () => new Observable<Response>((sub) => this.handleRequestExecution(req, server, handler, sub))
+        () => new Observable<Response>((sub) => this.handleRequestExecution(req, server, controller, handler, sub))
       );
 
       // Await the result of the composed interceptors and return the Response
       return await new Promise<Response>((resolve) => composed().subscribe({
         next: resolve,
         error: (error) => {
-          this.logger.error(`Error processing request: ${error.message}`, error.stack, 'HttpRouter');
+          this.logger.error(error, 'HttpRouter');
           resolve(new Response("Internal Server Error", { status: 500 }));
         },
       }));
@@ -102,9 +102,14 @@ export class RouterHandler implements OnApplicationBootstrap {
     }
   }
 
-  private handleRequestExecution(req: BunRequest, server: Bun.Server<any>, handler: Function, sub: Subscriber<Response>) {
+  private handleRequestExecution(req: BunRequest, server: Bun.Server<any>, controller: Type<any>, handler: Function, sub: Subscriber<Response>) {
     try {
-      const maybePromise = handler(req, server);
+
+      const routeArgsMetadata = Reflect.getMetadata(ROUTE_ARGS_METADATA, controller.constructor, 'handler') || {};
+
+      console.log(routeArgsMetadata)
+
+      const maybePromise = handler();
       if (maybePromise instanceof Promise) {
         maybePromise
           .then((result) => {

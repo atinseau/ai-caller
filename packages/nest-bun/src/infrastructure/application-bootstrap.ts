@@ -1,6 +1,5 @@
 import { Inject, Injectable, type OnApplicationBootstrap, type OnModuleInit } from "@nestjs/common";
 import { RouterExplorer } from "../interfaces/router-explorer";
-import { ModuleExplorer } from "../interfaces/module-explorer";
 import { PORT_METADATA_KEY } from "../lib/constants";
 import type { CreateServerOptions } from "../types/create-server-options.types";
 

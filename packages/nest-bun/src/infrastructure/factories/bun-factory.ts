@@ -6,34 +6,33 @@ import { IMPORTS_METADATA_KEY, PORT_METADATA_KEY, PROVIDER_METADATA_KEY } from "
 import { ApplicationBootstrap } from "../application-bootstrap";
 import { RouterExplorer } from "../../interfaces/router-explorer";
 import { RouterHandler } from "../../interfaces/router-handler";
-import { ModuleExplorer } from "../../interfaces/module-explorer";
 
 const PROVIDERS = [
   ApplicationBootstrap,
-  ModuleExplorer,
   RouterExplorer,
   RouterHandler
 ]
 
 export class BunFactory {
   static async create(module: ModuleType, options?: FactoryOptions) {
-    this.inject(module, options)
-    const app = await NestFactory.createApplicationContext(module, options)
-    return app
+    return {
+      listen: (port: number) => {
+        this.inject(module as ModuleType, port)
+        return NestFactory.createApplicationContext(module, options || undefined)
+      }
+    }
   }
 
-  private static inject(module: ModuleType, options?: FactoryOptions) {
+  private static inject(module: ModuleType, port: number) {
     const existingProvider: Provider[] = Reflect.getMetadata(PROVIDER_METADATA_KEY, module) || []
     const existingImports: ModuleType[] = Reflect.getMetadata(IMPORTS_METADATA_KEY, module) || []
 
     existingProvider.push(
       ...PROVIDERS,
-      ...(options?.port ? [
-        {
-          provide: PORT_METADATA_KEY,
-          useValue: options.port
-        }
-      ] : [])
+      {
+        provide: PORT_METADATA_KEY,
+        useValue: port
+      }
     )
     existingImports.push(DiscoveryModule)
 
