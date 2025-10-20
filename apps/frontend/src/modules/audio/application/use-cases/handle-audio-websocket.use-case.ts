@@ -1,25 +1,23 @@
 import { ApiWebSocket } from "@/adapters/api-websocket";
+import { AudioInput } from "../../infrastructure/audio-input";
 
 
 export function handleAudioWebSocketUseCase(audioStream: MediaStream) {
-  const audioWebSocket = new ApiWebSocket('/ws/audio')
-  const mediaRecorder = new MediaRecorder(audioStream, { mimeType: 'audio/webm' })
+  const audioWebSocket = new ApiWebSocket('/audio/stream/ws');
+  const audioInput = new AudioInput()
 
-  console.log('Audio WebSocket initialized:', mediaRecorder)
-
-  mediaRecorder.addEventListener('dataavailable', (event) => {
-    console.log('Audio data available:', event.data)
+  audioInput.start(audioStream, (chunk) => {
+    if (!audioWebSocket.isOpen()) {
+      return
+    }
+    audioWebSocket.send(chunk)
   })
 
-  mediaRecorder.addEventListener('start', () => {
-    console.log('MediaRecorder started')
+  // Gestion de la fermeture du WebSocket et nettoyage audio
+  audioWebSocket.once('close', () => {
+    console.log('Audio WebSocket closed, audio context cleaned up');
+    audioInput.stop();
   })
 
-  mediaRecorder.addEventListener('stop', () => {
-    console.log('MediaRecorder stopped')
-  })
-
-  mediaRecorder.start(200) // Collect 1 second of audio data
-
-  return audioWebSocket
+  return audioWebSocket;
 }

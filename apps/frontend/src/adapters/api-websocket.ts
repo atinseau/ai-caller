@@ -30,7 +30,7 @@ export class ApiWebSocket {
   }
 
   close() {
-    if (!this.isOpen || !this.socket) {
+    if (!this.isOpen() || !this.socket) {
       console.warn("WebSocket is not open or already closed.");
       return;
     }
@@ -89,14 +89,14 @@ export class ApiWebSocket {
   }
 
   send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
-    if (!this.isOpen || !this.socket) {
+    if (!this.isOpen() || !this.socket) {
       console.warn("WebSocket is not open. Unable to send message.");
       return;
     }
     this.socket.send(data)
   }
 
-  private get isOpen(): boolean {
+  isOpen(): boolean {
     return this.socket?.readyState === WebSocket.OPEN
   }
 }

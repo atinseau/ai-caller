@@ -11,8 +11,9 @@
     "@types/bun": "latest"
   },
   "dependencies": {
-    "nest-bun": "workspace:*",
-    "rxjs": "7.8.2",
-    "openai": "6.2.0"
+    "hono": "4.10.1",
+    "mediabunny": "1.24.0",
+    "openai": "6.2.0",
+    "rxjs": "7.8.2"
   }
 }
