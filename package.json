@@ -1,0 +1,16 @@
+{
+  "name": "@ai-caller/root",
+  "private": true,
+  "scripts": {
+    "dev": "turbo dev --parallel",
+    "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "turbo": "2.5.8"
+  },
+  "packageManager": "bun@1.2.23"
+}
