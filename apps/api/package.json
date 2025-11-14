@@ -5,16 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "bun --hot src/index.ts",
-    "start": "NODE_ENV=production bun src/index.ts"
+    "start": "NODE_ENV=production bun src/index.ts",
+    "hurl": "hurl --variable endpoint=http://localhost:8000"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "@types/ws": "^8.18.1"
+    "@types/bun": "latest"
   },
   "dependencies": {
     "@ai-caller/shared": "workspace:*",
+    "@prisma/client": "6.19.0",
+    "dotenv": "17.2.3",
     "hono": "4.10.1",
+    "inversify": "7.10.4",
     "openai": "6.7.0",
-    "rxjs": "7.8.2"
+    "prisma": "6.19.0",
+    "reflect-metadata": "0.2.2",
+    "rxjs": "7.8.2",
+    "zod": "^4.1.12"
   }
 }

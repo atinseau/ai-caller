@@ -7,13 +7,14 @@ import { stopPeerConnection } from "@/shared/utils/stopPeerConnection"
 export const audioCallMachine = setup({
   types: {} as {
     context: {
-      audioStream: MediaStream | null,
+      audioStream?: MediaStream,
       peerConnection?: RTCPeerConnection,
       dataChannel?: RTCDataChannel,
-      audioRef?: React.RefObject<HTMLAudioElement>
+      audioRef?: React.RefObject<HTMLAudioElement>,
+      companyId?: string
     },
     events:
-    | { type: "START_CALL", audioRef: React.RefObject<HTMLAudioElement> }
+    | { type: "START_CALL", audioRef: React.RefObject<HTMLAudioElement>, companyId: string }
     | { type: "STOP_CALL" }
     | { type: "RTC_OPEN", pc: RTCPeerConnection, dc: RTCDataChannel }
     | { type: "RTC_ERROR" }
@@ -44,8 +45,12 @@ export const audioCallMachine = setup({
       // Save the data channel in the context by sending an event
     }),
     handleAudioWebRtc: fromCallback(({ input, sendBack }) => {
-      const { audioStream, audioRef } = input as { audioStream: MediaStream, audioRef?: React.RefObject<HTMLAudioElement> }
-      const { pc, dc } = handleAudioWebRtcUseCase(audioStream, audioRef)
+      const { audioStream, audioRef, companyId } = input as { audioStream: MediaStream, companyId: string, audioRef: React.RefObject<HTMLAudioElement> }
+      const { pc, dc } = handleAudioWebRtcUseCase(companyId, audioStream, audioRef, (error) => {
+        console.error("WebRTC error:", error)
+        sendBack({ type: "RTC_ERROR" })
+      })
+
       pc.onconnectionstatechange = () => {
         if (pc.connectionState === "connected") {
           sendBack({ type: "RTC_OPEN", pc, dc })
@@ -70,11 +75,20 @@ export const audioCallMachine = setup({
       console.log('Stopping audio stream')
       if (context.audioStream) {
         stopAudioStream(context.audioStream)
-        context.audioStream = null
+        context.audioStream = undefined
       }
       return {
-        audioStream: null
+        audioStream: undefined
       }
+    }),
+    setCompanyId: assign(({ context, event }) => {
+      if (event.type === "START_CALL") {
+        return {
+          ...context,
+          companyId: event.companyId
+        }
+      }
+      return context
     }),
     // Ajoute l'action pour setter audioRef dans le contexte lors de START_CALL
     setAudioRef: assign(({ context, event }) => {
@@ -117,10 +131,6 @@ export const audioCallMachine = setup({
   entry: () => {
     console.log("Audio call machine started")
   },
-  context: {
-    audioStream: null,
-    audioRef: undefined
-  },
   on: {
     STOP_CALL: {
       guard: 'canStopCall',
@@ -132,7 +142,10 @@ export const audioCallMachine = setup({
       on: {
         START_CALL: {
           target: "aquiringMedia",
-          actions: "setAudioRef"
+          actions: [
+            "setAudioRef",
+            "setCompanyId"
+          ]
         }
       }
     },
@@ -153,7 +166,7 @@ export const audioCallMachine = setup({
     callReady: {
       initial: "connecting",
       invoke: {
-        input: ({ context }) => ({ audioStream: context.audioStream!, audioRef: context.audioRef }),
+        input: ({ context }) => ({ audioStream: context.audioStream!, audioRef: context.audioRef!, companyId: context.companyId! }),
         src: "handleAudioWebRtc",
       },
       on: {

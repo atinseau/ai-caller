@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "turbo dev --parallel",
+    "up": "docker compose up -d",
+    "http": "ngrok --config ngrok.yml http --url=light-grackle-eternal.ngrok-free.app 5678",
     "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock"
   },
   "workspaces": [

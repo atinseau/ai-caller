@@ -1,5 +1,9 @@
+import { Link } from "react-router";
 
 
 export default function HomeRoute() {
-  return <p>salut</p>
+  return <div>
+    <p>salut</p>
+    <Link to="/audio">Go to audio</Link>
+  </div>
 }

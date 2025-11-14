@@ -28,6 +28,12 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@/domain/*": [
+        "./src/domain/*"
+      ],
+      "@/generated/prisma/*": [
+        "./generated/prisma/*"
       ]
     },
     // Some stricter flags (disabled by default)

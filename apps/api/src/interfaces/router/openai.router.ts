@@ -1,13 +1,30 @@
 import { OpenAI } from "@ai-caller/shared";
 import { Hono } from "hono";
+import { validator } from "hono/validator";
+import { GetCallTokenParamsDto } from "../dtos/get-call-token-params.dto";
+import { container } from "@/infrastructure/di/container";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 
 export const openAiRouter = new Hono()
 
 
 let token: string | null = null;
 
-openAiRouter.get('/token', async (ctx) => {
+openAiRouter.get('/token/:companyId', validator('param', (value) => GetCallTokenParamsDto.parse(value)), async (ctx) => {
+
+  const companyRepository = container.get(CompanyRepositoryPort)
+
   try {
+    const companyId = ctx.req.param('companyId');
+    const company = await companyRepository.findById(companyId);
+
+    if (!company) {
+      ctx.status(404)
+      return ctx.json({
+        error: "Company not found"
+      });
+    }
+
     const openai = new OpenAI({
       apiKey: Bun.env.OPENAI_API_KEY,
     })
@@ -18,6 +35,19 @@ openAiRouter.get('/token', async (ctx) => {
         tool_choice: "auto",
         type: "realtime",
         model: "gpt-realtime",
+        tools: [
+          {
+            type: "mcp",
+            server_label: "default",
+            server_url: company.mcpServerUrl,
+            require_approval: 'never'
+          }
+        ],
+        instructions: `
+        You are an AI assistant that helps users by providing information,
+        taking actions using tools, and answering questions to the best of your ability.
+        Always use the provided tools when necessary to fulfill user requests.
+        `,
         audio: {
           output: {
             speed: 1,
@@ -51,30 +81,6 @@ openAiRouter.patch('/calls/:id', async (ctx) => {
 
   ws.onopen = () => {
     console.log("WebSocket connection established for call ID:", id);
-
-    ws.send(JSON.stringify({
-      "type": "session.update",
-      "session": {
-        "tools": [
-          {
-            "type": "function",
-            "name": "list_files",
-            "description": "When a user wants to see the files in a directory, use this tool to list the files.",
-            "parameters": {
-              "type": "object",
-              "properties": {
-                "directory_path": {
-                  "type": "string",
-                  "description": "The path of the directory to list files from."
-                }
-              },
-              "required": ["directory_path"]
-            }
-          }
-        ],
-        "tool_choice": "auto"
-      }
-    }))
   }
 
   ws.onerror = (event) => {
@@ -91,7 +97,7 @@ openAiRouter.patch('/calls/:id', async (ctx) => {
   }
 
   ws.onclose = () => {
-    // console.log("WebSocket connection closed for call ID:", id);
+    console.log("WebSocket connection closed for call ID:", id);
   }
 
   return ctx.json({ message: `WebSocket initiated for call ID: ${id}` });

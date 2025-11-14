@@ -4,7 +4,7 @@ import { useMachine } from "@xstate/react";
 export function useAudioCall(audioRef: React.RefObject<HTMLAudioElement>) {
   const [state, send] = useMachine(audioCallMachine)
 
-  const startCall = async () => send({ type: "START_CALL", audioRef })
+  const startCall = async (companyId: string) => send({ type: "START_CALL", audioRef, companyId })
   const stopCall = () => send({ type: "STOP_CALL" })
   const sendMessage = (message: string) => send({ type: "MESSAGE", message })
 
