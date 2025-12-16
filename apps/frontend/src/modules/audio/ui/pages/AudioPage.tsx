@@ -1,21 +1,26 @@
 import { useAudioCall } from "@/modules/audio/ui/hooks/useAudioCall"
 import { Button } from "@/shared/components/ui/button"
 import { useRef, type RefObject } from "react"
+import { AudioCallMachineState } from "../../domain/enums/audio-call-machine-state.enum"
+import { AudioCallMachineEvent } from "../../domain/enums/audio-call-machine-event.enum"
+import { useCompanies } from "@/shared/hooks/useCompanies"
 
 export function AudioPage() {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const { startCall, stopCall, sendMessage, state } = useAudioCall(audioRef as RefObject<HTMLAudioElement>)
+  const { companies, isLoading } = useCompanies()
 
-  const handleMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    const form = e.target as HTMLFormElement
-    const input = form.elements.namedItem("message") as HTMLInputElement
-    const message = input.value.trim()
-    if (message) {
-      sendMessage(message)
-      input.value = ""
-    }
-  }
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const { start, stop, state } = useAudioCall(audioRef as RefObject<HTMLAudioElement>)
+
+  // const handleMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault()
+  //   const form = e.target as HTMLFormElement
+  //   const input = form.elements.namedItem("message") as HTMLInputElement
+  //   const message = input.value.trim()
+  //   if (message) {
+  //     sendMessage(message)
+  //     input.value = ""
+  //   }
+  // }
 
   const handleCompanyIdSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -28,13 +33,32 @@ export function AudioPage() {
       return
     }
 
-    startCall(companyId)
+    start(companyId)
     input.value = ""
   }
 
   return <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
 
-    {typeof state.value === 'string' && state.value === 'idle'
+    {isLoading
+      ? <p>Loading companies...</p>
+      : <div>
+        <h2 className="text-lg mb-2">Available Companies:</h2>
+        {companies && companies.length > 0
+          ? (
+            <ul className="list-disc list-inside">
+              {companies.map(company => (
+                <li key={company.id}>
+                  ID: {company.id}, Name: {company.name}
+                </li>
+              ))}
+            </ul>
+          )
+          : <p>No companies available.</p>
+        }
+      </div>
+    }
+
+    {typeof state.value === 'string' && state.value === AudioCallMachineState.IDLE
       ? <form className="flex gap-2" onSubmit={handleCompanyIdSubmit}>
         <input
           name="companyId"
@@ -53,16 +77,15 @@ export function AudioPage() {
       : null
     }
 
-
-    {typeof state.value === 'object' && state.value.callReady === "streaming"
-      ? <Button variant="destructive" onClick={stopCall}>Stop audio call</Button>
+    {typeof state.value === "object" && state.value[AudioCallMachineState.CALLING] === AudioCallMachineState.CONNECTED
+      ? <Button variant="destructive" className="h-[42px] flex items-center justify-center" onClick={stop}> End Call </Button>
       : null
     }
 
     <audio ref={audioRef} autoPlay className="hidden" />
     <p>{JSON.stringify(state.value)}</p>
 
-    {typeof state.value === 'object' && state.value.callReady === "streaming"
+    {/*{typeof state.value === 'object' && state.value.callReady === "streaming"
       ? <form
         className="flex gap-2"
         onSubmit={handleMessageSubmit}
@@ -82,7 +105,7 @@ export function AudioPage() {
         </Button>
       </form>
       : null
-    }
+    }*/}
 
   </div>
 }

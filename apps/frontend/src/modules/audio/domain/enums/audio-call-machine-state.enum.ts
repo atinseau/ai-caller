@@ -1,0 +1,7 @@
+export const AudioCallMachineState = {
+  IDLE: "IDLE",
+  INITIALIZING: "INITIALIZING",
+  CALLING: "CALLING",
+  CONNECTING: "CONNECTING",
+  CONNECTED: "CONNECTED"
+} as const

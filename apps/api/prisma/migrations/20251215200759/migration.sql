@@ -8,3 +8,6 @@ CREATE TABLE "Company" (
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");

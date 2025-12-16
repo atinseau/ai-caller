@@ -1,9 +1,12 @@
 import z, { ZodError } from "zod"
 import { HTTPException } from "hono/http-exception"
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
 import type { ErrorHandler } from "hono"
+import { PrismaClientKnownRequestError } from "@/generated/prisma/internal/prismaNamespace"
+import { logger } from "../logger"
 
 export const globalErrorHandler: ErrorHandler = (error, ctx) => {
+  logger.error(error)
+
   if (error instanceof ZodError) {
     return ctx.json(z.treeifyError(error), 400)
   }
@@ -11,7 +14,7 @@ export const globalErrorHandler: ErrorHandler = (error, ctx) => {
     return error.getResponse()
   }
 
-  if(error instanceof PrismaClientKnownRequestError) {
+  if (error instanceof PrismaClientKnownRequestError) {
     switch (error.code) {
       case 'P2002':
         return ctx.json({ message: 'Unique constraint failed', meta: error.meta }, 409)

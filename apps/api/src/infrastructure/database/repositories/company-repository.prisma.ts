@@ -2,7 +2,6 @@ import type { CompanyRepositoryPort } from "@/domain/repositories/company-reposi
 import { injectable } from "inversify";
 import { prisma } from "../prisma";
 import { CompanyMapper } from "../mappers/company.mapper";
-import type { CompanyModel } from "@/domain/models/company.model";
 
 @injectable()
 export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
@@ -24,5 +23,10 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
     })
     if (!company) return null
     return CompanyMapper.toModel(company)
+  }
+
+  async getAllCompanies() {
+    const companies = await prisma.company.findMany()
+    return companies.map(CompanyMapper.toModel)
   }
 }

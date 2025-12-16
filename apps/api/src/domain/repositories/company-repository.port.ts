@@ -14,4 +14,9 @@ export abstract class CompanyRepositoryPort {
    * @param id The id of the company to find
    */
   abstract findById(id: string): Promise<CompanyModel | null>
+
+  /**
+   * Retrieve all companies
+   */
+  abstract getAllCompanies(): Promise<CompanyModel[]>
 }

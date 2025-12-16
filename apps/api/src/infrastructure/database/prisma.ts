@@ -1,12 +1,18 @@
 import { PrismaClient } from '@/generated/prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
+import { logger } from '../logger'
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({
+    connectionString: Bun.env.DATABASE_URL,
+  })
+})
 
 try {
   await prisma.$connect()
-  console.log('Connected to the database successfully.')
+  logger.info('Connected to the database successfully.')
 } catch (error) {
-  console.error('Error connecting to the database:', error)
+  logger.error(error, 'Error connecting to the database')
   process.exit(1)
 }
 

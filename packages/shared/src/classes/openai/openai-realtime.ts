@@ -47,4 +47,14 @@ export class OpenAIRealtime {
     return response.json()
   }
 
+  public async hangups(callId: string) {
+    const response = await this.client.fetch(`/realtime/calls/${callId}/hangup`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${this.client.config.apiKey}`,
+      },
+    });
+    return response.ok;
+  }
+
 }

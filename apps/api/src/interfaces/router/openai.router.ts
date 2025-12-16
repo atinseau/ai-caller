@@ -8,10 +8,7 @@ import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.
 export const openAiRouter = new Hono()
 
 
-let token: string | null = null;
-
 openAiRouter.get('/token/:companyId', validator('param', (value) => GetCallTokenParamsDto.parse(value)), async (ctx) => {
-
   const companyRepository = container.get(CompanyRepositoryPort)
 
   try {
@@ -57,8 +54,6 @@ openAiRouter.get('/token/:companyId', validator('param', (value) => GetCallToken
       }
     })
 
-    token = data.value;
-
     return ctx.json(data);
   } catch (error) {
     console.error("Token generation error:", error);
@@ -72,6 +67,10 @@ openAiRouter.patch('/calls/:id', async (ctx) => {
 
   console.log("Initiating WebSocket connection for call ID:", id);
   console.log("Using token:", token);
+
+  const openai = new OpenAI({
+    apiKey: token || ''
+  })
 
   const ws = new WebSocket(`wss://api.openai.com/v1/realtime?call_id=${id}`, {
     headers: {
@@ -87,12 +86,16 @@ openAiRouter.patch('/calls/:id', async (ctx) => {
     console.error("WebSocket error for call ID:", id, event);
   }
 
-  ws.onmessage = (event) => {
+  ws.onmessage = async (event) => {
     const data = JSON.parse(event.data);
     console.log("Message type:", data.type);
 
     if (data.type === "response.done") {
       console.log("Received response data:", JSON.stringify(data.response.output, null, 2));
+    }
+
+    if (data.type === "output_audio_buffer.stopped") {
+      console.log("Audio streaming has stopped for call ID:", id);
     }
   }
 

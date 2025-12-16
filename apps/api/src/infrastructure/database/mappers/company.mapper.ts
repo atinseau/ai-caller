@@ -1,6 +1,7 @@
 import { randomUUIDv7 } from "bun";
 import type { CompanyModel } from "@/domain/models/company.model";
-import type { Company } from "@/prisma/client";
+import type { Company } from "@/generated/prisma/client";
+
 
 export abstract class CompanyMapper {
   static toModel(prismaCompany: Company): CompanyModel {

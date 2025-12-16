@@ -29,8 +29,8 @@
       "@/shared/*": [
         "./src/shared/*"
       ],
-      "@/adapters/*": [
-        "./src/adapters/*"
+      "@/infrastructure/*": [
+        "./src/infrastructure/*"
       ],
       "@/types/*": [
         "./src/types/*"
@@ -44,12 +44,17 @@
       "@/modules/*": [
         "./src/modules/*"
       ],
+      "@/domain/*": [
+        "./src/domain/*"
+      ],
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
-    "strict": true
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true
   }
 }
