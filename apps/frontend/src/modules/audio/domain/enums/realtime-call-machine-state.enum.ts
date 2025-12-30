@@ -1,4 +1,4 @@
-export const AudioCallMachineState = {
+export const RealtimeCallMachineState = {
   IDLE: "IDLE",
   INITIALIZING: "INITIALIZING",
   CALLING: "CALLING",

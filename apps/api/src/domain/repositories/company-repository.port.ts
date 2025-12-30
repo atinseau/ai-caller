@@ -5,9 +5,10 @@ export abstract class CompanyRepositoryPort {
   /**
    *
    * @param name Name of the company to create
-   * @param mcpServerUrl MCP server URL associated with the company
+   * @param mcpUrl MCP URL of the company to create
+   * @param mcpTestUrl Optional MCP Test URL of the company to create
    */
-  abstract createCompany(name: string, mcpServerUrl: string): Promise<CompanyModel>
+  abstract createCompany(name: string, mcpUrl: string, mcpTestUrl?: string): Promise<CompanyModel>
 
   /**
    *

@@ -1,6 +1,8 @@
 import { app } from "./interfaces/application";
 import { websocket } from "hono/bun";
 
+import './infrastructure/cron'
+
 const PORT = parseInt(Bun.env.PORT)
 if (isNaN(PORT)) {
   throw new Error("PORT environment variable must be a valid number")

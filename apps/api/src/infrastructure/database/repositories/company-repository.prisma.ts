@@ -5,10 +5,11 @@ import { CompanyMapper } from "../mappers/company.mapper";
 
 @injectable()
 export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
-  async createCompany(name: string, mcpServerUrl: string) {
+  async createCompany(name: string, mcpUrl: string, mcpTestUrl?: string) {
     const company = await prisma.company.create({
       data: CompanyMapper.toEntity({
-        mcpServerUrl,
+        mcpUrl: mcpUrl,
+        mcpTestUrl: mcpTestUrl || mcpUrl,
         name
       })
     })

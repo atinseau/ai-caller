@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
-import { AudioCallServicePort } from "../../domain/ports/audio-call-service.port";
+import { RealtimeRoomServicePort } from "../../domain/ports/realtime-room-service.port";
 
-type AudioWebRtcUseCaseParams = {
+type RealtimeWebRtcUseCaseParams = {
   audioStream: MediaStream,
   audioRef: React.RefObject<HTMLAudioElement>,
   companyId: string,
@@ -12,25 +12,37 @@ type AudioWebRtcUseCaseParams = {
 }
 
 @injectable()
-export class AudioWebRtcUseCase {
+export class RealtimeWebRtcUseCase {
   constructor(
-    @inject(AudioCallServicePort) private readonly audioCallService: AudioCallServicePort
+    @inject(RealtimeRoomServicePort) private readonly realtimeRoomServicePort: RealtimeRoomServicePort
   ) { }
 
-  async execute(params: AudioWebRtcUseCaseParams) {
+  async execute(params: RealtimeWebRtcUseCaseParams) {
     try {
-      const token = await this.audioCallService.getToken(params.companyId)
-      const pc = new RTCPeerConnection();
-      const dc = pc.createDataChannel("oai-events");
+      const { pc, dc, roomId, roomToken } = await this.realtimeRoomServicePort.createRoom(params.companyId)
 
       pc.addTrack(params.audioStream.getTracks()[0]);
-      pc.ontrack = (e) => (params.audioRef.current.srcObject = e.streams[0]);
+      pc.ontrack = (e) => (params.audioRef.current!.srcObject = e.streams[0]);
 
-      await this.audioCallService.startCall(pc, token)
+      await this.realtimeRoomServicePort.attachCallToRoom(pc, roomId, roomToken)
+
       params.onConnected(pc, dc)
     } catch (error) {
       params.onError(error as Error)
     }
+    // try {
+    //   const token = await this.audioCallService.getToken(params.companyId)
+    //   const pc = new RTCPeerConnection();
+    //   const dc = pc.createDataChannel("oai-events");
+
+    //   pc.addTrack(params.audioStream.getTracks()[0]);
+    //   pc.ontrack = (e) => (params.audioRef.current.srcObject = e.streams[0]);
+
+    //   await this.audioCallService.startCall(pc, token)
+    //   params.onConnected(pc, dc)
+    // } catch (error) {
+    //   params.onError(error as Error)
+    // }
   }
 
 }

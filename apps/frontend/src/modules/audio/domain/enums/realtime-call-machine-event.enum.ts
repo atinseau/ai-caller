@@ -1,6 +1,5 @@
 
-
-export const AudioCallMachineEvent = {
+export const RealtimeCallMachineEvent = {
   START: "START",
   CONNECTED: "CONNECTED",
   CLOSED: "CLOSED",

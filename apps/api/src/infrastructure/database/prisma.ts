@@ -4,7 +4,7 @@ import { logger } from '../logger'
 
 const prisma = new PrismaClient({
   adapter: new PrismaPg({
-    connectionString: Bun.env.DATABASE_URL,
+    connectionString: process.env.DATABASE_URL,
   })
 })
 

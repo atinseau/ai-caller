@@ -1,4 +1,4 @@
-import { CompanyUseCase } from "@/application/company.use-case";
+import { CompanyUseCase } from "@/application/use-cases/company.use-case";
 import { container } from "@/infrastructure/di/container";
 import { Hono } from "hono";
 import { CreateCompanyDto } from "../dtos/create-company.dto";

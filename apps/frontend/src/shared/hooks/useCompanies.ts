@@ -1,9 +1,9 @@
 import { Api } from "@/infrastructure/http/api";
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import type { CompanyModel } from "@ai-caller/api/types"
 
 export function useCompanies() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useSuspenseQuery({
     queryKey: ['companies'],
     queryFn: async () => {
       const api = new Api()

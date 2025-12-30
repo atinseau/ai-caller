@@ -9,7 +9,7 @@ export class CompanyUseCase {
   ) { }
 
   async create(dto: ICreateCompanyDto) {
-    return this.companyRepository.createCompany(dto.name, dto.mcpServerUrl);
+    return this.companyRepository.createCompany(dto.name, dto.mcpUrl, dto.mcpTestUrl);
   }
 
   async list() {

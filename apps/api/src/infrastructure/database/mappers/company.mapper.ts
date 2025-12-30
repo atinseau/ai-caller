@@ -8,18 +8,20 @@ export abstract class CompanyMapper {
     return {
       createdAt: prismaCompany.createdAt,
       id: prismaCompany.id,
-      mcpServerUrl: prismaCompany.mcpServerUrl,
+      mcpUrl: prismaCompany.mcpUrl,
+      mcpTestUrl: prismaCompany.mcpTestUrl,
       name: prismaCompany.name,
       updatedAt: prismaCompany.updatedAt
     }
   }
 
-  static toEntity(modelCompany: Pick<CompanyModel, 'mcpServerUrl' | 'name'>): Company {
+  static toEntity(modelCompany: Omit<CompanyModel, 'id' | 'createdAt' | 'updatedAt'>): Company {
     return {
       id: randomUUIDv7(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      mcpServerUrl: modelCompany.mcpServerUrl,
+      mcpTestUrl: modelCompany.mcpTestUrl,
+      mcpUrl: modelCompany.mcpUrl,
       name: modelCompany.name,
     }
   }

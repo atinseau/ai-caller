@@ -21,5 +21,15 @@ declare module "bun" {
     PORT: string;
     OPENAI_API_KEY: string;
     DATABASE_URL: string;
+    GOOGLE_CLIENT_ID: string;
+    GOOGLE_CLIENT_SECRET: string;
+    CLIENT_URL: string;
+    MAX_ROOM_CALL_DURATION_MINUTE: string
+  }
+}
+
+declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends Bun.Env { }
   }
 }

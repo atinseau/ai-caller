@@ -1,10 +1,10 @@
 import { AudioStreamPort } from "@/domain/audio-stream.port"
 import { Container } from "inversify"
 import { AudioStream } from "../browser/audio-stream"
-import { AudioCallMachine } from "@/modules/audio/application/machine/audio-call.machine"
-import { AudioWebRtcUseCase } from "@/modules/audio/application/use-cases/audio-webrtc.use-case"
-import { AudioCallServicePort } from "@/modules/audio/domain/ports/audio-call-service.port"
-import { AudioCallService } from "@/modules/audio/infrastructure/services/audio-call.service"
+import { RealtimeCallMachine } from "@/modules/audio/application/machine/realtime-call.machine"
+import { RealtimeWebRtcUseCase } from "@/modules/audio/application/use-cases/realtime-webrtc.use-case"
+import { RealtimeRoomServicePort } from "@/modules/audio/domain/ports/realtime-room-service.port"
+import { RealtimeOpenAiRoomService } from "@/modules/audio/application/services/realtime-openai-room.service"
 
 export const container = new Container()
 
@@ -14,11 +14,11 @@ container.bind(AudioStreamPort).to(AudioStream).inSingletonScope()
 // ----------------------------------------------------
 
 // Ports
-container.bind(AudioCallServicePort).to(AudioCallService).inSingletonScope()
+container.bind(RealtimeRoomServicePort).to(RealtimeOpenAiRoomService).inSingletonScope()
 
 // Use Cases
-container.bind(AudioCallMachine).toSelf().inSingletonScope()
-container.bind(AudioWebRtcUseCase).toSelf().inSingletonScope()
+container.bind(RealtimeCallMachine).toSelf().inSingletonScope()
+container.bind(RealtimeWebRtcUseCase).toSelf().inSingletonScope()
 
 
 // ----------------------------------------------------

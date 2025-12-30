@@ -20,4 +20,15 @@ export class Api {
       ...options,
     });
   }
+
+  post(path: string, body?: any, options?: Omit<RequestInit, 'method' | 'body'>) {
+    return fetch(`${this.baseUrl}${path}`, {
+      method: 'POST',
+      body: JSON.stringify(body),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      ...options,
+    });
+  }
 }

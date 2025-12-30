@@ -1,26 +1,25 @@
-import { useAudioCall } from "@/modules/audio/ui/hooks/useAudioCall"
 import { Button } from "@/shared/components/ui/button"
 import { useRef, type RefObject } from "react"
-import { AudioCallMachineState } from "../../domain/enums/audio-call-machine-state.enum"
-import { AudioCallMachineEvent } from "../../domain/enums/audio-call-machine-event.enum"
 import { useCompanies } from "@/shared/hooks/useCompanies"
+import { useRealtimeCall } from "../hooks/useRealtimeCall"
+import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum"
 
-export function AudioPage() {
+export function RealtimeCallPage() {
   const { companies, isLoading } = useCompanies()
 
   const audioRef = useRef<HTMLAudioElement>(null)
-  const { start, stop, state } = useAudioCall(audioRef as RefObject<HTMLAudioElement>)
+  const { start, stop, state, sendMessage } = useRealtimeCall(audioRef as RefObject<HTMLAudioElement>)
 
-  // const handleMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault()
-  //   const form = e.target as HTMLFormElement
-  //   const input = form.elements.namedItem("message") as HTMLInputElement
-  //   const message = input.value.trim()
-  //   if (message) {
-  //     sendMessage(message)
-  //     input.value = ""
-  //   }
-  // }
+  const handleMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    const form = e.target as HTMLFormElement
+    const input = form.elements.namedItem("message") as HTMLInputElement
+    const message = input.value.trim()
+    if (message) {
+      sendMessage(message)
+      input.value = ""
+    }
+  }
 
   const handleCompanyIdSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -37,8 +36,8 @@ export function AudioPage() {
     input.value = ""
   }
 
-  return <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
 
+  return <div className="min-h-screen flex flex-col items-center justify-center gap-4 p-4">
     {isLoading
       ? <p>Loading companies...</p>
       : <div>
@@ -58,7 +57,7 @@ export function AudioPage() {
       </div>
     }
 
-    {typeof state.value === 'string' && state.value === AudioCallMachineState.IDLE
+    {typeof state.value === 'string' && state.value === RealtimeCallMachineState.IDLE
       ? <form className="flex gap-2" onSubmit={handleCompanyIdSubmit}>
         <input
           name="companyId"
@@ -77,7 +76,8 @@ export function AudioPage() {
       : null
     }
 
-    {typeof state.value === "object" && state.value[AudioCallMachineState.CALLING] === AudioCallMachineState.CONNECTED
+
+    {typeof state.value === "object" && state.value[RealtimeCallMachineState.CALLING] === RealtimeCallMachineState.CONNECTED
       ? <Button variant="destructive" className="h-[42px] flex items-center justify-center" onClick={stop}> End Call </Button>
       : null
     }
@@ -85,7 +85,7 @@ export function AudioPage() {
     <audio ref={audioRef} autoPlay className="hidden" />
     <p>{JSON.stringify(state.value)}</p>
 
-    {/*{typeof state.value === 'object' && state.value.callReady === "streaming"
+    {typeof state.value === 'object' && state.value[RealtimeCallMachineState.CALLING] === RealtimeCallMachineState.CONNECTED
       ? <form
         className="flex gap-2"
         onSubmit={handleMessageSubmit}
@@ -105,7 +105,7 @@ export function AudioPage() {
         </Button>
       </form>
       : null
-    }*/}
+    }
 
   </div>
 }
