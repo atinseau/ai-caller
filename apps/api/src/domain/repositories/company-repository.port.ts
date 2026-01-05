@@ -1,14 +1,13 @@
-import { CompanyModel } from "@/domain/models/company.model"
+import type { CompanyModel } from "@/domain/models/company.model"
+import type { CompanyMapper } from "@/infrastructure/database/mappers/company.mapper";
 
 export abstract class CompanyRepositoryPort {
 
   /**
    *
-   * @param name Name of the company to create
-   * @param mcpUrl MCP URL of the company to create
-   * @param mcpTestUrl Optional MCP Test URL of the company to create
+   * @param companyEntity The company entity to create
    */
-  abstract createCompany(name: string, mcpUrl: string, mcpTestUrl?: string): Promise<CompanyModel>
+  abstract createCompany(companyEntity: Parameters<typeof CompanyMapper['toEntity']>[0]): Promise<CompanyModel>
 
   /**
    *

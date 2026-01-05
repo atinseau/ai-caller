@@ -13,18 +13,6 @@ datasource db {
   provider = "postgresql"
 }
 
-model Company {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  mcpUrl String
-  mcpTestUrl String
-
-  rooms     Room[]
-}
-
 model User {
   id            String    @id
   name          String
@@ -88,6 +76,23 @@ model Verification {
   @@map("verification")
 }
 
+//
+// ----------------------------------
+//
+
+model Company {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  mcpUrl String
+  mcpTestUrl String
+
+  promptId String
+
+  rooms     Room[]
+}
 
 model Room {
     id          String   @id @default(uuid())

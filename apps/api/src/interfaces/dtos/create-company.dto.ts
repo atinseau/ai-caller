@@ -3,6 +3,7 @@ import z from "zod";
 export const CreateCompanyDto = z.object({
   name: z.string(),
   mcpUrl: z.url(),
+  promptId: z.string(),
   mcpTestUrl: z.url().optional(),
 })
 

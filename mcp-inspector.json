@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "n8n-test": {
+      "type": "sse",
+      "url": "http://localhost:5678/mcp/56e31f2d-26dd-4251-9651-46409f24c14d"
+    }
+  }
+}

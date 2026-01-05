@@ -7,9 +7,9 @@ export default function HomeRoute() {
   const { signIn } = authClient
   const { data, isPending } = authClient.useSession()
 
-  return <div>
+  return <div className="flex flex-col gap-2 w-fit">
     <p>salut</p>
-    <Link to="/audio">Go to audio</Link>
+    <Link to="/realtime-call">Go to realtime call</Link>
 
     {isPending && <p>Loading...</p>}
 
