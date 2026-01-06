@@ -1,8 +1,8 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
+import devtoolsJson from "vite-plugin-devtools-json";
 import tsconfigPaths from "vite-tsconfig-paths";
-import devtoolsJson from 'vite-plugin-devtools-json';
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT) : undefined;
 if (!PORT) {
@@ -10,20 +10,15 @@ if (!PORT) {
 }
 
 export default defineConfig({
-  ...process.env.ENV === "production" && {
+  ...(process.env.ENV === "production" && {
     resolve: {
       alias: {
-        'react-dom/server': 'react-dom/server.node',
+        "react-dom/server": "react-dom/server.node",
       },
     },
-  },
+  }),
   server: {
     port: PORT,
   },
-  plugins: [
-    tailwindcss(),
-    reactRouter(),
-    tsconfigPaths(),
-    devtoolsJson(),
-  ],
+  plugins: [tailwindcss(), reactRouter(), tsconfigPaths(), devtoolsJson()],
 });

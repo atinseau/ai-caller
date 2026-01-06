@@ -1,8 +1,7 @@
-import dayjs from "dayjs";
 import { randomUUIDv7 } from "bun";
-import type { Room } from "@/generated/prisma/client";
+import dayjs from "dayjs";
 import type { RoomModel } from "@/domain/models/room.model";
-
+import type { Room } from "@/generated/prisma/client";
 
 export abstract class RoomMapper {
   static toModel(prismaRoom: Room): RoomModel {
@@ -13,14 +12,22 @@ export abstract class RoomMapper {
       expiresAt: prismaRoom.expiresAt,
       updatedAt: prismaRoom.updatedAt,
       createdAt: prismaRoom.createdAt,
-      token: prismaRoom.token
-    }
+      token: prismaRoom.token,
+    };
   }
 
-  static toEntity(modelRoom: Omit<RoomModel, 'id' | 'createdAt' | 'updatedAt' | 'expiresAt'> & {
-    expiresAt?: Date
-  }): Room {
-    const maxDurationMinutes = parseInt(Bun.env.MAX_ROOM_CALL_DURATION_MINUTE, 10);
+  static toEntity(
+    modelRoom: Omit<
+      RoomModel,
+      "id" | "createdAt" | "updatedAt" | "expiresAt"
+    > & {
+      expiresAt?: Date;
+    },
+  ): Room {
+    const maxDurationMinutes = parseInt(
+      Bun.env.MAX_ROOM_CALL_DURATION_MINUTE,
+      10,
+    );
     const now = dayjs();
     const maxAllowedExpiry = now.add(maxDurationMinutes, "minute");
 
@@ -28,7 +35,7 @@ export abstract class RoomMapper {
       ? maxAllowedExpiry.toDate()
       : dayjs(modelRoom.expiresAt).isBefore(maxAllowedExpiry)
         ? modelRoom.expiresAt
-        : maxAllowedExpiry.toDate()
+        : maxAllowedExpiry.toDate();
 
     return {
       id: randomUUIDv7(),
@@ -37,7 +44,7 @@ export abstract class RoomMapper {
       updatedAt: new Date(),
       expiresAt,
       callId: modelRoom.callId || null,
-      token: modelRoom.token
-    }
+      token: modelRoom.token,
+    };
   }
 }

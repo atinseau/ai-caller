@@ -1,23 +1,21 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
+  readonly VITE_API_URL: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+  readonly env: ImportMetaEnv;
 }
-
 
 declare function registerProcessor(
   name: string,
   processorCtor: (new (
-    options?: AudioWorkletNodeOptions
+    options?: AudioWorkletNodeOptions,
   ) => AudioWorkletProcessor) & {
     parameterDescriptors?: AudioParamDescriptor[];
-  }
+  },
 ): undefined;
-
 
 declare class AudioWorkletProcessor {
   _buffer: Int16Array[];
@@ -27,6 +25,6 @@ declare class AudioWorkletProcessor {
   process(
     inputs: Float32Array[][],
     outputs: Float32Array[][],
-    parameters: Record<string, Float32Array>
+    parameters: Record<string, Float32Array>,
   ): boolean;
 }

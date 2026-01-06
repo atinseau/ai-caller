@@ -1,7 +1,3 @@
 import z from "zod";
 
-
-
-export const ToolInvokeDto = z.object({
-
-})
+export const ToolInvokeDto = z.object({});

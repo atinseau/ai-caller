@@ -1,5 +1,5 @@
-import { isRouteErrorResponse } from "react-router";
 import { useState } from "react";
+import { isRouteErrorResponse } from "react-router";
 
 export function GenericErrorBoundary({ error }: { error: unknown }) {
   const [open, setOpen] = useState(true);
@@ -27,5 +27,5 @@ export function GenericErrorBoundary({ error }: { error: unknown }) {
 
   if (!open) return null;
 
-  return <p>salut</p>
+  return <p>salut</p>;
 }

@@ -1,27 +1,35 @@
 import { Hono } from "hono";
 import { validator } from "hono/validator";
-import { container } from "@/infrastructure/di/container";
-import { CreateRoomParamsDto } from "../dtos/create-room-params.dto";
 import { RoomUseCase } from "@/application/use-cases/room.use-case";
+import { container } from "@/infrastructure/di/container";
 import { AttachCallToRoomDto } from "../dtos/attach-call-to-room.dto";
+import { CreateRoomParamsDto } from "../dtos/create-room-params.dto";
 
-export const roomRouter = new Hono()
+export const roomRouter = new Hono();
 
-roomRouter.post('/create', validator('json', (value) => CreateRoomParamsDto.parse(value)), async (ctx) => {
-  const roomUseCase = container.get(RoomUseCase)
-  return ctx.json({
-    message: 'Room created successfully',
-    data: await roomUseCase.createRoom(ctx.req.valid('json'))
-  })
-})
+roomRouter.post(
+  "/create",
+  validator("json", (value) => CreateRoomParamsDto.parse(value)),
+  async (ctx) => {
+    const roomUseCase = container.get(RoomUseCase);
+    return ctx.json({
+      message: "Room created successfully",
+      data: await roomUseCase.createRoom(ctx.req.valid("json")),
+    });
+  },
+);
 
-roomRouter.patch('/:roomId/attach/:id', validator('param', (value) => AttachCallToRoomDto.parse(value)), async (ctx) => {
-  const roomUseCase = container.get(RoomUseCase)
-  await roomUseCase.attachCallToRoom(ctx.req.valid('param'))
-  return ctx.json({
-    message: 'Call attached to room successfully'
-  })
-})
+roomRouter.patch(
+  "/:roomId/attach/:id",
+  validator("param", (value) => AttachCallToRoomDto.parse(value)),
+  async (ctx) => {
+    const roomUseCase = container.get(RoomUseCase);
+    await roomUseCase.attachCallToRoom(ctx.req.valid("param"));
+    return ctx.json({
+      message: "Call attached to room successfully",
+    });
+  },
+);
 
 // export const openAiRouter = new Hono()
 

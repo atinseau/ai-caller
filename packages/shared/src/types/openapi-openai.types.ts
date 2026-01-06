@@ -3686,7 +3686,9 @@ export interface components {
       metadata: components["schemas"]["Metadata"];
       temperature?: number | null;
       top_p?: number | null;
-      response_format?: components["schemas"]["AssistantsApiResponseFormatOption"] | null;
+      response_format?:
+        | components["schemas"]["AssistantsApiResponseFormatOption"]
+        | null;
     };
     /**
      * @description Represents an event emitted when streaming a Run.
@@ -3709,9 +3711,56 @@ export interface components {
      *     in your code. See the [Assistants API quickstart](https://platform.openai.com/docs/assistants/overview) to learn how to
      *     integrate the Assistants API with streaming.
      */
-    AssistantStreamEvent: components["schemas"]["ThreadStreamEvent"] | components["schemas"]["RunStreamEvent"] | components["schemas"]["RunStepStreamEvent"] | components["schemas"]["MessageStreamEvent"] | components["schemas"]["ErrorEvent"];
+    AssistantStreamEvent:
+      | components["schemas"]["ThreadStreamEvent"]
+      | components["schemas"]["RunStreamEvent"]
+      | components["schemas"]["RunStepStreamEvent"]
+      | components["schemas"]["MessageStreamEvent"]
+      | components["schemas"]["ErrorEvent"];
     /** @enum {string} */
-    AssistantSupportedModels: "gpt-5" | "gpt-5-mini" | "gpt-5-nano" | "gpt-5-2025-08-07" | "gpt-5-mini-2025-08-07" | "gpt-5-nano-2025-08-07" | "gpt-4.1" | "gpt-4.1-mini" | "gpt-4.1-nano" | "gpt-4.1-2025-04-14" | "gpt-4.1-mini-2025-04-14" | "gpt-4.1-nano-2025-04-14" | "o3-mini" | "o3-mini-2025-01-31" | "o1" | "o1-2024-12-17" | "gpt-4o" | "gpt-4o-2024-11-20" | "gpt-4o-2024-08-06" | "gpt-4o-2024-05-13" | "gpt-4o-mini" | "gpt-4o-mini-2024-07-18" | "gpt-4.5-preview" | "gpt-4.5-preview-2025-02-27" | "gpt-4-turbo" | "gpt-4-turbo-2024-04-09" | "gpt-4-0125-preview" | "gpt-4-turbo-preview" | "gpt-4-1106-preview" | "gpt-4-vision-preview" | "gpt-4" | "gpt-4-0314" | "gpt-4-0613" | "gpt-4-32k" | "gpt-4-32k-0314" | "gpt-4-32k-0613" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-1106" | "gpt-3.5-turbo-0125" | "gpt-3.5-turbo-16k-0613";
+    AssistantSupportedModels:
+      | "gpt-5"
+      | "gpt-5-mini"
+      | "gpt-5-nano"
+      | "gpt-5-2025-08-07"
+      | "gpt-5-mini-2025-08-07"
+      | "gpt-5-nano-2025-08-07"
+      | "gpt-4.1"
+      | "gpt-4.1-mini"
+      | "gpt-4.1-nano"
+      | "gpt-4.1-2025-04-14"
+      | "gpt-4.1-mini-2025-04-14"
+      | "gpt-4.1-nano-2025-04-14"
+      | "o3-mini"
+      | "o3-mini-2025-01-31"
+      | "o1"
+      | "o1-2024-12-17"
+      | "gpt-4o"
+      | "gpt-4o-2024-11-20"
+      | "gpt-4o-2024-08-06"
+      | "gpt-4o-2024-05-13"
+      | "gpt-4o-mini"
+      | "gpt-4o-mini-2024-07-18"
+      | "gpt-4.5-preview"
+      | "gpt-4.5-preview-2025-02-27"
+      | "gpt-4-turbo"
+      | "gpt-4-turbo-2024-04-09"
+      | "gpt-4-0125-preview"
+      | "gpt-4-turbo-preview"
+      | "gpt-4-1106-preview"
+      | "gpt-4-vision-preview"
+      | "gpt-4"
+      | "gpt-4-0314"
+      | "gpt-4-0613"
+      | "gpt-4-32k"
+      | "gpt-4-32k-0314"
+      | "gpt-4-32k-0613"
+      | "gpt-3.5-turbo"
+      | "gpt-3.5-turbo-16k"
+      | "gpt-3.5-turbo-0613"
+      | "gpt-3.5-turbo-1106"
+      | "gpt-3.5-turbo-0125"
+      | "gpt-3.5-turbo-16k-0613";
     /** Code interpreter tool */
     AssistantToolsCode: {
       /**
@@ -3764,7 +3813,11 @@ export interface components {
      *
      *     **Important:** when using JSON mode, you **must** also instruct the model to produce JSON yourself via a system or user message. Without this, the model may generate an unending stream of whitespace until the generation reaches the token limit, resulting in a long-running and seemingly "stuck" request. Also note that the message content may be partially cut off if `finish_reason="length"`, which indicates the generation exceeded `max_tokens` or the conversation exceeded the max context length.
      */
-    AssistantsApiResponseFormatOption: "auto" | components["schemas"]["ResponseFormatText"] | components["schemas"]["ResponseFormatJsonObject"] | components["schemas"]["ResponseFormatJsonSchema"];
+    AssistantsApiResponseFormatOption:
+      | "auto"
+      | components["schemas"]["ResponseFormatText"]
+      | components["schemas"]["ResponseFormatJsonObject"]
+      | components["schemas"]["ResponseFormatJsonSchema"];
     /**
      * @description Controls which (if any) tool is called by the model.
      *     `none` means the model will not call any tools and instead generates a message.
@@ -3772,7 +3825,9 @@ export interface components {
      *     `required` means the model must call one or more tools before responding to the user.
      *     Specifying a particular tool like `{"type": "file_search"}` or `{"type": "function", "function": {"name": "my_function"}}` forces the model to call that tool.
      */
-    AssistantsApiToolChoiceOption: ("none" | "auto" | "required") | components["schemas"]["AssistantsNamedToolChoice"];
+    AssistantsApiToolChoiceOption:
+      | ("none" | "auto" | "required")
+      | components["schemas"]["AssistantsNamedToolChoice"];
     /** @description Specifies a tool the model should use. Use to force the model to call a specific tool. */
     AssistantsNamedToolChoice: {
       /**
@@ -3790,13 +3845,23 @@ export interface components {
      * @default json
      * @enum {string}
      */
-    AudioResponseFormat: "json" | "text" | "srt" | "verbose_json" | "vtt" | "diarized_json";
+    AudioResponseFormat:
+      | "json"
+      | "text"
+      | "srt"
+      | "verbose_json"
+      | "vtt"
+      | "diarized_json";
     AudioTranscription: {
       /**
        * @description The model to use for transcription. Current options are `whisper-1`, `gpt-4o-mini-transcribe`, `gpt-4o-transcribe`, and `gpt-4o-transcribe-diarize`. Use `gpt-4o-transcribe-diarize` when you need diarization with speaker labels.
        * @enum {string}
        */
-      model?: "whisper-1" | "gpt-4o-mini-transcribe" | "gpt-4o-transcribe" | "gpt-4o-transcribe-diarize";
+      model?:
+        | "whisper-1"
+        | "gpt-4o-mini-transcribe"
+        | "gpt-4o-transcribe"
+        | "gpt-4o-transcribe-diarize";
       /**
        * @description The language of the input audio. Supplying the input language in
        *     [ISO-639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) (e.g. `en`) format
@@ -4281,7 +4346,55 @@ export interface components {
      * @description The event type.
      * @enum {string}
      */
-    AuditLogEventType: "api_key.created" | "api_key.updated" | "api_key.deleted" | "certificate.created" | "certificate.updated" | "certificate.deleted" | "certificates.activated" | "certificates.deactivated" | "checkpoint.permission.created" | "checkpoint.permission.deleted" | "external_key.registered" | "external_key.removed" | "group.created" | "group.updated" | "group.deleted" | "invite.sent" | "invite.accepted" | "invite.deleted" | "ip_allowlist.created" | "ip_allowlist.updated" | "ip_allowlist.deleted" | "ip_allowlist.config.activated" | "ip_allowlist.config.deactivated" | "login.succeeded" | "login.failed" | "logout.succeeded" | "logout.failed" | "organization.updated" | "project.created" | "project.updated" | "project.archived" | "project.deleted" | "rate_limit.updated" | "rate_limit.deleted" | "resource.deleted" | "role.created" | "role.updated" | "role.deleted" | "role.assignment.created" | "role.assignment.deleted" | "scim.enabled" | "scim.disabled" | "service_account.created" | "service_account.updated" | "service_account.deleted" | "user.added" | "user.updated" | "user.deleted";
+    AuditLogEventType:
+      | "api_key.created"
+      | "api_key.updated"
+      | "api_key.deleted"
+      | "certificate.created"
+      | "certificate.updated"
+      | "certificate.deleted"
+      | "certificates.activated"
+      | "certificates.deactivated"
+      | "checkpoint.permission.created"
+      | "checkpoint.permission.deleted"
+      | "external_key.registered"
+      | "external_key.removed"
+      | "group.created"
+      | "group.updated"
+      | "group.deleted"
+      | "invite.sent"
+      | "invite.accepted"
+      | "invite.deleted"
+      | "ip_allowlist.created"
+      | "ip_allowlist.updated"
+      | "ip_allowlist.deleted"
+      | "ip_allowlist.config.activated"
+      | "ip_allowlist.config.deactivated"
+      | "login.succeeded"
+      | "login.failed"
+      | "logout.succeeded"
+      | "logout.failed"
+      | "organization.updated"
+      | "project.created"
+      | "project.updated"
+      | "project.archived"
+      | "project.deleted"
+      | "rate_limit.updated"
+      | "rate_limit.deleted"
+      | "resource.deleted"
+      | "role.created"
+      | "role.updated"
+      | "role.deleted"
+      | "role.assignment.created"
+      | "role.assignment.deleted"
+      | "scim.enabled"
+      | "scim.disabled"
+      | "service_account.created"
+      | "service_account.updated"
+      | "service_account.deleted"
+      | "user.added"
+      | "user.updated"
+      | "user.deleted";
     /**
      * Auto Chunking Strategy
      * @description The default strategy. This strategy currently uses a `max_chunk_size_tokens` of `800` and `chunk_overlap_tokens` of `400`.
@@ -4322,7 +4435,15 @@ export interface components {
        * @description The current status of the batch.
        * @enum {string}
        */
-      status: "validating" | "failed" | "in_progress" | "finalizing" | "completed" | "expired" | "cancelling" | "cancelled";
+      status:
+        | "validating"
+        | "failed"
+        | "in_progress"
+        | "finalizing"
+        | "completed"
+        | "expired"
+        | "cancelling"
+        | "cancelled";
       /** @description The ID of the file containing the outputs of successfully executed requests. */
       output_file_id?: string;
       /** @description The ID of the file containing the outputs of requests with errors. */
@@ -4438,7 +4559,10 @@ export interface components {
        *     - If listing, activating, or deactivating certificates for a project, the object type is `organization.project.certificate`.
        * @enum {string}
        */
-      object: "certificate" | "organization.certificate" | "organization.project.certificate";
+      object:
+        | "certificate"
+        | "organization.certificate"
+        | "organization.project.certificate";
       /** @description The identifier, which can be referenced in API endpoints */
       id: string;
       /** @description The name of the certificate. */
@@ -4577,7 +4701,12 @@ export interface components {
       data: (components["schemas"]["ChatCompletionResponseMessage"] & {
         /** @description The identifier of the chat message. */
         id: string;
-        content_parts?: (components["schemas"]["ChatCompletionRequestMessageContentPartText"] | components["schemas"]["ChatCompletionRequestMessageContentPartImage"])[] | null;
+        content_parts?:
+          | (
+              | components["schemas"]["ChatCompletionRequestMessageContentPartText"]
+              | components["schemas"]["ChatCompletionRequestMessageContentPartImage"]
+            )[]
+          | null;
       })[];
       /** @description The identifier of the first chat message in the data array. */
       first_id: string;
@@ -4623,7 +4752,10 @@ export interface components {
       };
     };
     /** @description The tool calls generated by the model, such as function calls. */
-    ChatCompletionMessageToolCalls: (components["schemas"]["ChatCompletionMessageToolCall"] | components["schemas"]["ChatCompletionMessageCustomToolCall"])[];
+    ChatCompletionMessageToolCalls: (
+      | components["schemas"]["ChatCompletionMessageToolCall"]
+      | components["schemas"]["ChatCompletionMessageCustomToolCall"]
+    )[];
     ChatCompletionModalities: ("text" | "audio")[] | null;
     /**
      * Function tool choice
@@ -4660,7 +4792,12 @@ export interface components {
      * @description Messages sent by the model in response to user messages.
      */
     ChatCompletionRequestAssistantMessage: {
-      content?: (string | components["schemas"]["ChatCompletionRequestAssistantMessageContentPart"][]) | null;
+      content?:
+        | (
+            | string
+            | components["schemas"]["ChatCompletionRequestAssistantMessageContentPart"][]
+          )
+        | null;
       refusal?: string | null;
       /**
        * @description The role of the messages author, in this case `assistant`.
@@ -4681,7 +4818,9 @@ export interface components {
         name: string;
       } | null;
     };
-    ChatCompletionRequestAssistantMessageContentPart: components["schemas"]["ChatCompletionRequestMessageContentPartText"] | components["schemas"]["ChatCompletionRequestMessageContentPartRefusal"];
+    ChatCompletionRequestAssistantMessageContentPart:
+      | components["schemas"]["ChatCompletionRequestMessageContentPartText"]
+      | components["schemas"]["ChatCompletionRequestMessageContentPartRefusal"];
     /**
      * Developer message
      * @description Developer-provided instructions that the model should follow, regardless of
@@ -4690,7 +4829,9 @@ export interface components {
      */
     ChatCompletionRequestDeveloperMessage: {
       /** @description The contents of the developer message. */
-      content: string | components["schemas"]["ChatCompletionRequestMessageContentPartText"][];
+      content:
+        | string
+        | components["schemas"]["ChatCompletionRequestMessageContentPartText"][];
       /**
        * @description The role of the messages author, in this case `developer`.
        * @enum {string}
@@ -4713,7 +4854,13 @@ export interface components {
       /** @description The name of the function to call. */
       name: string;
     };
-    ChatCompletionRequestMessage: components["schemas"]["ChatCompletionRequestDeveloperMessage"] | components["schemas"]["ChatCompletionRequestSystemMessage"] | components["schemas"]["ChatCompletionRequestUserMessage"] | components["schemas"]["ChatCompletionRequestAssistantMessage"] | components["schemas"]["ChatCompletionRequestToolMessage"] | components["schemas"]["ChatCompletionRequestFunctionMessage"];
+    ChatCompletionRequestMessage:
+      | components["schemas"]["ChatCompletionRequestDeveloperMessage"]
+      | components["schemas"]["ChatCompletionRequestSystemMessage"]
+      | components["schemas"]["ChatCompletionRequestUserMessage"]
+      | components["schemas"]["ChatCompletionRequestAssistantMessage"]
+      | components["schemas"]["ChatCompletionRequestToolMessage"]
+      | components["schemas"]["ChatCompletionRequestFunctionMessage"];
     /**
      * Audio content part
      * @description Learn about [audio inputs](https://platform.openai.com/docs/guides/audio).
@@ -4814,7 +4961,9 @@ export interface components {
      */
     ChatCompletionRequestSystemMessage: {
       /** @description The contents of the system message. */
-      content: string | components["schemas"]["ChatCompletionRequestSystemMessageContentPart"][];
+      content:
+        | string
+        | components["schemas"]["ChatCompletionRequestSystemMessageContentPart"][];
       /**
        * @description The role of the messages author, in this case `system`.
        * @enum {string}
@@ -4832,7 +4981,9 @@ export interface components {
        */
       role: "tool";
       /** @description The contents of the tool message. */
-      content: string | components["schemas"]["ChatCompletionRequestToolMessageContentPart"][];
+      content:
+        | string
+        | components["schemas"]["ChatCompletionRequestToolMessageContentPart"][];
       /** @description Tool call that this message is responding to. */
       tool_call_id: string;
     };
@@ -4844,7 +4995,9 @@ export interface components {
      */
     ChatCompletionRequestUserMessage: {
       /** @description The contents of the user message. */
-      content: string | components["schemas"]["ChatCompletionRequestUserMessageContentPart"][];
+      content:
+        | string
+        | components["schemas"]["ChatCompletionRequestUserMessageContentPart"][];
       /**
        * @description The role of the messages author, in this case `user`.
        * @enum {string}
@@ -4853,7 +5006,11 @@ export interface components {
       /** @description An optional name for the participant. Provides the model information to differentiate between participants of the same role. */
       name?: string;
     };
-    ChatCompletionRequestUserMessageContentPart: components["schemas"]["ChatCompletionRequestMessageContentPartText"] | components["schemas"]["ChatCompletionRequestMessageContentPartImage"] | components["schemas"]["ChatCompletionRequestMessageContentPartAudio"] | components["schemas"]["ChatCompletionRequestMessageContentPartFile"];
+    ChatCompletionRequestUserMessageContentPart:
+      | components["schemas"]["ChatCompletionRequestMessageContentPartText"]
+      | components["schemas"]["ChatCompletionRequestMessageContentPartImage"]
+      | components["schemas"]["ChatCompletionRequestMessageContentPartAudio"]
+      | components["schemas"]["ChatCompletionRequestMessageContentPartFile"];
     /** @description A chat completion message generated by the model. */
     ChatCompletionResponseMessage: {
       content: string | null;
@@ -4918,7 +5075,13 @@ export interface components {
      * @description The role of the author of a message
      * @enum {string}
      */
-    ChatCompletionRole: "developer" | "system" | "user" | "assistant" | "tool" | "function";
+    ChatCompletionRole:
+      | "developer"
+      | "system"
+      | "user"
+      | "assistant"
+      | "tool"
+      | "function";
     ChatCompletionStreamOptions: {
       /**
        * @description If set, an additional chunk will be streamed before the `data: [DONE]`
@@ -4999,9 +5162,15 @@ export interface components {
      *
      *     `none` is the default when no tools are present. `auto` is the default if tools are present.
      */
-    ChatCompletionToolChoiceOption: ("none" | "auto" | "required") | components["schemas"]["ChatCompletionAllowedToolsChoice"] | components["schemas"]["ChatCompletionNamedToolChoice"] | components["schemas"]["ChatCompletionNamedToolChoiceCustom"];
+    ChatCompletionToolChoiceOption:
+      | ("none" | "auto" | "required")
+      | components["schemas"]["ChatCompletionAllowedToolsChoice"]
+      | components["schemas"]["ChatCompletionNamedToolChoice"]
+      | components["schemas"]["ChatCompletionNamedToolChoiceCustom"];
     /** @description The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy. Only applicable if `file_ids` is non-empty. */
-    ChunkingStrategyRequestParam: components["schemas"]["AutoChunkingStrategyRequestParam"] | components["schemas"]["StaticChunkingStrategyRequestParam"];
+    ChunkingStrategyRequestParam:
+      | components["schemas"]["AutoChunkingStrategyRequestParam"]
+      | components["schemas"]["StaticChunkingStrategyRequestParam"];
     /**
      * Code interpreter file output
      * @description The output of a code interpreter tool call that is a file.
@@ -5065,11 +5234,21 @@ export interface components {
        * @description The status of the code interpreter tool call. Valid values are `in_progress`, `completed`, `incomplete`, `interpreting`, and `failed`.
        * @enum {string}
        */
-      status: "in_progress" | "completed" | "incomplete" | "interpreting" | "failed";
+      status:
+        | "in_progress"
+        | "completed"
+        | "incomplete"
+        | "interpreting"
+        | "failed";
       /** @description The ID of the container used to run the code. */
       container_id: string;
       code: string | null;
-      outputs: (components["schemas"]["CodeInterpreterOutputLogs"] | components["schemas"]["CodeInterpreterOutputImage"])[] | null;
+      outputs:
+        | (
+            | components["schemas"]["CodeInterpreterOutputLogs"]
+            | components["schemas"]["CodeInterpreterOutputImage"]
+          )[]
+        | null;
     };
     /**
      * Comparison Filter
@@ -5093,7 +5272,11 @@ export interface components {
       /** @description The key to compare against the value. */
       key: string;
       /** @description The value to compare against the attribute key; supports string, number, or boolean types. */
-      value: string | number | boolean | components["schemas"]["ComparisonFilterValueItems"][];
+      value:
+        | string
+        | number
+        | boolean
+        | components["schemas"]["ComparisonFilterValueItems"][];
     };
     CompleteUploadRequest: {
       /** @description The ordered list of Part IDs. */
@@ -5173,7 +5356,16 @@ export interface components {
       /** @description Array of filters to combine. Items can be `ComparisonFilter` or `CompoundFilter`. */
       filters: (components["schemas"]["ComparisonFilter"] | unknown)[];
     };
-    ComputerAction: components["schemas"]["ClickParam"] | components["schemas"]["DoubleClickAction"] | components["schemas"]["Drag"] | components["schemas"]["KeyPressAction"] | components["schemas"]["Move"] | components["schemas"]["Screenshot"] | components["schemas"]["Scroll"] | components["schemas"]["Type"] | components["schemas"]["Wait"];
+    ComputerAction:
+      | components["schemas"]["ClickParam"]
+      | components["schemas"]["DoubleClickAction"]
+      | components["schemas"]["Drag"]
+      | components["schemas"]["KeyPressAction"]
+      | components["schemas"]["Move"]
+      | components["schemas"]["Screenshot"]
+      | components["schemas"]["Scroll"]
+      | components["schemas"]["Type"]
+      | components["schemas"]["Wait"];
     /** @description A computer screenshot image used with the computer use tool. */
     ComputerScreenshotImage: {
       /**
@@ -5324,14 +5516,34 @@ export interface components {
       };
     };
     /** @description Multi-modal input and output contents. */
-    Content: components["schemas"]["InputContent"] | components["schemas"]["OutputContent"];
+    Content:
+      | components["schemas"]["InputContent"]
+      | components["schemas"]["OutputContent"];
     /** The conversation object */
     Conversation: components["schemas"]["ConversationResource"];
     /**
      * Conversation item
      * @description A single item within a conversation. The set of possible types are the same as the `output` type of a [Response object](https://platform.openai.com/docs/api-reference/responses/object#responses/object-output).
      */
-    ConversationItem: components["schemas"]["Message"] | components["schemas"]["FunctionToolCallResource"] | components["schemas"]["FunctionToolCallOutputResource"] | components["schemas"]["FileSearchToolCall"] | components["schemas"]["WebSearchToolCall"] | components["schemas"]["ImageGenToolCall"] | components["schemas"]["ComputerToolCall"] | components["schemas"]["ComputerToolCallOutputResource"] | components["schemas"]["ReasoningItem"] | components["schemas"]["CodeInterpreterToolCall"] | components["schemas"]["LocalShellToolCall"] | components["schemas"]["LocalShellToolCallOutput"] | components["schemas"]["MCPListTools"] | components["schemas"]["MCPApprovalRequest"] | components["schemas"]["MCPApprovalResponseResource"] | components["schemas"]["MCPToolCall"] | components["schemas"]["CustomToolCall"] | components["schemas"]["CustomToolCallOutput"];
+    ConversationItem:
+      | components["schemas"]["Message"]
+      | components["schemas"]["FunctionToolCallResource"]
+      | components["schemas"]["FunctionToolCallOutputResource"]
+      | components["schemas"]["FileSearchToolCall"]
+      | components["schemas"]["WebSearchToolCall"]
+      | components["schemas"]["ImageGenToolCall"]
+      | components["schemas"]["ComputerToolCall"]
+      | components["schemas"]["ComputerToolCallOutputResource"]
+      | components["schemas"]["ReasoningItem"]
+      | components["schemas"]["CodeInterpreterToolCall"]
+      | components["schemas"]["LocalShellToolCall"]
+      | components["schemas"]["LocalShellToolCallOutput"]
+      | components["schemas"]["MCPListTools"]
+      | components["schemas"]["MCPApprovalRequest"]
+      | components["schemas"]["MCPApprovalResponseResource"]
+      | components["schemas"]["MCPToolCall"]
+      | components["schemas"]["CustomToolCall"]
+      | components["schemas"]["CustomToolCallOutput"];
     /**
      * The conversation item list
      * @description A list of Conversation items.
@@ -5393,45 +5605,52 @@ export interface components {
            */
           file_ids: string[];
         };
-        file_search?: {
-          /** @description The [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) attached to this assistant. There can be a maximum of 1 vector store attached to the assistant. */
-          vector_store_ids?: string[];
-          /** @description A helper to create a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) with file_ids and attach it to this assistant. There can be a maximum of 1 vector store attached to the assistant. */
-          vector_stores?: {
-            /** @description A list of [file](https://platform.openai.com/docs/api-reference/files) IDs to add to the vector store. There can be a maximum of 10000 files in a vector store. */
-            file_ids?: string[];
-            /** @description The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy. */
-            chunking_strategy?: {
-              /**
-               * @description Always `auto`.
-               * @enum {string}
-               */
-              type: "auto";
-            } | {
-              /**
-               * @description Always `static`.
-               * @enum {string}
-               */
-              type: "static";
-              static: {
-                /** @description The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`. */
-                max_chunk_size_tokens: number;
-                /**
-                 * @description The number of tokens that overlap between chunks. The default value is `400`.
-                 *
-                 *     Note that the overlap must not exceed half of `max_chunk_size_tokens`.
-                 */
-                chunk_overlap_tokens: number;
-              };
-            };
-            metadata?: components["schemas"]["Metadata"];
-          }[];
-        } | unknown | unknown;
+        file_search?:
+          | {
+              /** @description The [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) attached to this assistant. There can be a maximum of 1 vector store attached to the assistant. */
+              vector_store_ids?: string[];
+              /** @description A helper to create a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) with file_ids and attach it to this assistant. There can be a maximum of 1 vector store attached to the assistant. */
+              vector_stores?: {
+                /** @description A list of [file](https://platform.openai.com/docs/api-reference/files) IDs to add to the vector store. There can be a maximum of 10000 files in a vector store. */
+                file_ids?: string[];
+                /** @description The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy. */
+                chunking_strategy?:
+                  | {
+                      /**
+                       * @description Always `auto`.
+                       * @enum {string}
+                       */
+                      type: "auto";
+                    }
+                  | {
+                      /**
+                       * @description Always `static`.
+                       * @enum {string}
+                       */
+                      type: "static";
+                      static: {
+                        /** @description The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`. */
+                        max_chunk_size_tokens: number;
+                        /**
+                         * @description The number of tokens that overlap between chunks. The default value is `400`.
+                         *
+                         *     Note that the overlap must not exceed half of `max_chunk_size_tokens`.
+                         */
+                        chunk_overlap_tokens: number;
+                      };
+                    };
+                metadata?: components["schemas"]["Metadata"];
+              }[];
+            }
+          | unknown
+          | unknown;
       } | null;
       metadata?: components["schemas"]["Metadata"];
       temperature?: number | null;
       top_p?: number | null;
-      response_format?: components["schemas"]["AssistantsApiResponseFormatOption"] | null;
+      response_format?:
+        | components["schemas"]["AssistantsApiResponseFormatOption"]
+        | null;
     };
     CreateChatCompletionRequest: components["schemas"]["CreateModelResponseProperties"] & {
       /**
@@ -5502,7 +5721,10 @@ export interface components {
        *     ensures the message the model generates is valid JSON. Using `json_schema`
        *     is preferred for models that support it.
        */
-      response_format?: components["schemas"]["ResponseFormatText"] | components["schemas"]["ResponseFormatJsonSchema"] | components["schemas"]["ResponseFormatJsonObject"];
+      response_format?:
+        | components["schemas"]["ResponseFormatText"]
+        | components["schemas"]["ResponseFormatJsonSchema"]
+        | components["schemas"]["ResponseFormatJsonObject"];
       /**
        * @description Parameters for audio output. Required when audio output is requested with
        *     `modalities: ["audio"]`. [Learn more](https://platform.openai.com/docs/guides/audio).
@@ -5596,7 +5818,10 @@ export interface components {
        *     [custom tools](https://platform.openai.com/docs/guides/function-calling#custom-tools) or
        *     [function tools](https://platform.openai.com/docs/guides/function-calling).
        */
-      tools?: (components["schemas"]["ChatCompletionTool"] | components["schemas"]["CustomToolChatCompletions"])[];
+      tools?: (
+        | components["schemas"]["ChatCompletionTool"]
+        | components["schemas"]["CustomToolChatCompletions"]
+      )[];
       tool_choice?: components["schemas"]["ChatCompletionToolChoiceOption"];
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
       /**
@@ -5617,7 +5842,9 @@ export interface components {
        *     `none` is the default when no functions are present. `auto` is the default
        *     if functions are present.
        */
-      function_call?: ("none" | "auto") | components["schemas"]["ChatCompletionFunctionCallOption"];
+      function_call?:
+        | ("none" | "auto")
+        | components["schemas"]["ChatCompletionFunctionCallOption"];
       /**
        * @deprecated
        * @description Deprecated in favor of `tools`.
@@ -5639,7 +5866,12 @@ export interface components {
          *     `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
          * @enum {string}
          */
-        finish_reason: "stop" | "length" | "tool_calls" | "content_filter" | "function_call";
+        finish_reason:
+          | "stop"
+          | "length"
+          | "tool_calls"
+          | "content_filter"
+          | "function_call";
         /** @description The index of the choice in the list of choices. */
         index: number;
         message: components["schemas"]["ChatCompletionResponseMessage"];
@@ -5695,7 +5927,13 @@ export interface components {
          *     `tool_calls` if the model called a tool, or `function_call` (deprecated) if the model called a function.
          * @enum {string|null}
          */
-        finish_reason: "stop" | "length" | "tool_calls" | "content_filter" | "function_call" | null;
+        finish_reason:
+          | "stop"
+          | "length"
+          | "tool_calls"
+          | "content_filter"
+          | "function_call"
+          | null;
         /** @description The index of the choice in the list of choices. */
         index: number;
       }[];
@@ -5729,7 +5967,9 @@ export interface components {
     };
     CreateCompletionRequest: {
       /** @description ID of the model to use. You can use the [List models](https://platform.openai.com/docs/api-reference/models/list) API to see all of your available models, or see our [Model overview](https://platform.openai.com/docs/models) for descriptions of them. */
-      model: string | ("gpt-3.5-turbo-instruct" | "davinci-002" | "babbage-002");
+      model:
+        | string
+        | ("gpt-3.5-turbo-instruct" | "davinci-002" | "babbage-002");
       /**
        * @description The prompt(s) to generate completions for, encoded as a string, array of strings, array of tokens, or array of token arrays.
        *
@@ -5917,7 +6157,13 @@ export interface components {
        * @description ID of the model to use. You can use the [List models](https://platform.openai.com/docs/api-reference/models/list) API to see all of your available models, or see our [Model overview](https://platform.openai.com/docs/models) for descriptions of them.
        * @example text-embedding-3-small
        */
-      model: string | ("text-embedding-ada-002" | "text-embedding-3-small" | "text-embedding-3-large");
+      model:
+        | string
+        | (
+            | "text-embedding-ada-002"
+            | "text-embedding-3-small"
+            | "text-embedding-3-large"
+          );
       /**
        * @description The format to return the embeddings in. Can be either `float` or [`base64`](https://pypi.org/project/pybase64/).
        * @default float
@@ -5963,23 +6209,28 @@ export interface components {
        */
       type: "completions";
       /** @description Used when sampling from a model. Dictates the structure of the messages passed into the model. Can either be a reference to a prebuilt trajectory (ie, `item.input_trajectory`), or a template with variable references to the `item` namespace. */
-      input_messages?: {
-        /**
-         * @description The type of input messages. Always `template`.
-         * @enum {string}
-         */
-        type: "template";
-        /** @description A list of chat messages forming the prompt or context. May include variable references to the `item` namespace, ie {{item.name}}. */
-        template: (components["schemas"]["EasyInputMessage"] | components["schemas"]["EvalItem"])[];
-      } | {
-        /**
-         * @description The type of input messages. Always `item_reference`.
-         * @enum {string}
-         */
-        type: "item_reference";
-        /** @description A reference to a variable in the `item` namespace. Ie, "item.input_trajectory" */
-        item_reference: string;
-      };
+      input_messages?:
+        | {
+            /**
+             * @description The type of input messages. Always `template`.
+             * @enum {string}
+             */
+            type: "template";
+            /** @description A list of chat messages forming the prompt or context. May include variable references to the `item` namespace, ie {{item.name}}. */
+            template: (
+              | components["schemas"]["EasyInputMessage"]
+              | components["schemas"]["EvalItem"]
+            )[];
+          }
+        | {
+            /**
+             * @description The type of input messages. Always `item_reference`.
+             * @enum {string}
+             */
+            type: "item_reference";
+            /** @description A reference to a variable in the `item` namespace. Ie, "item.input_trajectory" */
+            item_reference: string;
+          };
       sampling_params?: {
         reasoning_effort?: components["schemas"]["ReasoningEffort"];
         /**
@@ -6011,14 +6262,20 @@ export interface components {
          *     ensures the message the model generates is valid JSON. Using `json_schema`
          *     is preferred for models that support it.
          */
-        response_format?: components["schemas"]["ResponseFormatText"] | components["schemas"]["ResponseFormatJsonSchema"] | components["schemas"]["ResponseFormatJsonObject"];
+        response_format?:
+          | components["schemas"]["ResponseFormatText"]
+          | components["schemas"]["ResponseFormatJsonSchema"]
+          | components["schemas"]["ResponseFormatJsonObject"];
         /** @description A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for. A max of 128 functions are supported. */
         tools?: components["schemas"]["ChatCompletionTool"][];
       };
       /** @description The name of the model to use for generating completions (e.g. "o3-mini"). */
       model?: string;
       /** @description Determines what populates the `item` namespace in this run's data source. */
-      source: components["schemas"]["EvalJsonlFileContentSource"] | components["schemas"]["EvalJsonlFileIdSource"] | components["schemas"]["EvalStoredCompletionsSource"];
+      source:
+        | components["schemas"]["EvalJsonlFileContentSource"]
+        | components["schemas"]["EvalJsonlFileIdSource"]
+        | components["schemas"]["EvalStoredCompletionsSource"];
     };
     /**
      * CustomDataSourceConfig
@@ -6048,12 +6305,14 @@ export interface components {
      * CreateEvalItem
      * @description A chat message that makes up the prompt or context. May include variable references to the `item` namespace, ie {{item.name}}.
      */
-    CreateEvalItem: {
-      /** @description The role of the message (e.g. "system", "assistant", "user"). */
-      role: string;
-      /** @description The content of the message. */
-      content: string;
-    } | components["schemas"]["EvalItem"];
+    CreateEvalItem:
+      | {
+          /** @description The role of the message (e.g. "system", "assistant", "user"). */
+          role: string;
+          /** @description The content of the message. */
+          content: string;
+        }
+      | components["schemas"]["EvalItem"];
     /**
      * JsonlRunDataSource
      * @description A JsonlRunDataSource object with that specifies a JSONL file that matches the eval
@@ -6066,7 +6325,9 @@ export interface components {
        */
       type: "jsonl";
       /** @description Determines what populates the `item` namespace in the data source. */
-      source: components["schemas"]["EvalJsonlFileContentSource"] | components["schemas"]["EvalJsonlFileIdSource"];
+      source:
+        | components["schemas"]["EvalJsonlFileContentSource"]
+        | components["schemas"]["EvalJsonlFileIdSource"];
     };
     /**
      * LabelModelGrader
@@ -6113,9 +6374,18 @@ export interface components {
       name?: string;
       metadata?: components["schemas"]["Metadata"];
       /** @description The configuration for the data source used for the evaluation runs. Dictates the schema of the data used in the evaluation. */
-      data_source_config: components["schemas"]["CreateEvalCustomDataSourceConfig"] | components["schemas"]["CreateEvalLogsDataSourceConfig"] | components["schemas"]["CreateEvalStoredCompletionsDataSourceConfig"];
+      data_source_config:
+        | components["schemas"]["CreateEvalCustomDataSourceConfig"]
+        | components["schemas"]["CreateEvalLogsDataSourceConfig"]
+        | components["schemas"]["CreateEvalStoredCompletionsDataSourceConfig"];
       /** @description A list of graders for all eval runs in this group. Graders can reference variables in the data source using double curly braces notation, like `{{item.variable_name}}`. To reference the model's output, use the `sample` namespace (ie, `{{sample.output_text}}`). */
-      testing_criteria: (components["schemas"]["CreateEvalLabelModelGrader"] | components["schemas"]["EvalGraderStringCheck"] | components["schemas"]["EvalGraderTextSimilarity"] | components["schemas"]["EvalGraderPython"] | components["schemas"]["EvalGraderScoreModel"])[];
+      testing_criteria: (
+        | components["schemas"]["CreateEvalLabelModelGrader"]
+        | components["schemas"]["EvalGraderStringCheck"]
+        | components["schemas"]["EvalGraderTextSimilarity"]
+        | components["schemas"]["EvalGraderPython"]
+        | components["schemas"]["EvalGraderScoreModel"]
+      )[];
     };
     /**
      * CreateEvalResponsesRunDataSource
@@ -6129,28 +6399,33 @@ export interface components {
        */
       type: "responses";
       /** @description Used when sampling from a model. Dictates the structure of the messages passed into the model. Can either be a reference to a prebuilt trajectory (ie, `item.input_trajectory`), or a template with variable references to the `item` namespace. */
-      input_messages?: {
-        /**
-         * @description The type of input messages. Always `template`.
-         * @enum {string}
-         */
-        type: "template";
-        /** @description A list of chat messages forming the prompt or context. May include variable references to the `item` namespace, ie {{item.name}}. */
-        template: ({
-          /** @description The role of the message (e.g. "system", "assistant", "user"). */
-          role: string;
-          /** @description The content of the message. */
-          content: string;
-        } | components["schemas"]["EvalItem"])[];
-      } | {
-        /**
-         * @description The type of input messages. Always `item_reference`.
-         * @enum {string}
-         */
-        type: "item_reference";
-        /** @description A reference to a variable in the `item` namespace. Ie, "item.name" */
-        item_reference: string;
-      };
+      input_messages?:
+        | {
+            /**
+             * @description The type of input messages. Always `template`.
+             * @enum {string}
+             */
+            type: "template";
+            /** @description A list of chat messages forming the prompt or context. May include variable references to the `item` namespace, ie {{item.name}}. */
+            template: (
+              | {
+                  /** @description The role of the message (e.g. "system", "assistant", "user"). */
+                  role: string;
+                  /** @description The content of the message. */
+                  content: string;
+                }
+              | components["schemas"]["EvalItem"]
+            )[];
+          }
+        | {
+            /**
+             * @description The type of input messages. Always `item_reference`.
+             * @enum {string}
+             */
+            type: "item_reference";
+            /** @description A reference to a variable in the `item` namespace. Ie, "item.name" */
+            item_reference: string;
+          };
       sampling_params?: {
         reasoning_effort?: components["schemas"]["ReasoningEffort"];
         /**
@@ -6198,7 +6473,10 @@ export interface components {
       /** @description The name of the model to use for generating completions (e.g. "o3-mini"). */
       model?: string;
       /** @description Determines what populates the `item` namespace in this run's data source. */
-      source: components["schemas"]["EvalJsonlFileContentSource"] | components["schemas"]["EvalJsonlFileIdSource"] | components["schemas"]["EvalResponsesSource"];
+      source:
+        | components["schemas"]["EvalJsonlFileContentSource"]
+        | components["schemas"]["EvalJsonlFileIdSource"]
+        | components["schemas"]["EvalResponsesSource"];
     };
     /** CreateEvalRunRequest */
     CreateEvalRunRequest: {
@@ -6206,7 +6484,10 @@ export interface components {
       name?: string;
       metadata?: components["schemas"]["Metadata"];
       /** @description Details about the run's data source. */
-      data_source: components["schemas"]["CreateEvalJsonlRunDataSource"] | components["schemas"]["CreateEvalCompletionsRunDataSource"] | components["schemas"]["CreateEvalResponsesRunDataSource"];
+      data_source:
+        | components["schemas"]["CreateEvalJsonlRunDataSource"]
+        | components["schemas"]["CreateEvalCompletionsRunDataSource"]
+        | components["schemas"]["CreateEvalResponsesRunDataSource"];
     };
     /**
      * StoredCompletionsDataSourceConfig
@@ -6244,7 +6525,9 @@ export interface components {
        *     [supported models](https://platform.openai.com/docs/guides/fine-tuning#which-models-can-be-fine-tuned).
        * @example gpt-4o-mini
        */
-      model: string | ("babbage-002" | "davinci-002" | "gpt-3.5-turbo" | "gpt-4o-mini");
+      model:
+        | string
+        | ("babbage-002" | "davinci-002" | "gpt-3.5-turbo" | "gpt-4o-mini");
       /**
        * @description The ID of an uploaded file that contains training data.
        *
@@ -6304,34 +6587,36 @@ export interface components {
        */
       validation_file?: string | null;
       /** @description A list of integrations to enable for your fine-tuning job. */
-      integrations?: {
-        /** @description The type of integration to enable. Currently, only "wandb" (Weights and Biases) is supported. */
-        type: "wandb";
-        /**
-         * @description The settings for your integration with Weights and Biases. This payload specifies the project that
-         *     metrics will be sent to. Optionally, you can set an explicit display name for your run, add tags
-         *     to your run, and set a default entity (team, username, etc) to be associated with your run.
-         */
-        wandb: {
-          /**
-           * @description The name of the project that the new run will be created under.
-           * @example my-wandb-project
-           */
-          project: string;
-          /** @description A display name to set for the run. If not set, we will use the Job ID as the name. */
-          name?: string | null;
-          /**
-           * @description The entity to use for the run. This allows you to set the team or username of the WandB user that you would
-           *     like associated with the run. If not set, the default entity for the registered WandB API key is used.
-           */
-          entity?: string | null;
-          /**
-           * @description A list of tags to be attached to the newly created run. These tags are passed through directly to WandB. Some
-           *     default tags are generated by OpenAI: "openai/finetune", "openai/{base-model}", "openai/{ftjob-abcdef}".
-           */
-          tags?: string[];
-        };
-      }[] | null;
+      integrations?:
+        | {
+            /** @description The type of integration to enable. Currently, only "wandb" (Weights and Biases) is supported. */
+            type: "wandb";
+            /**
+             * @description The settings for your integration with Weights and Biases. This payload specifies the project that
+             *     metrics will be sent to. Optionally, you can set an explicit display name for your run, add tags
+             *     to your run, and set a default entity (team, username, etc) to be associated with your run.
+             */
+            wandb: {
+              /**
+               * @description The name of the project that the new run will be created under.
+               * @example my-wandb-project
+               */
+              project: string;
+              /** @description A display name to set for the run. If not set, we will use the Job ID as the name. */
+              name?: string | null;
+              /**
+               * @description The entity to use for the run. This allows you to set the team or username of the WandB user that you would
+               *     like associated with the run. If not set, the default entity for the registered WandB API key is used.
+               */
+              entity?: string | null;
+              /**
+               * @description A list of tags to be attached to the newly created run. These tags are passed through directly to WandB. Some
+               *     default tags are generated by OpenAI: "openai/finetune", "openai/{base-model}", "openai/{ftjob-abcdef}".
+               */
+              tags?: string[];
+            };
+          }[]
+        | null;
       /**
        * @description The seed controls the reproducibility of the job. Passing in the same seed and job parameters should produce the same results, but may differ in rare cases.
        *     If a seed is not specified, one will be generated for you.
@@ -6376,7 +6661,9 @@ export interface components {
        */
       background: "transparent" | "opaque" | "auto" | null;
       /** @description The model to use for image generation. Only `dall-e-2` and `gpt-image-1` are supported. Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used. */
-      model?: (string | ("dall-e-2" | "gpt-image-1" | "gpt-image-1-mini")) | null;
+      model?:
+        | (string | ("dall-e-2" | "gpt-image-1" | "gpt-image-1-mini"))
+        | null;
       /**
        * @description The number of images to generate. Must be between 1 and 10.
        * @default 1
@@ -6389,7 +6676,14 @@ export interface components {
        * @example 1024x1024
        * @enum {string|null}
        */
-      size: "256x256" | "512x512" | "1024x1024" | "1536x1024" | "1024x1536" | "auto" | null;
+      size:
+        | "256x256"
+        | "512x512"
+        | "1024x1024"
+        | "1536x1024"
+        | "1024x1536"
+        | "auto"
+        | null;
       /**
        * @description The format in which the generated images are returned. Must be one of `url` or `b64_json`. URLs are only valid for 60 minutes after the image has been generated. This parameter is only supported for `dall-e-2`, as `gpt-image-1` will always return base64-encoded images.
        * @default url
@@ -6443,7 +6737,12 @@ export interface components {
        */
       prompt: string;
       /** @description The model to use for image generation. One of `dall-e-2`, `dall-e-3`, or `gpt-image-1`. Defaults to `dall-e-2` unless a parameter specific to `gpt-image-1` is used. */
-      model?: (string | ("dall-e-2" | "dall-e-3" | "gpt-image-1" | "gpt-image-1-mini")) | null;
+      model?:
+        | (
+            | string
+            | ("dall-e-2" | "dall-e-3" | "gpt-image-1" | "gpt-image-1-mini")
+          )
+        | null;
       /**
        * @description The number of images to generate. Must be between 1 and 10. For `dall-e-3`, only `n=1` is supported.
        * @default 1
@@ -6497,7 +6796,16 @@ export interface components {
        * @example 1024x1024
        * @enum {string|null}
        */
-      size: "auto" | "1024x1024" | "1536x1024" | "1024x1536" | "256x256" | "512x512" | "1792x1024" | "1024x1792" | null;
+      size:
+        | "auto"
+        | "1024x1024"
+        | "1536x1024"
+        | "1024x1536"
+        | "256x256"
+        | "512x512"
+        | "1792x1024"
+        | "1024x1792"
+        | null;
       /**
        * @description Control the content-moderation level for images generated by `gpt-image-1`. Must be either `low` for less restrictive filtering or `auto` (default value).
        * @default auto
@@ -6573,13 +6881,24 @@ export interface components {
        * @enum {string}
        */
       role: "user" | "assistant";
-      content: string | (components["schemas"]["MessageContentImageFileObject"] | components["schemas"]["MessageContentImageUrlObject"] | components["schemas"]["MessageRequestContentTextObject"])[];
-      attachments?: {
-        /** @description The ID of the file to attach to the message. */
-        file_id?: string;
-        /** @description The tools to add this file to. */
-        tools?: (components["schemas"]["AssistantToolsCode"] | components["schemas"]["AssistantToolsFileSearchTypeOnly"])[];
-      }[] | null;
+      content:
+        | string
+        | (
+            | components["schemas"]["MessageContentImageFileObject"]
+            | components["schemas"]["MessageContentImageUrlObject"]
+            | components["schemas"]["MessageRequestContentTextObject"]
+          )[];
+      attachments?:
+        | {
+            /** @description The ID of the file to attach to the message. */
+            file_id?: string;
+            /** @description The tools to add this file to. */
+            tools?: (
+              | components["schemas"]["AssistantToolsCode"]
+              | components["schemas"]["AssistantToolsFileSearchTypeOnly"]
+            )[];
+          }[]
+        | null;
       metadata?: components["schemas"]["Metadata"];
     };
     CreateModelResponseProperties: components["schemas"]["ModelResponseProperties"] & {
@@ -6594,13 +6913,26 @@ export interface components {
        * @description Input (or inputs) to classify. Can be a single string, an array of strings, or
        *     an array of multi-modal input objects similar to other models.
        */
-      input: string | string[] | (components["schemas"]["ModerationImageURLInput"] | components["schemas"]["ModerationTextInput"])[];
+      input:
+        | string
+        | string[]
+        | (
+            | components["schemas"]["ModerationImageURLInput"]
+            | components["schemas"]["ModerationTextInput"]
+          )[];
       /**
        * @description The content moderation model you would like to use. Learn more in
        *     [the moderation guide](https://platform.openai.com/docs/guides/moderation), and learn about
        *     available models [here](https://platform.openai.com/docs/models#moderation).
        */
-      model?: string | ("omni-moderation-latest" | "omni-moderation-2024-09-26" | "text-moderation-latest" | "text-moderation-stable");
+      model?:
+        | string
+        | (
+            | "omni-moderation-latest"
+            | "omni-moderation-2024-09-26"
+            | "text-moderation-latest"
+            | "text-moderation-stable"
+          );
     };
     /** @description Represents if a given text input is potentially harmful. */
     CreateModerationResponse: {
@@ -6699,28 +7031,33 @@ export interface components {
         };
       }[];
     };
-    CreateResponse: components["schemas"]["CreateModelResponseProperties"] & components["schemas"]["ResponseProperties"] & {
-      input?: components["schemas"]["InputParam"];
-      include?: components["schemas"]["IncludeEnum"][] | null;
-      parallel_tool_calls?: boolean | null;
-      store?: boolean | null;
-      instructions?: string | null;
-      stream?: boolean | null;
-      stream_options?: components["schemas"]["ResponseStreamOptions"];
-      conversation?: components["schemas"]["ConversationParam"] | null;
-    };
+    CreateResponse: components["schemas"]["CreateModelResponseProperties"] &
+      components["schemas"]["ResponseProperties"] & {
+        input?: components["schemas"]["InputParam"];
+        include?: components["schemas"]["IncludeEnum"][] | null;
+        parallel_tool_calls?: boolean | null;
+        store?: boolean | null;
+        instructions?: string | null;
+        stream?: boolean | null;
+        stream_options?: components["schemas"]["ResponseStreamOptions"];
+        conversation?: components["schemas"]["ConversationParam"] | null;
+      };
     CreateRunRequest: {
       /** @description The ID of the [assistant](https://platform.openai.com/docs/api-reference/assistants) to use to execute this run. */
       assistant_id: string;
       /** @description The ID of the [Model](https://platform.openai.com/docs/api-reference/models) to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used. */
-      model?: (string | components["schemas"]["AssistantSupportedModels"]) | null;
+      model?:
+        | (string | components["schemas"]["AssistantSupportedModels"])
+        | null;
       reasoning_effort?: components["schemas"]["ReasoningEffort"];
       /** @description Overrides the [instructions](https://platform.openai.com/docs/api-reference/assistants/createAssistant) of the assistant. This is useful for modifying the behavior on a per-run basis. */
       instructions?: string | null;
       /** @description Appends additional instructions at the end of the instructions for the run. This is useful for modifying the behavior on a per-run basis without overriding other instructions. */
       additional_instructions?: string | null;
       /** @description Adds additional messages to the thread before creating the run. */
-      additional_messages?: components["schemas"]["CreateMessageRequest"][] | null;
+      additional_messages?:
+        | components["schemas"]["CreateMessageRequest"][]
+        | null;
       /** @description Override the tools the assistant can use for this run. This is useful for modifying the behavior on a per-run basis. */
       tools?: components["schemas"]["AssistantTool"][] | null;
       metadata?: components["schemas"]["Metadata"];
@@ -6745,7 +7082,8 @@ export interface components {
       /** @description The maximum number of completion tokens that may be used over the course of the run. The run will make a best effort to use only the number of completion tokens specified, across multiple turns of the run. If the run exceeds the number of completion tokens specified, the run will end with status `incomplete`. See `incomplete_details` for more info. */
       max_completion_tokens?: number | null;
       truncation_strategy?: components["schemas"]["TruncationObject"] & unknown;
-      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] & unknown;
+      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] &
+        unknown;
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
       response_format?: components["schemas"]["AssistantsApiResponseFormatOption"];
     };
@@ -6776,13 +7114,59 @@ export interface components {
        */
       stream_format: "sse" | "audio";
     };
-    CreateSpeechResponseStreamEvent: components["schemas"]["SpeechAudioDeltaEvent"] | components["schemas"]["SpeechAudioDoneEvent"];
+    CreateSpeechResponseStreamEvent:
+      | components["schemas"]["SpeechAudioDeltaEvent"]
+      | components["schemas"]["SpeechAudioDoneEvent"];
     CreateThreadAndRunRequest: {
       /** @description The ID of the [assistant](https://platform.openai.com/docs/api-reference/assistants) to use to execute this run. */
       assistant_id: string;
       thread?: components["schemas"]["CreateThreadRequest"];
       /** @description The ID of the [Model](https://platform.openai.com/docs/api-reference/models) to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used. */
-      model?: (string | ("gpt-5" | "gpt-5-mini" | "gpt-5-nano" | "gpt-5-2025-08-07" | "gpt-5-mini-2025-08-07" | "gpt-5-nano-2025-08-07" | "gpt-4.1" | "gpt-4.1-mini" | "gpt-4.1-nano" | "gpt-4.1-2025-04-14" | "gpt-4.1-mini-2025-04-14" | "gpt-4.1-nano-2025-04-14" | "gpt-4o" | "gpt-4o-2024-11-20" | "gpt-4o-2024-08-06" | "gpt-4o-2024-05-13" | "gpt-4o-mini" | "gpt-4o-mini-2024-07-18" | "gpt-4.5-preview" | "gpt-4.5-preview-2025-02-27" | "gpt-4-turbo" | "gpt-4-turbo-2024-04-09" | "gpt-4-0125-preview" | "gpt-4-turbo-preview" | "gpt-4-1106-preview" | "gpt-4-vision-preview" | "gpt-4" | "gpt-4-0314" | "gpt-4-0613" | "gpt-4-32k" | "gpt-4-32k-0314" | "gpt-4-32k-0613" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-1106" | "gpt-3.5-turbo-0125" | "gpt-3.5-turbo-16k-0613")) | null;
+      model?:
+        | (
+            | string
+            | (
+                | "gpt-5"
+                | "gpt-5-mini"
+                | "gpt-5-nano"
+                | "gpt-5-2025-08-07"
+                | "gpt-5-mini-2025-08-07"
+                | "gpt-5-nano-2025-08-07"
+                | "gpt-4.1"
+                | "gpt-4.1-mini"
+                | "gpt-4.1-nano"
+                | "gpt-4.1-2025-04-14"
+                | "gpt-4.1-mini-2025-04-14"
+                | "gpt-4.1-nano-2025-04-14"
+                | "gpt-4o"
+                | "gpt-4o-2024-11-20"
+                | "gpt-4o-2024-08-06"
+                | "gpt-4o-2024-05-13"
+                | "gpt-4o-mini"
+                | "gpt-4o-mini-2024-07-18"
+                | "gpt-4.5-preview"
+                | "gpt-4.5-preview-2025-02-27"
+                | "gpt-4-turbo"
+                | "gpt-4-turbo-2024-04-09"
+                | "gpt-4-0125-preview"
+                | "gpt-4-turbo-preview"
+                | "gpt-4-1106-preview"
+                | "gpt-4-vision-preview"
+                | "gpt-4"
+                | "gpt-4-0314"
+                | "gpt-4-0613"
+                | "gpt-4-32k"
+                | "gpt-4-32k-0314"
+                | "gpt-4-32k-0613"
+                | "gpt-3.5-turbo"
+                | "gpt-3.5-turbo-16k"
+                | "gpt-3.5-turbo-0613"
+                | "gpt-3.5-turbo-1106"
+                | "gpt-3.5-turbo-0125"
+                | "gpt-3.5-turbo-16k-0613"
+              )
+          )
+        | null;
       /** @description Override the default system message of the assistant. This is useful for modifying the behavior on a per-run basis. */
       instructions?: string | null;
       /** @description Override the tools the assistant can use for this run. This is useful for modifying the behavior on a per-run basis. */
@@ -6823,7 +7207,8 @@ export interface components {
       /** @description The maximum number of completion tokens that may be used over the course of the run. The run will make a best effort to use only the number of completion tokens specified, across multiple turns of the run. If the run exceeds the number of completion tokens specified, the run will end with status `incomplete`. See `incomplete_details` for more info. */
       max_completion_tokens?: number | null;
       truncation_strategy?: components["schemas"]["TruncationObject"] & unknown;
-      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] & unknown;
+      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] &
+        unknown;
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
       response_format?: components["schemas"]["AssistantsApiResponseFormatOption"];
     };
@@ -6842,40 +7227,45 @@ export interface components {
            */
           file_ids: string[];
         };
-        file_search?: {
-          /** @description The [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) attached to this thread. There can be a maximum of 1 vector store attached to the thread. */
-          vector_store_ids?: string[];
-          /** @description A helper to create a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) with file_ids and attach it to this thread. There can be a maximum of 1 vector store attached to the thread. */
-          vector_stores?: {
-            /** @description A list of [file](https://platform.openai.com/docs/api-reference/files) IDs to add to the vector store. There can be a maximum of 10000 files in a vector store. */
-            file_ids?: string[];
-            /** @description The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy. */
-            chunking_strategy?: {
-              /**
-               * @description Always `auto`.
-               * @enum {string}
-               */
-              type: "auto";
-            } | {
-              /**
-               * @description Always `static`.
-               * @enum {string}
-               */
-              type: "static";
-              static: {
-                /** @description The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`. */
-                max_chunk_size_tokens: number;
-                /**
-                 * @description The number of tokens that overlap between chunks. The default value is `400`.
-                 *
-                 *     Note that the overlap must not exceed half of `max_chunk_size_tokens`.
-                 */
-                chunk_overlap_tokens: number;
-              };
-            };
-            metadata?: components["schemas"]["Metadata"];
-          }[];
-        } | unknown | unknown;
+        file_search?:
+          | {
+              /** @description The [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) attached to this thread. There can be a maximum of 1 vector store attached to the thread. */
+              vector_store_ids?: string[];
+              /** @description A helper to create a [vector store](https://platform.openai.com/docs/api-reference/vector-stores/object) with file_ids and attach it to this thread. There can be a maximum of 1 vector store attached to the thread. */
+              vector_stores?: {
+                /** @description A list of [file](https://platform.openai.com/docs/api-reference/files) IDs to add to the vector store. There can be a maximum of 10000 files in a vector store. */
+                file_ids?: string[];
+                /** @description The chunking strategy used to chunk the file(s). If not set, will use the `auto` strategy. */
+                chunking_strategy?:
+                  | {
+                      /**
+                       * @description Always `auto`.
+                       * @enum {string}
+                       */
+                      type: "auto";
+                    }
+                  | {
+                      /**
+                       * @description Always `static`.
+                       * @enum {string}
+                       */
+                      type: "static";
+                      static: {
+                        /** @description The maximum number of tokens in each chunk. The default value is `800`. The minimum value is `100` and the maximum value is `4096`. */
+                        max_chunk_size_tokens: number;
+                        /**
+                         * @description The number of tokens that overlap between chunks. The default value is `400`.
+                         *
+                         *     Note that the overlap must not exceed half of `max_chunk_size_tokens`.
+                         */
+                        chunk_overlap_tokens: number;
+                      };
+                    };
+                metadata?: components["schemas"]["Metadata"];
+              }[];
+            }
+          | unknown
+          | unknown;
       } | null;
       metadata?: components["schemas"]["Metadata"];
     };
@@ -6889,7 +7279,14 @@ export interface components {
        * @description ID of the model to use. The options are `gpt-4o-transcribe`, `gpt-4o-mini-transcribe`, `whisper-1` (which is powered by our open source Whisper V2 model), and `gpt-4o-transcribe-diarize`.
        * @example gpt-4o-transcribe
        */
-      model: string | ("whisper-1" | "gpt-4o-transcribe" | "gpt-4o-mini-transcribe" | "gpt-4o-transcribe-diarize");
+      model:
+        | string
+        | (
+            | "whisper-1"
+            | "gpt-4o-transcribe"
+            | "gpt-4o-mini-transcribe"
+            | "gpt-4o-transcribe-diarize"
+          );
       /** @description The language of the input audio. Supplying the input language in [ISO-639-1](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes) (e.g. `en`) format will improve accuracy and latency. */
       language?: string;
       /** @description An optional text to guide the model's style or continue a previous audio segment. The [prompt](https://platform.openai.com/docs/guides/speech-to-text#prompting) should match the audio language. This field is not supported when using `gpt-4o-transcribe-diarize`. */
@@ -6937,7 +7334,9 @@ export interface components {
       /** @description Segments of the transcript annotated with timestamps and speaker labels. */
       segments: components["schemas"]["TranscriptionDiarizedSegment"][];
       /** @description Token or duration usage statistics for the request. */
-      usage?: components["schemas"]["TranscriptTextUsageTokens"] | components["schemas"]["TranscriptTextUsageDuration"];
+      usage?:
+        | components["schemas"]["TranscriptTextUsageTokens"]
+        | components["schemas"]["TranscriptTextUsageDuration"];
     };
     /** @description Represents a transcription response returned by model, based on the provided input. */
     CreateTranscriptionResponseJson: {
@@ -6953,9 +7352,14 @@ export interface components {
         bytes?: number[];
       }[];
       /** @description Token usage statistics for the request. */
-      usage?: components["schemas"]["TranscriptTextUsageTokens"] | components["schemas"]["TranscriptTextUsageDuration"];
+      usage?:
+        | components["schemas"]["TranscriptTextUsageTokens"]
+        | components["schemas"]["TranscriptTextUsageDuration"];
     };
-    CreateTranscriptionResponseStreamEvent: components["schemas"]["TranscriptTextSegmentEvent"] | components["schemas"]["TranscriptTextDeltaEvent"] | components["schemas"]["TranscriptTextDoneEvent"];
+    CreateTranscriptionResponseStreamEvent:
+      | components["schemas"]["TranscriptTextSegmentEvent"]
+      | components["schemas"]["TranscriptTextDeltaEvent"]
+      | components["schemas"]["TranscriptTextDoneEvent"];
     /** @description Represents a verbose json transcription response returned by model, based on the provided input. */
     CreateTranscriptionResponseVerboseJson: {
       /** @description The language of the input audio. */
@@ -7088,7 +7492,9 @@ export interface components {
        * @description The output from the custom tool call generated by your code.
        *     Can be a string or an list of output content.
        */
-      output: string | components["schemas"]["FunctionAndCustomToolCallOutput"][];
+      output:
+        | string
+        | components["schemas"]["FunctionAndCustomToolCallOutput"][];
     };
     /**
      * Custom tool
@@ -7110,32 +7516,34 @@ export interface components {
         /** @description Optional description of the custom tool, used to provide more context. */
         description?: string;
         /** @description The input format for the custom tool. Default is unconstrained text. */
-        format?: {
-          /**
-           * @description Unconstrained text format. Always `text`.
-           * @enum {string}
-           */
-          type: "text";
-        } | {
-          /**
-           * @description Grammar format. Always `grammar`.
-           * @enum {string}
-           */
-          type: "grammar";
-          /**
-           * Grammar format
-           * @description Your chosen grammar.
-           */
-          grammar: {
-            /** @description The grammar definition. */
-            definition: string;
-            /**
-             * @description The syntax of the grammar definition. One of `lark` or `regex`.
-             * @enum {string}
-             */
-            syntax: "lark" | "regex";
-          };
-        };
+        format?:
+          | {
+              /**
+               * @description Unconstrained text format. Always `text`.
+               * @enum {string}
+               */
+              type: "text";
+            }
+          | {
+              /**
+               * @description Grammar format. Always `grammar`.
+               * @enum {string}
+               */
+              type: "grammar";
+              /**
+               * Grammar format
+               * @description Your chosen grammar.
+               */
+              grammar: {
+                /** @description The grammar definition. */
+                definition: string;
+                /**
+                 * @description The syntax of the grammar definition. One of `lark` or `regex`.
+                 * @enum {string}
+                 */
+                syntax: "lark" | "regex";
+              };
+            };
       };
     };
     DeleteAssistantResponse: {
@@ -7309,9 +7717,18 @@ export interface components {
        */
       name: string;
       /** @description Configuration of data sources used in runs of the evaluation. */
-      data_source_config: components["schemas"]["EvalCustomDataSourceConfig"] | components["schemas"]["EvalLogsDataSourceConfig"] | components["schemas"]["EvalStoredCompletionsDataSourceConfig"];
+      data_source_config:
+        | components["schemas"]["EvalCustomDataSourceConfig"]
+        | components["schemas"]["EvalLogsDataSourceConfig"]
+        | components["schemas"]["EvalStoredCompletionsDataSourceConfig"];
       /** @description A list of testing criteria. */
-      testing_criteria: (components["schemas"]["EvalGraderLabelModel"] | components["schemas"]["EvalGraderStringCheck"] | components["schemas"]["EvalGraderTextSimilarity"] | components["schemas"]["EvalGraderPython"] | components["schemas"]["EvalGraderScoreModel"])[];
+      testing_criteria: (
+        | components["schemas"]["EvalGraderLabelModel"]
+        | components["schemas"]["EvalGraderStringCheck"]
+        | components["schemas"]["EvalGraderTextSimilarity"]
+        | components["schemas"]["EvalGraderPython"]
+        | components["schemas"]["EvalGraderScoreModel"]
+      )[];
       /** @description The Unix timestamp (in seconds) for when the eval was created. */
       created_at: number;
       metadata: components["schemas"]["Metadata"];
@@ -7383,25 +7800,31 @@ export interface components {
        */
       role: "user" | "assistant" | "system" | "developer";
       /** @description Inputs to the model - can contain template strings. */
-      content: string | components["schemas"]["InputTextContent"] | {
-        /**
-         * @description The type of the output text. Always `output_text`.
-         * @enum {string}
-         */
-        type: "output_text";
-        /** @description The text output from the model. */
-        text: string;
-      } | {
-        /**
-         * @description The type of the image input. Always `input_image`.
-         * @enum {string}
-         */
-        type: "input_image";
-        /** @description The URL of the image input. */
-        image_url: string;
-        /** @description The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`. */
-        detail?: string;
-      } | components["schemas"]["InputAudio"] | unknown[];
+      content:
+        | string
+        | components["schemas"]["InputTextContent"]
+        | {
+            /**
+             * @description The type of the output text. Always `output_text`.
+             * @enum {string}
+             */
+            type: "output_text";
+            /** @description The text output from the model. */
+            text: string;
+          }
+        | {
+            /**
+             * @description The type of the image input. Always `input_image`.
+             * @enum {string}
+             */
+            type: "input_image";
+            /** @description The URL of the image input. */
+            image_url: string;
+            /** @description The detail level of the image to be sent to the model. One of `high`, `low`, or `auto`. Defaults to `auto`. */
+            detail?: string;
+          }
+        | components["schemas"]["InputAudio"]
+        | unknown[];
       /**
        * @description The type of the message input. Always `message`.
        * @enum {string}
@@ -7562,7 +7985,10 @@ export interface components {
         failed: number;
       }[];
       /** @description Information about the run's data source. */
-      data_source: components["schemas"]["CreateEvalJsonlRunDataSource"] | components["schemas"]["CreateEvalCompletionsRunDataSource"] | components["schemas"]["CreateEvalResponsesRunDataSource"];
+      data_source:
+        | components["schemas"]["CreateEvalJsonlRunDataSource"]
+        | components["schemas"]["CreateEvalCompletionsRunDataSource"]
+        | components["schemas"]["CreateEvalResponsesRunDataSource"];
       metadata: components["schemas"]["Metadata"];
       error: components["schemas"]["EvalApiError"];
     };
@@ -7797,23 +8223,30 @@ export interface components {
        *     `searching`, `incomplete` or `failed`,
        * @enum {string}
        */
-      status: "in_progress" | "searching" | "completed" | "incomplete" | "failed";
+      status:
+        | "in_progress"
+        | "searching"
+        | "completed"
+        | "incomplete"
+        | "failed";
       /** @description The queries used to search for files. */
       queries: string[];
-      results?: {
-        /** @description The unique ID of the file. */
-        file_id?: string;
-        /** @description The text that was retrieved from the file. */
-        text?: string;
-        /** @description The name of the file. */
-        filename?: string;
-        attributes?: components["schemas"]["VectorStoreFileAttributes"];
-        /**
-         * Format: float
-         * @description The relevance score of the file - a value between 0 and 1.
-         */
-        score?: number;
-      }[] | null;
+      results?:
+        | {
+            /** @description The unique ID of the file. */
+            file_id?: string;
+            /** @description The text that was retrieved from the file. */
+            text?: string;
+            /** @description The name of the file. */
+            filename?: string;
+            attributes?: components["schemas"]["VectorStoreFileAttributes"];
+            /**
+             * Format: float
+             * @description The relevance score of the file - a value between 0 and 1.
+             */
+            score?: number;
+          }[]
+        | null;
     };
     FineTuneChatCompletionRequestAssistantMessage: {
       /**
@@ -7821,14 +8254,23 @@ export interface components {
        * @enum {integer}
        */
       weight?: 0 | 1;
-    } & WithRequired<components["schemas"]["ChatCompletionRequestAssistantMessage"], "role">;
+    } & WithRequired<
+      components["schemas"]["ChatCompletionRequestAssistantMessage"],
+      "role"
+    >;
     /**
      * @description The per-line training example of a fine-tuning input file for chat models using the supervised method.
      *     Input messages may contain text or image content only. Audio and file input messages
      *     are not currently supported for fine-tuning.
      */
     FineTuneChatRequestInput: {
-      messages?: (components["schemas"]["ChatCompletionRequestSystemMessage"] | components["schemas"]["ChatCompletionRequestUserMessage"] | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"] | components["schemas"]["ChatCompletionRequestToolMessage"] | components["schemas"]["ChatCompletionRequestFunctionMessage"])[];
+      messages?: (
+        | components["schemas"]["ChatCompletionRequestSystemMessage"]
+        | components["schemas"]["ChatCompletionRequestUserMessage"]
+        | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"]
+        | components["schemas"]["ChatCompletionRequestToolMessage"]
+        | components["schemas"]["ChatCompletionRequestFunctionMessage"]
+      )[];
       /** @description A list of tools the model may generate JSON inputs for. */
       tools?: components["schemas"]["ChatCompletionTool"][];
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
@@ -7877,7 +8319,13 @@ export interface components {
      */
     FineTunePreferenceRequestInput: {
       input?: {
-        messages?: (components["schemas"]["ChatCompletionRequestSystemMessage"] | components["schemas"]["ChatCompletionRequestUserMessage"] | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"] | components["schemas"]["ChatCompletionRequestToolMessage"] | components["schemas"]["ChatCompletionRequestFunctionMessage"])[];
+        messages?: (
+          | components["schemas"]["ChatCompletionRequestSystemMessage"]
+          | components["schemas"]["ChatCompletionRequestUserMessage"]
+          | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"]
+          | components["schemas"]["ChatCompletionRequestToolMessage"]
+          | components["schemas"]["ChatCompletionRequestFunctionMessage"]
+        )[];
         /** @description A list of tools the model may generate JSON inputs for. */
         tools?: components["schemas"]["ChatCompletionTool"][];
         parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
@@ -7923,7 +8371,12 @@ export interface components {
     /** @description Configuration for the reinforcement fine-tuning method. */
     FineTuneReinforcementMethod: {
       /** @description The grader used for the fine-tuning job. */
-      grader: components["schemas"]["GraderStringCheck"] | components["schemas"]["GraderTextSimilarity"] | components["schemas"]["GraderPython"] | components["schemas"]["GraderScoreModel"] | components["schemas"]["GraderMulti"];
+      grader:
+        | components["schemas"]["GraderStringCheck"]
+        | components["schemas"]["GraderTextSimilarity"]
+        | components["schemas"]["GraderPython"]
+        | components["schemas"]["GraderScoreModel"]
+        | components["schemas"]["GraderMulti"];
       hyperparameters?: components["schemas"]["FineTuneReinforcementHyperparameters"];
     };
     /**
@@ -7933,7 +8386,12 @@ export interface components {
      *     are not currently supported for fine-tuning.
      */
     FineTuneReinforcementRequestInput: {
-      messages: (components["schemas"]["ChatCompletionRequestDeveloperMessage"] | components["schemas"]["ChatCompletionRequestUserMessage"] | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"] | components["schemas"]["ChatCompletionRequestToolMessage"])[];
+      messages: (
+        | components["schemas"]["ChatCompletionRequestDeveloperMessage"]
+        | components["schemas"]["ChatCompletionRequestUserMessage"]
+        | components["schemas"]["FineTuneChatCompletionRequestAssistantMessage"]
+        | components["schemas"]["ChatCompletionRequestToolMessage"]
+      )[];
       /** @description A list of tools the model may generate JSON inputs for. */
       tools?: components["schemas"]["ChatCompletionTool"][];
     };
@@ -8048,7 +8506,13 @@ export interface components {
        * @description The current status of the fine-tuning job, which can be either `validating_files`, `queued`, `running`, `succeeded`, `failed`, or `cancelled`.
        * @enum {string}
        */
-      status: "validating_files" | "queued" | "running" | "succeeded" | "failed" | "cancelled";
+      status:
+        | "validating_files"
+        | "queued"
+        | "running"
+        | "succeeded"
+        | "failed"
+        | "cancelled";
       trained_tokens: number | null;
       /** @description The file ID used for training. You can retrieve the training data with the [Files API](https://platform.openai.com/docs/api-reference/files/retrieve-contents). */
       training_file: string;
@@ -8117,7 +8581,10 @@ export interface components {
       /** @description The data associated with the event. */
       data?: Record<string, never>;
     };
-    FunctionAndCustomToolCallOutput: components["schemas"]["InputTextContent"] | components["schemas"]["InputImageContent"] | components["schemas"]["InputFileContent"];
+    FunctionAndCustomToolCallOutput:
+      | components["schemas"]["InputTextContent"]
+      | components["schemas"]["InputImageContent"]
+      | components["schemas"]["InputFileContent"];
     FunctionObject: {
       /** @description A description of what the function does, used by the model to choose when and how to call the function. */
       description?: string;
@@ -8181,7 +8648,9 @@ export interface components {
        * @description The output from the function call generated by your code.
        *     Can be a string or an list of output content.
        */
-      output: string | components["schemas"]["FunctionAndCustomToolCallOutput"][];
+      output:
+        | string
+        | components["schemas"]["FunctionAndCustomToolCallOutput"][];
       /**
        * @description The status of the item. One of `in_progress`, `completed`, or
        *     `incomplete`. Populated when items are returned via API.
@@ -8231,7 +8700,12 @@ export interface components {
       type: "multi";
       /** @description The name of the grader. */
       name: string;
-      graders: components["schemas"]["GraderStringCheck"] | components["schemas"]["GraderTextSimilarity"] | components["schemas"]["GraderPython"] | components["schemas"]["GraderScoreModel"] | components["schemas"]["GraderLabelModel"];
+      graders:
+        | components["schemas"]["GraderStringCheck"]
+        | components["schemas"]["GraderTextSimilarity"]
+        | components["schemas"]["GraderPython"]
+        | components["schemas"]["GraderScoreModel"]
+        | components["schemas"]["GraderLabelModel"];
       /** @description A formula to calculate the output based on grader results. */
       calculate_output: string;
     };
@@ -8324,7 +8798,18 @@ export interface components {
        *     or `rouge_l`.
        * @enum {string}
        */
-      evaluation_metric: "cosine" | "fuzzy_match" | "bleu" | "gleu" | "meteor" | "rouge_1" | "rouge_2" | "rouge_3" | "rouge_4" | "rouge_5" | "rouge_l";
+      evaluation_metric:
+        | "cosine"
+        | "fuzzy_match"
+        | "bleu"
+        | "gleu"
+        | "meteor"
+        | "rouge_1"
+        | "rouge_2"
+        | "rouge_3"
+        | "rouge_4"
+        | "rouge_5"
+        | "rouge_l";
     };
     /** @description Represents the content or the URL of an image generated by the OpenAI API. */
     Image: {
@@ -8402,7 +8887,9 @@ export interface components {
       /** @description 0-based index for the partial image (streaming). */
       partial_image_index: number;
     };
-    ImageEditStreamEvent: components["schemas"]["ImageEditPartialImageEvent"] | components["schemas"]["ImageEditCompletedEvent"];
+    ImageEditStreamEvent:
+      | components["schemas"]["ImageEditPartialImageEvent"]
+      | components["schemas"]["ImageEditCompletedEvent"];
     /** @description Emitted when image generation has completed and the final image is available. */
     ImageGenCompletedEvent: {
       /**
@@ -8470,7 +8957,9 @@ export interface components {
       /** @description 0-based index for the partial image (streaming). */
       partial_image_index: number;
     };
-    ImageGenStreamEvent: components["schemas"]["ImageGenPartialImageEvent"] | components["schemas"]["ImageGenCompletedEvent"];
+    ImageGenStreamEvent:
+      | components["schemas"]["ImageGenPartialImageEvent"]
+      | components["schemas"]["ImageGenCompletedEvent"];
     /**
      * Image generation tool
      * @description A tool that generates images using a model like `gpt-image-1`.
@@ -8630,8 +9119,14 @@ export interface components {
         format: "mp3" | "wav";
       };
     };
-    InputContent: components["schemas"]["InputTextContent"] | components["schemas"]["InputImageContent"] | components["schemas"]["InputFileContent"];
-    InputItem: components["schemas"]["EasyInputMessage"] | components["schemas"]["Item"] | components["schemas"]["ItemReferenceParam"];
+    InputContent:
+      | components["schemas"]["InputTextContent"]
+      | components["schemas"]["InputImageContent"]
+      | components["schemas"]["InputFileContent"];
+    InputItem:
+      | components["schemas"]["EasyInputMessage"]
+      | components["schemas"]["Item"]
+      | components["schemas"]["ItemReferenceParam"];
     /**
      * Input message
      * @description A message input to the model with a role indicating instruction following
@@ -8759,9 +9254,44 @@ export interface components {
       }[];
     };
     /** @description Content item used to generate a response. */
-    Item: components["schemas"]["InputMessage"] | components["schemas"]["OutputMessage"] | components["schemas"]["FileSearchToolCall"] | components["schemas"]["ComputerToolCall"] | components["schemas"]["ComputerCallOutputItemParam"] | components["schemas"]["WebSearchToolCall"] | components["schemas"]["FunctionToolCall"] | components["schemas"]["FunctionCallOutputItemParam"] | components["schemas"]["ReasoningItem"] | components["schemas"]["ImageGenToolCall"] | components["schemas"]["CodeInterpreterToolCall"] | components["schemas"]["LocalShellToolCall"] | components["schemas"]["LocalShellToolCallOutput"] | components["schemas"]["MCPListTools"] | components["schemas"]["MCPApprovalRequest"] | components["schemas"]["MCPApprovalResponse"] | components["schemas"]["MCPToolCall"] | components["schemas"]["CustomToolCallOutput"] | components["schemas"]["CustomToolCall"];
+    Item:
+      | components["schemas"]["InputMessage"]
+      | components["schemas"]["OutputMessage"]
+      | components["schemas"]["FileSearchToolCall"]
+      | components["schemas"]["ComputerToolCall"]
+      | components["schemas"]["ComputerCallOutputItemParam"]
+      | components["schemas"]["WebSearchToolCall"]
+      | components["schemas"]["FunctionToolCall"]
+      | components["schemas"]["FunctionCallOutputItemParam"]
+      | components["schemas"]["ReasoningItem"]
+      | components["schemas"]["ImageGenToolCall"]
+      | components["schemas"]["CodeInterpreterToolCall"]
+      | components["schemas"]["LocalShellToolCall"]
+      | components["schemas"]["LocalShellToolCallOutput"]
+      | components["schemas"]["MCPListTools"]
+      | components["schemas"]["MCPApprovalRequest"]
+      | components["schemas"]["MCPApprovalResponse"]
+      | components["schemas"]["MCPToolCall"]
+      | components["schemas"]["CustomToolCallOutput"]
+      | components["schemas"]["CustomToolCall"];
     /** @description Content item used to generate a response. */
-    ItemResource: components["schemas"]["InputMessageResource"] | components["schemas"]["OutputMessage"] | components["schemas"]["FileSearchToolCall"] | components["schemas"]["ComputerToolCall"] | components["schemas"]["ComputerToolCallOutputResource"] | components["schemas"]["WebSearchToolCall"] | components["schemas"]["FunctionToolCallResource"] | components["schemas"]["FunctionToolCallOutputResource"] | components["schemas"]["ImageGenToolCall"] | components["schemas"]["CodeInterpreterToolCall"] | components["schemas"]["LocalShellToolCall"] | components["schemas"]["LocalShellToolCallOutput"] | components["schemas"]["MCPListTools"] | components["schemas"]["MCPApprovalRequest"] | components["schemas"]["MCPApprovalResponseResource"] | components["schemas"]["MCPToolCall"];
+    ItemResource:
+      | components["schemas"]["InputMessageResource"]
+      | components["schemas"]["OutputMessage"]
+      | components["schemas"]["FileSearchToolCall"]
+      | components["schemas"]["ComputerToolCall"]
+      | components["schemas"]["ComputerToolCallOutputResource"]
+      | components["schemas"]["WebSearchToolCall"]
+      | components["schemas"]["FunctionToolCallResource"]
+      | components["schemas"]["FunctionToolCallOutputResource"]
+      | components["schemas"]["ImageGenToolCall"]
+      | components["schemas"]["CodeInterpreterToolCall"]
+      | components["schemas"]["LocalShellToolCall"]
+      | components["schemas"]["LocalShellToolCallOutput"]
+      | components["schemas"]["MCPListTools"]
+      | components["schemas"]["MCPApprovalRequest"]
+      | components["schemas"]["MCPApprovalResponseResource"]
+      | components["schemas"]["MCPToolCall"];
     ListAssistantsResponse: {
       /** @example list */
       object: string;
@@ -9067,7 +9597,15 @@ export interface components {
        *     - SharePoint: `connector_sharepoint`
        * @enum {string}
        */
-      connector_id?: "connector_dropbox" | "connector_gmail" | "connector_googlecalendar" | "connector_googledrive" | "connector_microsoftteams" | "connector_outlookcalendar" | "connector_outlookemail" | "connector_sharepoint";
+      connector_id?:
+        | "connector_dropbox"
+        | "connector_gmail"
+        | "connector_googlecalendar"
+        | "connector_googledrive"
+        | "connector_microsoftteams"
+        | "connector_outlookcalendar"
+        | "connector_outlookemail"
+        | "connector_sharepoint";
       /**
        * @description An OAuth access token that can be used with a remote MCP server, either
        *     with a custom MCP server URL or a service connector. Your application
@@ -9079,11 +9617,18 @@ export interface components {
       headers?: {
         [key: string]: string;
       } | null;
-      allowed_tools?: (string[] | components["schemas"]["MCPToolFilter"]) | null;
-      require_approval?: ({
-        always?: components["schemas"]["MCPToolFilter"];
-        never?: components["schemas"]["MCPToolFilter"];
-      } | ("always" | "never")) | null;
+      allowed_tools?:
+        | (string[] | components["schemas"]["MCPToolFilter"])
+        | null;
+      require_approval?:
+        | (
+            | {
+                always?: components["schemas"]["MCPToolFilter"];
+                never?: components["schemas"]["MCPToolFilter"];
+              }
+            | ("always" | "never")
+          )
+        | null;
     };
     /**
      * MCP tool call
@@ -9408,7 +9953,12 @@ export interface components {
          * @description The reason the message is incomplete.
          * @enum {string}
          */
-        reason: "content_filter" | "max_tokens" | "run_cancelled" | "run_expired" | "run_failed";
+        reason:
+          | "content_filter"
+          | "max_tokens"
+          | "run_cancelled"
+          | "run_expired"
+          | "run_failed";
       } | null;
       completed_at: number | null;
       incomplete_at: number | null;
@@ -9421,12 +9971,17 @@ export interface components {
       content: components["schemas"]["MessageContent"][];
       assistant_id: string | null;
       run_id: string | null;
-      attachments: {
-        /** @description The ID of the file to attach to the message. */
-        file_id?: string;
-        /** @description The tools to add this file to. */
-        tools?: (components["schemas"]["AssistantToolsCode"] | components["schemas"]["AssistantToolsFileSearchTypeOnly"])[];
-      }[] | null;
+      attachments:
+        | {
+            /** @description The ID of the file to attach to the message. */
+            file_id?: string;
+            /** @description The tools to add this file to. */
+            tools?: (
+              | components["schemas"]["AssistantToolsCode"]
+              | components["schemas"]["AssistantToolsFileSearchTypeOnly"]
+            )[];
+          }[]
+        | null;
       metadata: components["schemas"]["Metadata"];
     };
     /**
@@ -9442,27 +9997,32 @@ export interface components {
       /** @description Text content to be sent to the model */
       text: string;
     };
-    MessageStreamEvent: {
-      /** @enum {string} */
-      event: "thread.message.created";
-      data: components["schemas"]["MessageObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.message.in_progress";
-      data: components["schemas"]["MessageObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.message.delta";
-      data: components["schemas"]["MessageDeltaObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.message.completed";
-      data: components["schemas"]["MessageObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.message.incomplete";
-      data: components["schemas"]["MessageObject"];
-    };
+    MessageStreamEvent:
+      | {
+          /** @enum {string} */
+          event: "thread.message.created";
+          data: components["schemas"]["MessageObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.message.in_progress";
+          data: components["schemas"]["MessageObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.message.delta";
+          data: components["schemas"]["MessageDeltaObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.message.completed";
+          data: components["schemas"]["MessageObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.message.incomplete";
+          data: components["schemas"]["MessageObject"];
+        };
     Metadata: {
       [key: string]: string;
     } | null;
@@ -9483,9 +10043,27 @@ export interface components {
       /** @description The organization that owns the model. */
       owned_by: string;
     };
-    ModelIds: components["schemas"]["ModelIdsShared"] | components["schemas"]["ModelIdsResponses"];
+    ModelIds:
+      | components["schemas"]["ModelIdsShared"]
+      | components["schemas"]["ModelIdsResponses"];
     /** @example gpt-4o */
-    ModelIdsResponses: components["schemas"]["ModelIdsShared"] | ("o1-pro" | "o1-pro-2025-03-19" | "o3-pro" | "o3-pro-2025-06-10" | "o3-deep-research" | "o3-deep-research-2025-06-26" | "o4-mini-deep-research" | "o4-mini-deep-research-2025-06-26" | "computer-use-preview" | "computer-use-preview-2025-03-11" | "gpt-5-codex" | "gpt-5-pro" | "gpt-5-pro-2025-10-06");
+    ModelIdsResponses:
+      | components["schemas"]["ModelIdsShared"]
+      | (
+          | "o1-pro"
+          | "o1-pro-2025-03-19"
+          | "o3-pro"
+          | "o3-pro-2025-06-10"
+          | "o3-deep-research"
+          | "o3-deep-research-2025-06-26"
+          | "o4-mini-deep-research"
+          | "o4-mini-deep-research-2025-06-26"
+          | "computer-use-preview"
+          | "computer-use-preview-2025-03-11"
+          | "gpt-5-codex"
+          | "gpt-5-pro"
+          | "gpt-5-pro-2025-10-06"
+        );
     /** @example gpt-4o */
     ModelIdsShared: string | components["schemas"]["ChatModel"];
     ModelResponseProperties: {
@@ -9542,7 +10120,9 @@ export interface components {
       metadata?: components["schemas"]["Metadata"];
       temperature?: number | null;
       top_p?: number | null;
-      response_format?: components["schemas"]["AssistantsApiResponseFormatOption"] | null;
+      response_format?:
+        | components["schemas"]["AssistantsApiResponseFormatOption"]
+        | null;
     };
     ModifyCertificateRequest: {
       /** @description The updated name for the certificate */
@@ -9616,7 +10196,15 @@ export interface components {
        * @description The intended purpose of the file. Supported values are `assistants`, `assistants_output`, `batch`, `batch_output`, `fine-tune`, `fine-tune-results`, `vision`, and `user_data`.
        * @enum {string}
        */
-      purpose: "assistants" | "assistants_output" | "batch" | "batch_output" | "fine-tune" | "fine-tune-results" | "vision" | "user_data";
+      purpose:
+        | "assistants"
+        | "assistants_output"
+        | "batch"
+        | "batch_output"
+        | "fine-tune"
+        | "fine-tune-results"
+        | "vision"
+        | "user_data";
       /**
        * @deprecated
        * @description Deprecated. The current status of the file, which can be either `uploaded`, `processed`, or `error`.
@@ -9655,8 +10243,24 @@ export interface components {
       /** @description The transcript of the audio data from the model. */
       transcript: string;
     };
-    OutputContent: components["schemas"]["OutputTextContent"] | components["schemas"]["RefusalContent"] | components["schemas"]["ReasoningTextContent"];
-    OutputItem: components["schemas"]["OutputMessage"] | components["schemas"]["FileSearchToolCall"] | components["schemas"]["FunctionToolCall"] | components["schemas"]["WebSearchToolCall"] | components["schemas"]["ComputerToolCall"] | components["schemas"]["ReasoningItem"] | components["schemas"]["ImageGenToolCall"] | components["schemas"]["CodeInterpreterToolCall"] | components["schemas"]["LocalShellToolCall"] | components["schemas"]["MCPToolCall"] | components["schemas"]["MCPListTools"] | components["schemas"]["MCPApprovalRequest"] | components["schemas"]["CustomToolCall"];
+    OutputContent:
+      | components["schemas"]["OutputTextContent"]
+      | components["schemas"]["RefusalContent"]
+      | components["schemas"]["ReasoningTextContent"];
+    OutputItem:
+      | components["schemas"]["OutputMessage"]
+      | components["schemas"]["FileSearchToolCall"]
+      | components["schemas"]["FunctionToolCall"]
+      | components["schemas"]["WebSearchToolCall"]
+      | components["schemas"]["ComputerToolCall"]
+      | components["schemas"]["ReasoningItem"]
+      | components["schemas"]["ImageGenToolCall"]
+      | components["schemas"]["CodeInterpreterToolCall"]
+      | components["schemas"]["LocalShellToolCall"]
+      | components["schemas"]["MCPToolCall"]
+      | components["schemas"]["MCPListTools"]
+      | components["schemas"]["MCPApprovalRequest"]
+      | components["schemas"]["CustomToolCall"];
     /**
      * Output message
      * @description An output message from the model.
@@ -9683,7 +10287,9 @@ export interface components {
        */
       status: "in_progress" | "completed" | "incomplete";
     };
-    OutputMessageContent: components["schemas"]["OutputTextContent"] | components["schemas"]["RefusalContent"];
+    OutputMessageContent:
+      | components["schemas"]["OutputTextContent"]
+      | components["schemas"]["RefusalContent"];
     /**
      * @description Whether to enable [parallel function calling](https://platform.openai.com/docs/guides/function-calling#configuring-parallel-function-calling) during tool use.
      * @default true
@@ -9707,7 +10313,9 @@ export interface components {
        *     If generated tokens would match this content, the entire model response
        *     can be returned much more quickly.
        */
-      content: string | components["schemas"]["ChatCompletionRequestMessageContentPartText"][];
+      content:
+        | string
+        | components["schemas"]["ChatCompletionRequestMessageContentPartText"][];
     };
     /** @description Represents an individual project. */
     Project: {
@@ -9954,30 +10562,33 @@ export interface components {
       version?: string | null;
       variables?: components["schemas"]["ResponsePromptVariables"];
     } | null;
-    RealtimeAudioFormats: {
-      /**
-       * @description The audio format. Always `audio/pcm`.
-       * @enum {string}
-       */
-      type?: "audio/pcm";
-      /**
-       * @description The sample rate of the audio. Always `24000`.
-       * @enum {integer}
-       */
-      rate?: 24000;
-    } | {
-      /**
-       * @description The audio format. Always `audio/pcmu`.
-       * @enum {string}
-       */
-      type?: "audio/pcmu";
-    } | {
-      /**
-       * @description The audio format. Always `audio/pcma`.
-       * @enum {string}
-       */
-      type?: "audio/pcma";
-    };
+    RealtimeAudioFormats:
+      | {
+          /**
+           * @description The audio format. Always `audio/pcm`.
+           * @enum {string}
+           */
+          type?: "audio/pcm";
+          /**
+           * @description The sample rate of the audio. Always `24000`.
+           * @enum {integer}
+           */
+          rate?: 24000;
+        }
+      | {
+          /**
+           * @description The audio format. Always `audio/pcmu`.
+           * @enum {string}
+           */
+          type?: "audio/pcmu";
+        }
+      | {
+          /**
+           * @description The audio format. Always `audio/pcma`.
+           * @enum {string}
+           */
+          type?: "audio/pcma";
+        };
     /**
      * @description Add a new Item to the Conversation's context, including messages, function
      *     calls, and function call responses. This event can be used both to populate a
@@ -10252,7 +10863,12 @@ export interface components {
        *     `incomplete`, `in_progress`).
        * @enum {string}
        */
-      status?: "completed" | "cancelled" | "failed" | "incomplete" | "in_progress";
+      status?:
+        | "completed"
+        | "cancelled"
+        | "failed"
+        | "incomplete"
+        | "in_progress";
       /** @description Additional details about the status. */
       status_details?: {
         /**
@@ -10270,7 +10886,11 @@ export interface components {
          *     (the server-side safety filter activated and cut off the response).
          * @enum {string}
          */
-        reason?: "turn_detected" | "client_cancelled" | "max_output_tokens" | "content_filter";
+        reason?:
+          | "turn_detected"
+          | "client_cancelled"
+          | "max_output_tokens"
+          | "content_filter";
         /**
          * @description A description of the error that caused the response to fail,
          *     populated when the `status` is `failed`.
@@ -10427,7 +11047,10 @@ export interface components {
        *     function/MCP tool.
        * @default auto
        */
-      tool_choice: components["schemas"]["ToolChoiceOptions"] | components["schemas"]["ToolChoiceFunction"] | components["schemas"]["ToolChoiceMCP"];
+      tool_choice:
+        | components["schemas"]["ToolChoiceOptions"]
+        | components["schemas"]["ToolChoiceFunction"]
+        | components["schemas"]["ToolChoiceMCP"];
       /** @description Sampling temperature for the model, limited to [0.6, 1.2]. Defaults to 0.8. */
       temperature?: number;
       /**
@@ -10522,7 +11145,9 @@ export interface components {
       transcript: string;
       logprobs?: components["schemas"]["LogProbProperties"][] | null;
       /** @description Usage statistics for the transcription. */
-      usage: components["schemas"]["TranscriptTextUsageTokens"] | components["schemas"]["TranscriptTextUsageDuration"];
+      usage:
+        | components["schemas"]["TranscriptTextUsageTokens"]
+        | components["schemas"]["TranscriptTextUsageDuration"];
     };
     /** @description Returned when the text value of an input audio transcription content part is updated. */
     RealtimeBetaServerEventConversationItemInputAudioTranscriptionDelta: {
@@ -11286,7 +11911,18 @@ export interface components {
       status_code?: number;
     };
     /** @description A realtime client event. */
-    RealtimeClientEvent: components["schemas"]["RealtimeClientEventConversationItemCreate"] | components["schemas"]["RealtimeClientEventConversationItemDelete"] | components["schemas"]["RealtimeClientEventConversationItemRetrieve"] | components["schemas"]["RealtimeClientEventConversationItemTruncate"] | components["schemas"]["RealtimeClientEventInputAudioBufferAppend"] | components["schemas"]["RealtimeClientEventInputAudioBufferClear"] | components["schemas"]["RealtimeClientEventOutputAudioBufferClear"] | components["schemas"]["RealtimeClientEventInputAudioBufferCommit"] | components["schemas"]["RealtimeClientEventResponseCancel"] | components["schemas"]["RealtimeClientEventResponseCreate"] | components["schemas"]["RealtimeClientEventSessionUpdate"];
+    RealtimeClientEvent:
+      | components["schemas"]["RealtimeClientEventConversationItemCreate"]
+      | components["schemas"]["RealtimeClientEventConversationItemDelete"]
+      | components["schemas"]["RealtimeClientEventConversationItemRetrieve"]
+      | components["schemas"]["RealtimeClientEventConversationItemTruncate"]
+      | components["schemas"]["RealtimeClientEventInputAudioBufferAppend"]
+      | components["schemas"]["RealtimeClientEventInputAudioBufferClear"]
+      | components["schemas"]["RealtimeClientEventOutputAudioBufferClear"]
+      | components["schemas"]["RealtimeClientEventInputAudioBufferCommit"]
+      | components["schemas"]["RealtimeClientEventResponseCancel"]
+      | components["schemas"]["RealtimeClientEventResponseCreate"]
+      | components["schemas"]["RealtimeClientEventSessionUpdate"];
     /**
      * @description Add a new Item to the Conversation's context, including messages, function
      *     calls, and function call responses. This event can be used both to populate a
@@ -11536,7 +12172,9 @@ export interface components {
        * @description Update the Realtime session. Choose either a realtime
        *     session or a transcription session.
        */
-      session: components["schemas"]["RealtimeSessionCreateRequestGA"] | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
+      session:
+        | components["schemas"]["RealtimeSessionCreateRequestGA"]
+        | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
     };
     /** @description Send this event to update a transcription session. */
     RealtimeClientEventTranscriptionSessionUpdate: {
@@ -11550,7 +12188,16 @@ export interface components {
       session: components["schemas"]["RealtimeTranscriptionSessionCreateRequest"];
     };
     /** @description A single item within a Realtime conversation. */
-    RealtimeConversationItem: components["schemas"]["RealtimeConversationItemMessageSystem"] | components["schemas"]["RealtimeConversationItemMessageUser"] | components["schemas"]["RealtimeConversationItemMessageAssistant"] | components["schemas"]["RealtimeConversationItemFunctionCall"] | components["schemas"]["RealtimeConversationItemFunctionCallOutput"] | components["schemas"]["RealtimeMCPApprovalResponse"] | components["schemas"]["RealtimeMCPListTools"] | components["schemas"]["RealtimeMCPToolCall"] | components["schemas"]["RealtimeMCPApprovalRequest"];
+    RealtimeConversationItem:
+      | components["schemas"]["RealtimeConversationItemMessageSystem"]
+      | components["schemas"]["RealtimeConversationItemMessageUser"]
+      | components["schemas"]["RealtimeConversationItemMessageAssistant"]
+      | components["schemas"]["RealtimeConversationItemFunctionCall"]
+      | components["schemas"]["RealtimeConversationItemFunctionCallOutput"]
+      | components["schemas"]["RealtimeMCPApprovalResponse"]
+      | components["schemas"]["RealtimeMCPListTools"]
+      | components["schemas"]["RealtimeMCPToolCall"]
+      | components["schemas"]["RealtimeMCPApprovalRequest"];
     /**
      * Realtime function call item
      * @description A function call item in a Realtime conversation.
@@ -11752,7 +12399,11 @@ export interface components {
        * @description The type of the item (`message`, `function_call`, `function_call_output`, `item_reference`).
        * @enum {string}
        */
-      type?: "message" | "function_call" | "function_call_output" | "item_reference";
+      type?:
+        | "message"
+        | "function_call"
+        | "function_call_output"
+        | "item_reference";
       /**
        * @description Identifier for the API object being returned - always `realtime.item`.
        * @enum {string}
@@ -11843,7 +12494,9 @@ export interface components {
        * @description Session configuration to use for the client secret. Choose either a realtime
        *     session or a transcription session.
        */
-      session?: components["schemas"]["RealtimeSessionCreateRequestGA"] | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
+      session?:
+        | components["schemas"]["RealtimeSessionCreateRequestGA"]
+        | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
     };
     /**
      * Realtime session and client secret
@@ -11858,7 +12511,9 @@ export interface components {
        * Session configuration
        * @description The session configuration for either a realtime or transcription session.
        */
-      session: components["schemas"]["RealtimeSessionCreateResponseGA"] | components["schemas"]["RealtimeTranscriptionSessionCreateResponseGA"];
+      session:
+        | components["schemas"]["RealtimeSessionCreateResponseGA"]
+        | components["schemas"]["RealtimeTranscriptionSessionCreateResponseGA"];
     };
     /** Function tool */
     RealtimeFunctionTool: {
@@ -11966,7 +12621,13 @@ export interface components {
       arguments: string;
       approval_request_id?: string | null;
       output?: string | null;
-      error?: (components["schemas"]["RealtimeMCPProtocolError"] | components["schemas"]["RealtimeMCPToolExecutionError"] | components["schemas"]["RealtimeMCPHTTPError"]) | null;
+      error?:
+        | (
+            | components["schemas"]["RealtimeMCPProtocolError"]
+            | components["schemas"]["RealtimeMCPToolExecutionError"]
+            | components["schemas"]["RealtimeMCPHTTPError"]
+          )
+        | null;
     };
     /** Realtime MCP tool execution error */
     RealtimeMCPToolExecutionError: {
@@ -11988,7 +12649,12 @@ export interface components {
        *     `incomplete`, `in_progress`).
        * @enum {string}
        */
-      status?: "completed" | "cancelled" | "failed" | "incomplete" | "in_progress";
+      status?:
+        | "completed"
+        | "cancelled"
+        | "failed"
+        | "incomplete"
+        | "in_progress";
       /** @description Additional details about the status. */
       status_details?: {
         /**
@@ -12002,7 +12668,11 @@ export interface components {
          * @description The reason the Response did not complete. For a `cancelled` Response,  one of `turn_detected` (the server VAD detected a new start of speech)  or `client_cancelled` (the client sent a cancel event). For an  `incomplete` Response, one of `max_output_tokens` or `content_filter`  (the server-side safety filter activated and cut off the response).
          * @enum {string}
          */
-        reason?: "turn_detected" | "client_cancelled" | "max_output_tokens" | "content_filter";
+        reason?:
+          | "turn_detected"
+          | "client_cancelled"
+          | "max_output_tokens"
+          | "content_filter";
         /**
          * @description A description of the error that caused the response to fail,
          *     populated when the `status` is `failed`.
@@ -12134,13 +12804,19 @@ export interface components {
         };
       };
       /** @description Tools available to the model. */
-      tools?: (components["schemas"]["RealtimeFunctionTool"] | components["schemas"]["MCPTool"])[];
+      tools?: (
+        | components["schemas"]["RealtimeFunctionTool"]
+        | components["schemas"]["MCPTool"]
+      )[];
       /**
        * @description How the model chooses tools. Provide one of the string modes or force a specific
        *     function/MCP tool.
        * @default auto
        */
-      tool_choice: components["schemas"]["ToolChoiceOptions"] | components["schemas"]["ToolChoiceFunction"] | components["schemas"]["ToolChoiceMCP"];
+      tool_choice:
+        | components["schemas"]["ToolChoiceOptions"]
+        | components["schemas"]["ToolChoiceFunction"]
+        | components["schemas"]["ToolChoiceMCP"];
       /**
        * @description Maximum number of output tokens for a single assistant response,
        *     inclusive of tool calls. Provide an integer between 1 and 4096 to
@@ -12168,7 +12844,52 @@ export interface components {
       input?: components["schemas"]["RealtimeConversationItem"][];
     };
     /** @description A realtime server event. */
-    RealtimeServerEvent: components["schemas"]["RealtimeServerEventConversationCreated"] | components["schemas"]["RealtimeServerEventConversationItemCreated"] | components["schemas"]["RealtimeServerEventConversationItemDeleted"] | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionCompleted"] | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionDelta"] | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionFailed"] | components["schemas"]["RealtimeServerEventConversationItemRetrieved"] | components["schemas"]["RealtimeServerEventConversationItemTruncated"] | components["schemas"]["RealtimeServerEventError"] | components["schemas"]["RealtimeServerEventInputAudioBufferCleared"] | components["schemas"]["RealtimeServerEventInputAudioBufferCommitted"] | components["schemas"]["RealtimeServerEventInputAudioBufferSpeechStarted"] | components["schemas"]["RealtimeServerEventInputAudioBufferSpeechStopped"] | components["schemas"]["RealtimeServerEventRateLimitsUpdated"] | components["schemas"]["RealtimeServerEventResponseAudioDelta"] | components["schemas"]["RealtimeServerEventResponseAudioDone"] | components["schemas"]["RealtimeServerEventResponseAudioTranscriptDelta"] | components["schemas"]["RealtimeServerEventResponseAudioTranscriptDone"] | components["schemas"]["RealtimeServerEventResponseContentPartAdded"] | components["schemas"]["RealtimeServerEventResponseContentPartDone"] | components["schemas"]["RealtimeServerEventResponseCreated"] | components["schemas"]["RealtimeServerEventResponseDone"] | components["schemas"]["RealtimeServerEventResponseFunctionCallArgumentsDelta"] | components["schemas"]["RealtimeServerEventResponseFunctionCallArgumentsDone"] | components["schemas"]["RealtimeServerEventResponseOutputItemAdded"] | components["schemas"]["RealtimeServerEventResponseOutputItemDone"] | components["schemas"]["RealtimeServerEventResponseTextDelta"] | components["schemas"]["RealtimeServerEventResponseTextDone"] | components["schemas"]["RealtimeServerEventSessionCreated"] | components["schemas"]["RealtimeServerEventSessionUpdated"] | components["schemas"]["RealtimeServerEventOutputAudioBufferStarted"] | components["schemas"]["RealtimeServerEventOutputAudioBufferStopped"] | components["schemas"]["RealtimeServerEventOutputAudioBufferCleared"] | components["schemas"]["RealtimeServerEventConversationItemAdded"] | components["schemas"]["RealtimeServerEventConversationItemDone"] | components["schemas"]["RealtimeServerEventInputAudioBufferTimeoutTriggered"] | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionSegment"] | components["schemas"]["RealtimeServerEventMCPListToolsInProgress"] | components["schemas"]["RealtimeServerEventMCPListToolsCompleted"] | components["schemas"]["RealtimeServerEventMCPListToolsFailed"] | components["schemas"]["RealtimeServerEventResponseMCPCallArgumentsDelta"] | components["schemas"]["RealtimeServerEventResponseMCPCallArgumentsDone"] | components["schemas"]["RealtimeServerEventResponseMCPCallInProgress"] | components["schemas"]["RealtimeServerEventResponseMCPCallCompleted"] | components["schemas"]["RealtimeServerEventResponseMCPCallFailed"];
+    RealtimeServerEvent:
+      | components["schemas"]["RealtimeServerEventConversationCreated"]
+      | components["schemas"]["RealtimeServerEventConversationItemCreated"]
+      | components["schemas"]["RealtimeServerEventConversationItemDeleted"]
+      | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionCompleted"]
+      | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionDelta"]
+      | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionFailed"]
+      | components["schemas"]["RealtimeServerEventConversationItemRetrieved"]
+      | components["schemas"]["RealtimeServerEventConversationItemTruncated"]
+      | components["schemas"]["RealtimeServerEventError"]
+      | components["schemas"]["RealtimeServerEventInputAudioBufferCleared"]
+      | components["schemas"]["RealtimeServerEventInputAudioBufferCommitted"]
+      | components["schemas"]["RealtimeServerEventInputAudioBufferSpeechStarted"]
+      | components["schemas"]["RealtimeServerEventInputAudioBufferSpeechStopped"]
+      | components["schemas"]["RealtimeServerEventRateLimitsUpdated"]
+      | components["schemas"]["RealtimeServerEventResponseAudioDelta"]
+      | components["schemas"]["RealtimeServerEventResponseAudioDone"]
+      | components["schemas"]["RealtimeServerEventResponseAudioTranscriptDelta"]
+      | components["schemas"]["RealtimeServerEventResponseAudioTranscriptDone"]
+      | components["schemas"]["RealtimeServerEventResponseContentPartAdded"]
+      | components["schemas"]["RealtimeServerEventResponseContentPartDone"]
+      | components["schemas"]["RealtimeServerEventResponseCreated"]
+      | components["schemas"]["RealtimeServerEventResponseDone"]
+      | components["schemas"]["RealtimeServerEventResponseFunctionCallArgumentsDelta"]
+      | components["schemas"]["RealtimeServerEventResponseFunctionCallArgumentsDone"]
+      | components["schemas"]["RealtimeServerEventResponseOutputItemAdded"]
+      | components["schemas"]["RealtimeServerEventResponseOutputItemDone"]
+      | components["schemas"]["RealtimeServerEventResponseTextDelta"]
+      | components["schemas"]["RealtimeServerEventResponseTextDone"]
+      | components["schemas"]["RealtimeServerEventSessionCreated"]
+      | components["schemas"]["RealtimeServerEventSessionUpdated"]
+      | components["schemas"]["RealtimeServerEventOutputAudioBufferStarted"]
+      | components["schemas"]["RealtimeServerEventOutputAudioBufferStopped"]
+      | components["schemas"]["RealtimeServerEventOutputAudioBufferCleared"]
+      | components["schemas"]["RealtimeServerEventConversationItemAdded"]
+      | components["schemas"]["RealtimeServerEventConversationItemDone"]
+      | components["schemas"]["RealtimeServerEventInputAudioBufferTimeoutTriggered"]
+      | components["schemas"]["RealtimeServerEventConversationItemInputAudioTranscriptionSegment"]
+      | components["schemas"]["RealtimeServerEventMCPListToolsInProgress"]
+      | components["schemas"]["RealtimeServerEventMCPListToolsCompleted"]
+      | components["schemas"]["RealtimeServerEventMCPListToolsFailed"]
+      | components["schemas"]["RealtimeServerEventResponseMCPCallArgumentsDelta"]
+      | components["schemas"]["RealtimeServerEventResponseMCPCallArgumentsDone"]
+      | components["schemas"]["RealtimeServerEventResponseMCPCallInProgress"]
+      | components["schemas"]["RealtimeServerEventResponseMCPCallCompleted"]
+      | components["schemas"]["RealtimeServerEventResponseMCPCallFailed"];
     /** @description Returned when a conversation is created. Emitted right after session creation. */
     RealtimeServerEventConversationCreated: {
       /** @description The unique ID of the server event. */
@@ -12291,7 +13012,9 @@ export interface components {
       transcript: string;
       logprobs?: components["schemas"]["LogProbProperties"][] | null;
       /** @description Usage statistics for the transcription, this is billed according to the ASR model's pricing rather than the realtime model's pricing. */
-      usage: components["schemas"]["TranscriptTextUsageTokens"] | components["schemas"]["TranscriptTextUsageDuration"];
+      usage:
+        | components["schemas"]["TranscriptTextUsageTokens"]
+        | components["schemas"]["TranscriptTextUsageDuration"];
     };
     /** @description Returned when the text value of an input audio transcription content part is updated with incremental transcription results. */
     RealtimeServerEventConversationItemInputAudioTranscriptionDelta: {
@@ -13060,7 +13783,9 @@ export interface components {
        */
       type: "session.created";
       /** @description The session configuration. */
-      session: components["schemas"]["RealtimeSessionCreateRequestGA"] | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
+      session:
+        | components["schemas"]["RealtimeSessionCreateRequestGA"]
+        | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
     };
     /**
      * @description Returned when a session is updated with a `session.update` event, unless
@@ -13075,7 +13800,9 @@ export interface components {
        */
       type: "session.updated";
       /** @description The session configuration. */
-      session: components["schemas"]["RealtimeSessionCreateRequestGA"] | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
+      session:
+        | components["schemas"]["RealtimeSessionCreateRequestGA"]
+        | components["schemas"]["RealtimeTranscriptionSessionCreateRequestGA"];
     };
     /**
      * @description Returned when a transcription session is updated with a `transcription_session.update` event, unless
@@ -13109,7 +13836,19 @@ export interface components {
        * @description The Realtime model used for this session.
        * @enum {string}
        */
-      model?: "gpt-realtime" | "gpt-realtime-2025-08-28" | "gpt-4o-realtime-preview" | "gpt-4o-realtime-preview-2024-10-01" | "gpt-4o-realtime-preview-2024-12-17" | "gpt-4o-realtime-preview-2025-06-03" | "gpt-4o-mini-realtime-preview" | "gpt-4o-mini-realtime-preview-2024-12-17" | "gpt-realtime-mini" | "gpt-realtime-mini-2025-10-06" | "gpt-audio-mini" | "gpt-audio-mini-2025-10-06";
+      model?:
+        | "gpt-realtime"
+        | "gpt-realtime-2025-08-28"
+        | "gpt-4o-realtime-preview"
+        | "gpt-4o-realtime-preview-2024-10-01"
+        | "gpt-4o-realtime-preview-2024-12-17"
+        | "gpt-4o-realtime-preview-2025-06-03"
+        | "gpt-4o-mini-realtime-preview"
+        | "gpt-4o-mini-realtime-preview-2024-12-17"
+        | "gpt-realtime-mini"
+        | "gpt-realtime-mini-2025-10-06"
+        | "gpt-audio-mini"
+        | "gpt-audio-mini-2025-10-06";
       /**
        * @description The default system instructions (i.e. system message) prepended to model
        *     calls. This field allows the client to guide the model on desired
@@ -13148,7 +13887,9 @@ export interface components {
        * @enum {string}
        */
       output_audio_format: "pcm16" | "g711_ulaw" | "g711_alaw";
-      input_audio_transcription?: components["schemas"]["AudioTranscription"] | null;
+      input_audio_transcription?:
+        | components["schemas"]["AudioTranscription"]
+        | null;
       turn_detection?: components["schemas"]["RealtimeTurnDetection"];
       /**
        * @description Configuration for input audio noise reduction. This can be set to `null` to turn off.
@@ -13165,23 +13906,28 @@ export interface components {
        * @default 1
        */
       speed: number;
-      tracing?: ("auto" | {
-        /**
-         * @description The name of the workflow to attach to this trace. This is used to
-         *     name the trace in the traces dashboard.
-         */
-        workflow_name?: string;
-        /**
-         * @description The group id to attach to this trace to enable filtering and
-         *     grouping in the traces dashboard.
-         */
-        group_id?: string;
-        /**
-         * @description The arbitrary metadata to attach to this trace to enable
-         *     filtering in the traces dashboard.
-         */
-        metadata?: Record<string, never>;
-      }) | null;
+      tracing?:
+        | (
+            | "auto"
+            | {
+                /**
+                 * @description The name of the workflow to attach to this trace. This is used to
+                 *     name the trace in the traces dashboard.
+                 */
+                workflow_name?: string;
+                /**
+                 * @description The group id to attach to this trace to enable filtering and
+                 *     grouping in the traces dashboard.
+                 */
+                group_id?: string;
+                /**
+                 * @description The arbitrary metadata to attach to this trace to enable
+                 *     filtering in the traces dashboard.
+                 */
+                metadata?: Record<string, never>;
+              }
+          )
+        | null;
       /** @description Tools (functions) available to the model. */
       tools?: components["schemas"]["RealtimeFunctionTool"][];
       /**
@@ -13273,23 +14019,25 @@ export interface components {
        *     `auto` will create a trace for the session with default values for the
        *     workflow name, group id, and metadata.
        */
-      tracing?: "auto" | {
-        /**
-         * @description The name of the workflow to attach to this trace. This is used to
-         *     name the trace in the traces dashboard.
-         */
-        workflow_name?: string;
-        /**
-         * @description The group id to attach to this trace to enable filtering and
-         *     grouping in the traces dashboard.
-         */
-        group_id?: string;
-        /**
-         * @description The arbitrary metadata to attach to this trace to enable
-         *     filtering in the traces dashboard.
-         */
-        metadata?: Record<string, never>;
-      };
+      tracing?:
+        | "auto"
+        | {
+            /**
+             * @description The name of the workflow to attach to this trace. This is used to
+             *     name the trace in the traces dashboard.
+             */
+            workflow_name?: string;
+            /**
+             * @description The group id to attach to this trace to enable filtering and
+             *     grouping in the traces dashboard.
+             */
+            group_id?: string;
+            /**
+             * @description The arbitrary metadata to attach to this trace to enable
+             *     filtering in the traces dashboard.
+             */
+            metadata?: Record<string, never>;
+          };
       /**
        * @description Configuration for turn detection. Can be set to `null` to turn off. Server
        *     VAD means that the model will detect the start and end of speech based on
@@ -13371,7 +14119,22 @@ export interface components {
        */
       output_modalities: ("text" | "audio")[];
       /** @description The Realtime model used for this session. */
-      model?: string | ("gpt-realtime" | "gpt-realtime-2025-08-28" | "gpt-4o-realtime-preview" | "gpt-4o-realtime-preview-2024-10-01" | "gpt-4o-realtime-preview-2024-12-17" | "gpt-4o-realtime-preview-2025-06-03" | "gpt-4o-mini-realtime-preview" | "gpt-4o-mini-realtime-preview-2024-12-17" | "gpt-realtime-mini" | "gpt-realtime-mini-2025-10-06" | "gpt-audio-mini" | "gpt-audio-mini-2025-10-06");
+      model?:
+        | string
+        | (
+            | "gpt-realtime"
+            | "gpt-realtime-2025-08-28"
+            | "gpt-4o-realtime-preview"
+            | "gpt-4o-realtime-preview-2024-10-01"
+            | "gpt-4o-realtime-preview-2024-12-17"
+            | "gpt-4o-realtime-preview-2025-06-03"
+            | "gpt-4o-mini-realtime-preview"
+            | "gpt-4o-mini-realtime-preview-2024-12-17"
+            | "gpt-realtime-mini"
+            | "gpt-realtime-mini-2025-10-06"
+            | "gpt-audio-mini"
+            | "gpt-audio-mini-2025-10-06"
+          );
       /**
        * @description The default system instructions (i.e. system message) prepended to model calls. This field allows the client to guide the model on desired responses. The model can be instructed on response content and format, (e.g. "be extremely succinct", "act friendly", "here are examples of good responses") and on audio behavior (e.g. "talk quickly", "inject emotion into your voice", "laugh frequently"). The instructions are not guaranteed to be followed by the model, but they provide guidance to the model on the desired behavior.
        *
@@ -13432,31 +14195,42 @@ export interface components {
        *     `auto` will create a trace for the session with default values for the
        *     workflow name, group id, and metadata.
        */
-      tracing?: ("auto" | {
-        /**
-         * @description The name of the workflow to attach to this trace. This is used to
-         *     name the trace in the Traces Dashboard.
-         */
-        workflow_name?: string;
-        /**
-         * @description The group id to attach to this trace to enable filtering and
-         *     grouping in the Traces Dashboard.
-         */
-        group_id?: string;
-        /**
-         * @description The arbitrary metadata to attach to this trace to enable
-         *     filtering in the Traces Dashboard.
-         */
-        metadata?: Record<string, never>;
-      }) | null;
+      tracing?:
+        | (
+            | "auto"
+            | {
+                /**
+                 * @description The name of the workflow to attach to this trace. This is used to
+                 *     name the trace in the Traces Dashboard.
+                 */
+                workflow_name?: string;
+                /**
+                 * @description The group id to attach to this trace to enable filtering and
+                 *     grouping in the Traces Dashboard.
+                 */
+                group_id?: string;
+                /**
+                 * @description The arbitrary metadata to attach to this trace to enable
+                 *     filtering in the Traces Dashboard.
+                 */
+                metadata?: Record<string, never>;
+              }
+          )
+        | null;
       /** @description Tools available to the model. */
-      tools?: (components["schemas"]["RealtimeFunctionTool"] | components["schemas"]["MCPTool"])[];
+      tools?: (
+        | components["schemas"]["RealtimeFunctionTool"]
+        | components["schemas"]["MCPTool"]
+      )[];
       /**
        * @description How the model chooses tools. Provide one of the string modes or force a specific
        *     function/MCP tool.
        * @default auto
        */
-      tool_choice: components["schemas"]["ToolChoiceOptions"] | components["schemas"]["ToolChoiceFunction"] | components["schemas"]["ToolChoiceMCP"];
+      tool_choice:
+        | components["schemas"]["ToolChoiceOptions"]
+        | components["schemas"]["ToolChoiceFunction"]
+        | components["schemas"]["ToolChoiceMCP"];
       /**
        * @description Maximum number of output tokens for a single assistant response,
        *     inclusive of tool calls. Provide an integer between 1 and 4096 to
@@ -13538,23 +14312,25 @@ export interface components {
        *     `auto` will create a trace for the session with default values for the
        *     workflow name, group id, and metadata.
        */
-      tracing?: "auto" | {
-        /**
-         * @description The name of the workflow to attach to this trace. This is used to
-         *     name the trace in the traces dashboard.
-         */
-        workflow_name?: string;
-        /**
-         * @description The group id to attach to this trace to enable filtering and
-         *     grouping in the traces dashboard.
-         */
-        group_id?: string;
-        /**
-         * @description The arbitrary metadata to attach to this trace to enable
-         *     filtering in the traces dashboard.
-         */
-        metadata?: Record<string, never>;
-      };
+      tracing?:
+        | "auto"
+        | {
+            /**
+             * @description The name of the workflow to attach to this trace. This is used to
+             *     name the trace in the traces dashboard.
+             */
+            workflow_name?: string;
+            /**
+             * @description The group id to attach to this trace to enable filtering and
+             *     grouping in the traces dashboard.
+             */
+            group_id?: string;
+            /**
+             * @description The arbitrary metadata to attach to this trace to enable
+             *     filtering in the traces dashboard.
+             */
+            metadata?: Record<string, never>;
+          };
       /**
        * @description Configuration for turn detection. Can be set to `null` to turn off. Server
        *     VAD means that the model will detect the start and end of speech based on
@@ -13626,7 +14402,22 @@ export interface components {
        */
       output_modalities: ("text" | "audio")[];
       /** @description The Realtime model used for this session. */
-      model?: string | ("gpt-realtime" | "gpt-realtime-2025-08-28" | "gpt-4o-realtime-preview" | "gpt-4o-realtime-preview-2024-10-01" | "gpt-4o-realtime-preview-2024-12-17" | "gpt-4o-realtime-preview-2025-06-03" | "gpt-4o-mini-realtime-preview" | "gpt-4o-mini-realtime-preview-2024-12-17" | "gpt-realtime-mini" | "gpt-realtime-mini-2025-10-06" | "gpt-audio-mini" | "gpt-audio-mini-2025-10-06");
+      model?:
+        | string
+        | (
+            | "gpt-realtime"
+            | "gpt-realtime-2025-08-28"
+            | "gpt-4o-realtime-preview"
+            | "gpt-4o-realtime-preview-2024-10-01"
+            | "gpt-4o-realtime-preview-2024-12-17"
+            | "gpt-4o-realtime-preview-2025-06-03"
+            | "gpt-4o-mini-realtime-preview"
+            | "gpt-4o-mini-realtime-preview-2024-12-17"
+            | "gpt-realtime-mini"
+            | "gpt-realtime-mini-2025-10-06"
+            | "gpt-audio-mini"
+            | "gpt-audio-mini-2025-10-06"
+          );
       /**
        * @description The default system instructions (i.e. system message) prepended to model calls. This field allows the client to guide the model on desired responses. The model can be instructed on response content and format, (e.g. "be extremely succinct", "act friendly", "here are examples of good responses") and on audio behavior (e.g. "talk quickly", "inject emotion into your voice", "laugh frequently"). The instructions are not guaranteed to be followed by the model, but they provide guidance to the model on the desired behavior.
        *
@@ -13679,31 +14470,42 @@ export interface components {
        *     `item.input_audio_transcription.logprobs`: Include logprobs for input audio transcription.
        */
       include?: "item.input_audio_transcription.logprobs"[];
-      tracing?: ("auto" | {
-        /**
-         * @description The name of the workflow to attach to this trace. This is used to
-         *     name the trace in the Traces Dashboard.
-         */
-        workflow_name?: string;
-        /**
-         * @description The group id to attach to this trace to enable filtering and
-         *     grouping in the Traces Dashboard.
-         */
-        group_id?: string;
-        /**
-         * @description The arbitrary metadata to attach to this trace to enable
-         *     filtering in the Traces Dashboard.
-         */
-        metadata?: Record<string, never>;
-      }) | null;
+      tracing?:
+        | (
+            | "auto"
+            | {
+                /**
+                 * @description The name of the workflow to attach to this trace. This is used to
+                 *     name the trace in the Traces Dashboard.
+                 */
+                workflow_name?: string;
+                /**
+                 * @description The group id to attach to this trace to enable filtering and
+                 *     grouping in the Traces Dashboard.
+                 */
+                group_id?: string;
+                /**
+                 * @description The arbitrary metadata to attach to this trace to enable
+                 *     filtering in the Traces Dashboard.
+                 */
+                metadata?: Record<string, never>;
+              }
+          )
+        | null;
       /** @description Tools available to the model. */
-      tools?: (components["schemas"]["RealtimeFunctionTool"] | components["schemas"]["MCPTool"])[];
+      tools?: (
+        | components["schemas"]["RealtimeFunctionTool"]
+        | components["schemas"]["MCPTool"]
+      )[];
       /**
        * @description How the model chooses tools. Provide one of the string modes or force a specific
        *     function/MCP tool.
        * @default auto
        */
-      tool_choice: components["schemas"]["ToolChoiceOptions"] | components["schemas"]["ToolChoiceFunction"] | components["schemas"]["ToolChoiceMCP"];
+      tool_choice:
+        | components["schemas"]["ToolChoiceOptions"]
+        | components["schemas"]["ToolChoiceFunction"]
+        | components["schemas"]["ToolChoiceMCP"];
       /**
        * @description Maximum number of output tokens for a single assistant response,
        *     inclusive of tool calls. Provide an integer between 1 and 4096 to
@@ -13928,75 +14730,82 @@ export interface components {
      * @description Controls how the realtime conversation is truncated prior to model inference.
      *     The default is `auto`.
      */
-    RealtimeTruncation: ("auto" | "disabled") | {
-      /**
-       * @description Use retention ratio truncation.
-       * @enum {string}
-       */
-      type: "retention_ratio";
-      /** @description Fraction of post-instruction conversation tokens to retain (0.0 - 1.0) when the conversation exceeds the input token limit. */
-      retention_ratio: number;
-    };
-    RealtimeTurnDetection: ({
-      /**
-       * @description Type of turn detection, `server_vad` to turn on simple Server VAD.
-       * @default server_vad
-       * @constant
-       */
-      type: "server_vad";
-      /**
-       * @description Used only for `server_vad` mode. Activation threshold for VAD (0.0 to 1.0), this defaults to 0.5. A
-       *     higher threshold will require louder audio to activate the model, and
-       *     thus might perform better in noisy environments.
-       */
-      threshold?: number;
-      /**
-       * @description Used only for `server_vad` mode. Amount of audio to include before the VAD detected speech (in
-       *     milliseconds). Defaults to 300ms.
-       */
-      prefix_padding_ms?: number;
-      /**
-       * @description Used only for `server_vad` mode. Duration of silence to detect speech stop (in milliseconds). Defaults
-       *     to 500ms. With shorter values the model will respond more quickly,
-       *     but may jump in on short pauses from the user.
-       */
-      silence_duration_ms?: number;
-      /**
-       * @description Whether or not to automatically generate a response when a VAD stop event occurs.
-       * @default true
-       */
-      create_response: boolean;
-      /**
-       * @description Whether or not to automatically interrupt any ongoing response with output to the default
-       *     conversation (i.e. `conversation` of `auto`) when a VAD start event occurs.
-       * @default true
-       */
-      interrupt_response: boolean;
-      idle_timeout_ms?: number | null;
-    } | {
-      /**
-       * @description Type of turn detection, `semantic_vad` to turn on Semantic VAD.
-       * @constant
-       */
-      type: "semantic_vad";
-      /**
-       * @description Used only for `semantic_vad` mode. The eagerness of the model to respond. `low` will wait longer for the user to continue speaking, `high` will respond more quickly. `auto` is the default and is equivalent to `medium`. `low`, `medium`, and `high` have max timeouts of 8s, 4s, and 2s respectively.
-       * @default auto
-       * @enum {string}
-       */
-      eagerness: "low" | "medium" | "high" | "auto";
-      /**
-       * @description Whether or not to automatically generate a response when a VAD stop event occurs.
-       * @default true
-       */
-      create_response: boolean;
-      /**
-       * @description Whether or not to automatically interrupt any ongoing response with output to the default
-       *     conversation (i.e. `conversation` of `auto`) when a VAD start event occurs.
-       * @default true
-       */
-      interrupt_response: boolean;
-    }) | null;
+    RealtimeTruncation:
+      | ("auto" | "disabled")
+      | {
+          /**
+           * @description Use retention ratio truncation.
+           * @enum {string}
+           */
+          type: "retention_ratio";
+          /** @description Fraction of post-instruction conversation tokens to retain (0.0 - 1.0) when the conversation exceeds the input token limit. */
+          retention_ratio: number;
+        };
+    RealtimeTurnDetection:
+      | (
+          | {
+              /**
+               * @description Type of turn detection, `server_vad` to turn on simple Server VAD.
+               * @default server_vad
+               * @constant
+               */
+              type: "server_vad";
+              /**
+               * @description Used only for `server_vad` mode. Activation threshold for VAD (0.0 to 1.0), this defaults to 0.5. A
+               *     higher threshold will require louder audio to activate the model, and
+               *     thus might perform better in noisy environments.
+               */
+              threshold?: number;
+              /**
+               * @description Used only for `server_vad` mode. Amount of audio to include before the VAD detected speech (in
+               *     milliseconds). Defaults to 300ms.
+               */
+              prefix_padding_ms?: number;
+              /**
+               * @description Used only for `server_vad` mode. Duration of silence to detect speech stop (in milliseconds). Defaults
+               *     to 500ms. With shorter values the model will respond more quickly,
+               *     but may jump in on short pauses from the user.
+               */
+              silence_duration_ms?: number;
+              /**
+               * @description Whether or not to automatically generate a response when a VAD stop event occurs.
+               * @default true
+               */
+              create_response: boolean;
+              /**
+               * @description Whether or not to automatically interrupt any ongoing response with output to the default
+               *     conversation (i.e. `conversation` of `auto`) when a VAD start event occurs.
+               * @default true
+               */
+              interrupt_response: boolean;
+              idle_timeout_ms?: number | null;
+            }
+          | {
+              /**
+               * @description Type of turn detection, `semantic_vad` to turn on Semantic VAD.
+               * @constant
+               */
+              type: "semantic_vad";
+              /**
+               * @description Used only for `semantic_vad` mode. The eagerness of the model to respond. `low` will wait longer for the user to continue speaking, `high` will respond more quickly. `auto` is the default and is equivalent to `medium`. `low`, `medium`, and `high` have max timeouts of 8s, 4s, and 2s respectively.
+               * @default auto
+               * @enum {string}
+               */
+              eagerness: "low" | "medium" | "high" | "auto";
+              /**
+               * @description Whether or not to automatically generate a response when a VAD stop event occurs.
+               * @default true
+               */
+              create_response: boolean;
+              /**
+               * @description Whether or not to automatically interrupt any ongoing response with output to the default
+               *     conversation (i.e. `conversation` of `auto`) when a VAD start event occurs.
+               * @default true
+               */
+              interrupt_response: boolean;
+            }
+        )
+      | null;
     /**
      * Reasoning
      * @description **gpt-5 and o-series models only**
@@ -14038,51 +14847,58 @@ export interface components {
       status?: "in_progress" | "completed" | "incomplete";
     };
     /** The response object */
-    Response: components["schemas"]["ModelResponseProperties"] & components["schemas"]["ResponseProperties"] & {
-      /** @description Unique identifier for this Response. */
-      id: string;
-      /**
-       * @description The object type of this resource - always set to `response`.
-       * @enum {string}
-       */
-      object: "response";
-      /**
-       * @description The status of the response generation. One of `completed`, `failed`,
-       *     `in_progress`, `cancelled`, `queued`, or `incomplete`.
-       * @enum {string}
-       */
-      status?: "completed" | "failed" | "in_progress" | "cancelled" | "queued" | "incomplete";
-      /** @description Unix timestamp (in seconds) of when this Response was created. */
-      created_at: number;
-      error: components["schemas"]["ResponseError"];
-      incomplete_details: {
+    Response: components["schemas"]["ModelResponseProperties"] &
+      components["schemas"]["ResponseProperties"] & {
+        /** @description Unique identifier for this Response. */
+        id: string;
         /**
-         * @description The reason why the response is incomplete.
+         * @description The object type of this resource - always set to `response`.
          * @enum {string}
          */
-        reason?: "max_output_tokens" | "content_filter";
-      } | null;
-      /**
-       * @description An array of content items generated by the model.
-       *
-       *     - The length and order of items in the `output` array is dependent
-       *       on the model's response.
-       *     - Rather than accessing the first item in the `output` array and
-       *       assuming it's an `assistant` message with the content generated by
-       *       the model, you might consider using the `output_text` property where
-       *       supported in SDKs.
-       */
-      output: components["schemas"]["OutputItem"][];
-      instructions: (string | components["schemas"]["InputItem"][]) | null;
-      output_text?: string | null;
-      usage?: components["schemas"]["ResponseUsage"];
-      /**
-       * @description Whether to allow the model to run tool calls in parallel.
-       * @default true
-       */
-      parallel_tool_calls: boolean;
-      conversation?: components["schemas"]["Conversation-2"] | null;
-    };
+        object: "response";
+        /**
+         * @description The status of the response generation. One of `completed`, `failed`,
+         *     `in_progress`, `cancelled`, `queued`, or `incomplete`.
+         * @enum {string}
+         */
+        status?:
+          | "completed"
+          | "failed"
+          | "in_progress"
+          | "cancelled"
+          | "queued"
+          | "incomplete";
+        /** @description Unix timestamp (in seconds) of when this Response was created. */
+        created_at: number;
+        error: components["schemas"]["ResponseError"];
+        incomplete_details: {
+          /**
+           * @description The reason why the response is incomplete.
+           * @enum {string}
+           */
+          reason?: "max_output_tokens" | "content_filter";
+        } | null;
+        /**
+         * @description An array of content items generated by the model.
+         *
+         *     - The length and order of items in the `output` array is dependent
+         *       on the model's response.
+         *     - Rather than accessing the first item in the `output` array and
+         *       assuming it's an `assistant` message with the content generated by
+         *       the model, you might consider using the `output_text` property where
+         *       supported in SDKs.
+         */
+        output: components["schemas"]["OutputItem"][];
+        instructions: (string | components["schemas"]["InputItem"][]) | null;
+        output_text?: string | null;
+        usage?: components["schemas"]["ResponseUsage"];
+        /**
+         * @description Whether to allow the model to run tool calls in parallel.
+         * @default true
+         */
+        parallel_tool_calls: boolean;
+        conversation?: components["schemas"]["Conversation-2"] | null;
+      };
     /** @description Emitted when there is a partial audio response. */
     ResponseAudioDeltaEvent: {
       /**
@@ -14308,7 +15124,25 @@ export interface components {
      * @description The error code for the response.
      * @enum {string}
      */
-    ResponseErrorCode: "server_error" | "rate_limit_exceeded" | "invalid_prompt" | "vector_store_timeout" | "invalid_image" | "invalid_image_format" | "invalid_base64_image" | "invalid_image_url" | "image_too_large" | "image_too_small" | "image_parse_error" | "image_content_policy_violation" | "invalid_image_mode" | "image_file_too_large" | "unsupported_image_media_type" | "empty_image_file" | "failed_to_download_image" | "image_file_not_found";
+    ResponseErrorCode:
+      | "server_error"
+      | "rate_limit_exceeded"
+      | "invalid_prompt"
+      | "vector_store_timeout"
+      | "invalid_image"
+      | "invalid_image_format"
+      | "invalid_base64_image"
+      | "invalid_image_url"
+      | "image_too_large"
+      | "image_too_small"
+      | "image_parse_error"
+      | "image_content_policy_violation"
+      | "invalid_image_mode"
+      | "image_file_too_large"
+      | "unsupported_image_media_type"
+      | "empty_image_file"
+      | "failed_to_download_image"
+      | "image_file_not_found";
     /** @description Emitted when an error occurs. */
     ResponseErrorEvent: {
       /**
@@ -14820,7 +15654,11 @@ export interface components {
       annotation: Record<string, never>;
     };
     ResponsePromptVariables: {
-      [key: string]: string | components["schemas"]["InputTextContent"] | components["schemas"]["InputImageContent"] | components["schemas"]["InputFileContent"];
+      [key: string]:
+        | string
+        | components["schemas"]["InputTextContent"]
+        | components["schemas"]["InputImageContent"]
+        | components["schemas"]["InputFileContent"];
     } | null;
     ResponseProperties: {
       previous_response_id?: string | null;
@@ -15016,7 +15854,60 @@ export interface components {
       /** @description The sequence number of this event. */
       sequence_number: number;
     };
-    ResponseStreamEvent: components["schemas"]["ResponseAudioDeltaEvent"] | components["schemas"]["ResponseAudioDoneEvent"] | components["schemas"]["ResponseAudioTranscriptDeltaEvent"] | components["schemas"]["ResponseAudioTranscriptDoneEvent"] | components["schemas"]["ResponseCodeInterpreterCallCodeDeltaEvent"] | components["schemas"]["ResponseCodeInterpreterCallCodeDoneEvent"] | components["schemas"]["ResponseCodeInterpreterCallCompletedEvent"] | components["schemas"]["ResponseCodeInterpreterCallInProgressEvent"] | components["schemas"]["ResponseCodeInterpreterCallInterpretingEvent"] | components["schemas"]["ResponseCompletedEvent"] | components["schemas"]["ResponseContentPartAddedEvent"] | components["schemas"]["ResponseContentPartDoneEvent"] | components["schemas"]["ResponseCreatedEvent"] | components["schemas"]["ResponseErrorEvent"] | components["schemas"]["ResponseFileSearchCallCompletedEvent"] | components["schemas"]["ResponseFileSearchCallInProgressEvent"] | components["schemas"]["ResponseFileSearchCallSearchingEvent"] | components["schemas"]["ResponseFunctionCallArgumentsDeltaEvent"] | components["schemas"]["ResponseFunctionCallArgumentsDoneEvent"] | components["schemas"]["ResponseInProgressEvent"] | components["schemas"]["ResponseFailedEvent"] | components["schemas"]["ResponseIncompleteEvent"] | components["schemas"]["ResponseOutputItemAddedEvent"] | components["schemas"]["ResponseOutputItemDoneEvent"] | components["schemas"]["ResponseReasoningSummaryPartAddedEvent"] | components["schemas"]["ResponseReasoningSummaryPartDoneEvent"] | components["schemas"]["ResponseReasoningSummaryTextDeltaEvent"] | components["schemas"]["ResponseReasoningSummaryTextDoneEvent"] | components["schemas"]["ResponseReasoningTextDeltaEvent"] | components["schemas"]["ResponseReasoningTextDoneEvent"] | components["schemas"]["ResponseRefusalDeltaEvent"] | components["schemas"]["ResponseRefusalDoneEvent"] | components["schemas"]["ResponseTextDeltaEvent"] | components["schemas"]["ResponseTextDoneEvent"] | components["schemas"]["ResponseWebSearchCallCompletedEvent"] | components["schemas"]["ResponseWebSearchCallInProgressEvent"] | components["schemas"]["ResponseWebSearchCallSearchingEvent"] | components["schemas"]["ResponseImageGenCallCompletedEvent"] | components["schemas"]["ResponseImageGenCallGeneratingEvent"] | components["schemas"]["ResponseImageGenCallInProgressEvent"] | components["schemas"]["ResponseImageGenCallPartialImageEvent"] | components["schemas"]["ResponseMCPCallArgumentsDeltaEvent"] | components["schemas"]["ResponseMCPCallArgumentsDoneEvent"] | components["schemas"]["ResponseMCPCallCompletedEvent"] | components["schemas"]["ResponseMCPCallFailedEvent"] | components["schemas"]["ResponseMCPCallInProgressEvent"] | components["schemas"]["ResponseMCPListToolsCompletedEvent"] | components["schemas"]["ResponseMCPListToolsFailedEvent"] | components["schemas"]["ResponseMCPListToolsInProgressEvent"] | components["schemas"]["ResponseOutputTextAnnotationAddedEvent"] | components["schemas"]["ResponseQueuedEvent"] | components["schemas"]["ResponseCustomToolCallInputDeltaEvent"] | components["schemas"]["ResponseCustomToolCallInputDoneEvent"];
+    ResponseStreamEvent:
+      | components["schemas"]["ResponseAudioDeltaEvent"]
+      | components["schemas"]["ResponseAudioDoneEvent"]
+      | components["schemas"]["ResponseAudioTranscriptDeltaEvent"]
+      | components["schemas"]["ResponseAudioTranscriptDoneEvent"]
+      | components["schemas"]["ResponseCodeInterpreterCallCodeDeltaEvent"]
+      | components["schemas"]["ResponseCodeInterpreterCallCodeDoneEvent"]
+      | components["schemas"]["ResponseCodeInterpreterCallCompletedEvent"]
+      | components["schemas"]["ResponseCodeInterpreterCallInProgressEvent"]
+      | components["schemas"]["ResponseCodeInterpreterCallInterpretingEvent"]
+      | components["schemas"]["ResponseCompletedEvent"]
+      | components["schemas"]["ResponseContentPartAddedEvent"]
+      | components["schemas"]["ResponseContentPartDoneEvent"]
+      | components["schemas"]["ResponseCreatedEvent"]
+      | components["schemas"]["ResponseErrorEvent"]
+      | components["schemas"]["ResponseFileSearchCallCompletedEvent"]
+      | components["schemas"]["ResponseFileSearchCallInProgressEvent"]
+      | components["schemas"]["ResponseFileSearchCallSearchingEvent"]
+      | components["schemas"]["ResponseFunctionCallArgumentsDeltaEvent"]
+      | components["schemas"]["ResponseFunctionCallArgumentsDoneEvent"]
+      | components["schemas"]["ResponseInProgressEvent"]
+      | components["schemas"]["ResponseFailedEvent"]
+      | components["schemas"]["ResponseIncompleteEvent"]
+      | components["schemas"]["ResponseOutputItemAddedEvent"]
+      | components["schemas"]["ResponseOutputItemDoneEvent"]
+      | components["schemas"]["ResponseReasoningSummaryPartAddedEvent"]
+      | components["schemas"]["ResponseReasoningSummaryPartDoneEvent"]
+      | components["schemas"]["ResponseReasoningSummaryTextDeltaEvent"]
+      | components["schemas"]["ResponseReasoningSummaryTextDoneEvent"]
+      | components["schemas"]["ResponseReasoningTextDeltaEvent"]
+      | components["schemas"]["ResponseReasoningTextDoneEvent"]
+      | components["schemas"]["ResponseRefusalDeltaEvent"]
+      | components["schemas"]["ResponseRefusalDoneEvent"]
+      | components["schemas"]["ResponseTextDeltaEvent"]
+      | components["schemas"]["ResponseTextDoneEvent"]
+      | components["schemas"]["ResponseWebSearchCallCompletedEvent"]
+      | components["schemas"]["ResponseWebSearchCallInProgressEvent"]
+      | components["schemas"]["ResponseWebSearchCallSearchingEvent"]
+      | components["schemas"]["ResponseImageGenCallCompletedEvent"]
+      | components["schemas"]["ResponseImageGenCallGeneratingEvent"]
+      | components["schemas"]["ResponseImageGenCallInProgressEvent"]
+      | components["schemas"]["ResponseImageGenCallPartialImageEvent"]
+      | components["schemas"]["ResponseMCPCallArgumentsDeltaEvent"]
+      | components["schemas"]["ResponseMCPCallArgumentsDoneEvent"]
+      | components["schemas"]["ResponseMCPCallCompletedEvent"]
+      | components["schemas"]["ResponseMCPCallFailedEvent"]
+      | components["schemas"]["ResponseMCPCallInProgressEvent"]
+      | components["schemas"]["ResponseMCPListToolsCompletedEvent"]
+      | components["schemas"]["ResponseMCPListToolsFailedEvent"]
+      | components["schemas"]["ResponseMCPListToolsInProgressEvent"]
+      | components["schemas"]["ResponseOutputTextAnnotationAddedEvent"]
+      | components["schemas"]["ResponseQueuedEvent"]
+      | components["schemas"]["ResponseCustomToolCallInputDeltaEvent"]
+      | components["schemas"]["ResponseCustomToolCallInputDoneEvent"];
     ResponseStreamOptions: {
       /**
        * @description When true, stream obfuscation will be enabled. Stream obfuscation adds
@@ -15157,7 +16048,12 @@ export interface components {
     /** RunGraderRequest */
     RunGraderRequest: {
       /** @description The grader used for the fine-tuning job. */
-      grader: components["schemas"]["GraderStringCheck"] | components["schemas"]["GraderTextSimilarity"] | components["schemas"]["GraderPython"] | components["schemas"]["GraderScoreModel"] | components["schemas"]["GraderMulti"];
+      grader:
+        | components["schemas"]["GraderStringCheck"]
+        | components["schemas"]["GraderTextSimilarity"]
+        | components["schemas"]["GraderPython"]
+        | components["schemas"]["GraderScoreModel"]
+        | components["schemas"]["GraderMulti"];
       /**
        * @description The dataset item provided to the grader. This will be used to populate
        *     the `item` namespace. See [the guide](https://platform.openai.com/docs/guides/graders) for more details.
@@ -15286,7 +16182,8 @@ export interface components {
       /** @description The maximum number of completion tokens specified to have been used over the course of the run. */
       max_completion_tokens: number | null;
       truncation_strategy: components["schemas"]["TruncationObject"] & unknown;
-      tool_choice: components["schemas"]["AssistantsApiToolChoiceOption"] & unknown;
+      tool_choice: components["schemas"]["AssistantsApiToolChoiceOption"] &
+        unknown;
       parallel_tool_calls: components["schemas"]["ParallelToolCalls"];
       response_format: components["schemas"]["AssistantsApiResponseFormatOption"];
     };
@@ -15346,7 +16243,10 @@ export interface components {
         /** @description The input to the Code Interpreter tool call. */
         input?: string;
         /** @description The outputs from the Code Interpreter tool call. Code Interpreter can output one or more items, including text (`logs`) or images (`image`). Each of these are represented by a different object type. */
-        outputs?: (components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeOutputLogsObject"] | components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeOutputImageObject"])[];
+        outputs?: (
+          | components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeOutputLogsObject"]
+          | components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeOutputImageObject"]
+        )[];
       };
     };
     /** Code interpreter image output */
@@ -15457,7 +16357,10 @@ export interface components {
         /** @description The input to the Code Interpreter tool call. */
         input: string;
         /** @description The outputs from the Code Interpreter tool call. Code Interpreter can output one or more items, including text (`logs`) or images (`image`). Each of these are represented by a different object type. */
-        outputs: (components["schemas"]["RunStepDetailsToolCallsCodeOutputLogsObject"] | components["schemas"]["RunStepDetailsToolCallsCodeOutputImageObject"])[];
+        outputs: (
+          | components["schemas"]["RunStepDetailsToolCallsCodeOutputLogsObject"]
+          | components["schemas"]["RunStepDetailsToolCallsCodeOutputImageObject"]
+        )[];
       };
     };
     /** Code Interpreter image output */
@@ -15594,7 +16497,9 @@ export interface components {
        */
       status: "in_progress" | "cancelled" | "failed" | "completed" | "expired";
       /** @description The details of the run step. */
-      step_details: components["schemas"]["RunStepDetailsMessageCreationObject"] | components["schemas"]["RunStepDetailsToolCallsObject"];
+      step_details:
+        | components["schemas"]["RunStepDetailsMessageCreationObject"]
+        | components["schemas"]["RunStepDetailsToolCallsObject"];
       last_error: {
         /**
          * @description One of `server_error` or `rate_limit_exceeded`.
@@ -15611,76 +16516,93 @@ export interface components {
       metadata: components["schemas"]["Metadata"];
       usage: components["schemas"]["RunStepCompletionUsage"];
     };
-    RunStepStreamEvent: {
-      /** @enum {string} */
-      event: "thread.run.step.created";
-      data: components["schemas"]["RunStepObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.in_progress";
-      data: components["schemas"]["RunStepObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.delta";
-      data: components["schemas"]["RunStepDeltaObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.completed";
-      data: components["schemas"]["RunStepObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.failed";
-      data: components["schemas"]["RunStepObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.cancelled";
-      data: components["schemas"]["RunStepObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.step.expired";
-      data: components["schemas"]["RunStepObject"];
-    };
-    RunStreamEvent: {
-      /** @enum {string} */
-      event: "thread.run.created";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.queued";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.in_progress";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.requires_action";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.completed";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.incomplete";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.failed";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.cancelling";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.cancelled";
-      data: components["schemas"]["RunObject"];
-    } | {
-      /** @enum {string} */
-      event: "thread.run.expired";
-      data: components["schemas"]["RunObject"];
-    };
+    RunStepStreamEvent:
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.created";
+          data: components["schemas"]["RunStepObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.in_progress";
+          data: components["schemas"]["RunStepObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.delta";
+          data: components["schemas"]["RunStepDeltaObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.completed";
+          data: components["schemas"]["RunStepObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.failed";
+          data: components["schemas"]["RunStepObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.cancelled";
+          data: components["schemas"]["RunStepObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.step.expired";
+          data: components["schemas"]["RunStepObject"];
+        };
+    RunStreamEvent:
+      | {
+          /** @enum {string} */
+          event: "thread.run.created";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.queued";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.in_progress";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.requires_action";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.completed";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.incomplete";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.failed";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.cancelling";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.cancelled";
+          data: components["schemas"]["RunObject"];
+        }
+      | {
+          /** @enum {string} */
+          event: "thread.run.expired";
+          data: components["schemas"]["RunObject"];
+        };
     /** @description Tool call objects */
     RunToolCallObject: {
       /** @description The ID of the tool call. This ID must be referenced when you submit the tool outputs in using the [Submit tool outputs to run](https://platform.openai.com/docs/api-reference/runs/submitToolOutputs) endpoint. */
@@ -15823,7 +16745,10 @@ export interface components {
      *     ensures the message the model generates is valid JSON. Using `json_schema`
      *     is preferred for models that support it.
      */
-    TextResponseFormatConfiguration: components["schemas"]["ResponseFormatText"] | components["schemas"]["TextResponseFormatJsonSchema"] | components["schemas"]["ResponseFormatJsonObject"];
+    TextResponseFormatConfiguration:
+      | components["schemas"]["ResponseFormatText"]
+      | components["schemas"]["TextResponseFormatJsonSchema"]
+      | components["schemas"]["ResponseFormatJsonObject"];
     /**
      * JSON schema
      * @description JSON Schema response format. Used to generate structured JSON responses.
@@ -15888,7 +16813,17 @@ export interface components {
       certificate_ids: string[];
     };
     /** @description A tool that can be used to generate a response. */
-    Tool: components["schemas"]["FunctionTool"] | components["schemas"]["FileSearchTool"] | components["schemas"]["ComputerUsePreviewTool"] | components["schemas"]["WebSearchTool"] | components["schemas"]["MCPTool"] | components["schemas"]["CodeInterpreterTool"] | components["schemas"]["ImageGenTool"] | components["schemas"]["LocalShellToolParam"] | components["schemas"]["CustomToolParam"] | components["schemas"]["WebSearchPreviewTool"];
+    Tool:
+      | components["schemas"]["FunctionTool"]
+      | components["schemas"]["FileSearchTool"]
+      | components["schemas"]["ComputerUsePreviewTool"]
+      | components["schemas"]["WebSearchTool"]
+      | components["schemas"]["MCPTool"]
+      | components["schemas"]["CodeInterpreterTool"]
+      | components["schemas"]["ImageGenTool"]
+      | components["schemas"]["LocalShellToolParam"]
+      | components["schemas"]["CustomToolParam"]
+      | components["schemas"]["WebSearchPreviewTool"];
     /**
      * Allowed tools
      * @description Constrains the tools available to the model to a pre-defined set.
@@ -15983,7 +16918,13 @@ export interface components {
      *     a response. See the `tools` parameter to see how to specify which tools
      *     the model can call.
      */
-    ToolChoiceParam: components["schemas"]["ToolChoiceOptions"] | components["schemas"]["ToolChoiceAllowed"] | components["schemas"]["ToolChoiceTypes"] | components["schemas"]["ToolChoiceFunction"] | components["schemas"]["ToolChoiceMCP"] | components["schemas"]["ToolChoiceCustom"];
+    ToolChoiceParam:
+      | components["schemas"]["ToolChoiceOptions"]
+      | components["schemas"]["ToolChoiceAllowed"]
+      | components["schemas"]["ToolChoiceTypes"]
+      | components["schemas"]["ToolChoiceFunction"]
+      | components["schemas"]["ToolChoiceMCP"]
+      | components["schemas"]["ToolChoiceCustom"];
     /**
      * Hosted tool
      * @description Indicates that the model should use a built-in tool to generate a response.
@@ -16002,7 +16943,13 @@ export interface components {
        *     - `image_generation`
        * @enum {string}
        */
-      type: "file_search" | "web_search_preview" | "computer_use_preview" | "web_search_preview_2025_03_11" | "image_generation" | "code_interpreter";
+      type:
+        | "file_search"
+        | "web_search_preview"
+        | "computer_use_preview"
+        | "web_search_preview_2025_03_11"
+        | "image_generation"
+        | "code_interpreter";
     };
     /**
      * @description An array of tools the model may call while generating a response. You
@@ -16125,7 +17072,9 @@ export interface components {
       /** @description Total number of tokens used (input + output). */
       total_tokens: number;
     };
-    TranscriptionChunkingStrategy: ("auto" | components["schemas"]["VadConfig"]) | null;
+    TranscriptionChunkingStrategy:
+      | ("auto" | components["schemas"]["VadConfig"])
+      | null;
     /** @description A segment of diarized transcript text with speaker metadata. */
     TranscriptionDiarizedSegment: {
       /**
@@ -16239,7 +17188,8 @@ export interface components {
     UpdateVectorStoreRequest: {
       /** @description The name of the vector store. */
       name?: string | null;
-      expires_after?: components["schemas"]["VectorStoreExpirationAfter"] & unknown;
+      expires_after?: components["schemas"]["VectorStoreExpirationAfter"] &
+        unknown;
       metadata?: components["schemas"]["Metadata"];
     };
     /**
@@ -16404,7 +17354,17 @@ export interface components {
       object: "bucket";
       start_time: number;
       end_time: number;
-      result: (components["schemas"]["UsageCompletionsResult"] | components["schemas"]["UsageEmbeddingsResult"] | components["schemas"]["UsageModerationsResult"] | components["schemas"]["UsageImagesResult"] | components["schemas"]["UsageAudioSpeechesResult"] | components["schemas"]["UsageAudioTranscriptionsResult"] | components["schemas"]["UsageVectorStoresResult"] | components["schemas"]["UsageCodeInterpreterSessionsResult"] | components["schemas"]["CostsResult"])[];
+      result: (
+        | components["schemas"]["UsageCompletionsResult"]
+        | components["schemas"]["UsageEmbeddingsResult"]
+        | components["schemas"]["UsageModerationsResult"]
+        | components["schemas"]["UsageImagesResult"]
+        | components["schemas"]["UsageAudioSpeechesResult"]
+        | components["schemas"]["UsageAudioTranscriptionsResult"]
+        | components["schemas"]["UsageVectorStoresResult"]
+        | components["schemas"]["UsageCodeInterpreterSessionsResult"]
+        | components["schemas"]["CostsResult"]
+      )[];
     };
     /** @description The aggregated vector stores usage details of the specific time bucket. */
     UsageVectorStoresResult: {
@@ -16486,12 +17446,22 @@ export interface components {
     /** ValidateGraderRequest */
     ValidateGraderRequest: {
       /** @description The grader used for the fine-tuning job. */
-      grader: components["schemas"]["GraderStringCheck"] | components["schemas"]["GraderTextSimilarity"] | components["schemas"]["GraderPython"] | components["schemas"]["GraderScoreModel"] | components["schemas"]["GraderMulti"];
+      grader:
+        | components["schemas"]["GraderStringCheck"]
+        | components["schemas"]["GraderTextSimilarity"]
+        | components["schemas"]["GraderPython"]
+        | components["schemas"]["GraderScoreModel"]
+        | components["schemas"]["GraderMulti"];
     };
     /** ValidateGraderResponse */
     ValidateGraderResponse: {
       /** @description The grader used for the fine-tuning job. */
-      grader?: components["schemas"]["GraderStringCheck"] | components["schemas"]["GraderTextSimilarity"] | components["schemas"]["GraderPython"] | components["schemas"]["GraderScoreModel"] | components["schemas"]["GraderMulti"];
+      grader?:
+        | components["schemas"]["GraderStringCheck"]
+        | components["schemas"]["GraderTextSimilarity"]
+        | components["schemas"]["GraderPython"]
+        | components["schemas"]["GraderScoreModel"]
+        | components["schemas"]["GraderMulti"];
     };
     /**
      * Vector store expiration policy
@@ -16650,7 +17620,9 @@ export interface components {
        */
       max_num_results: number;
       /** @description A filter to apply based on file attributes. */
-      filters?: components["schemas"]["ComparisonFilter"] | components["schemas"]["CompoundFilter"];
+      filters?:
+        | components["schemas"]["ComparisonFilter"]
+        | components["schemas"]["CompoundFilter"];
       /** @description Ranking options for search. */
       ranking_options?: {
         /**
@@ -16698,7 +17670,20 @@ export interface components {
     };
     Verbosity: ("low" | "medium" | "high") | null;
     /** @example ash */
-    VoiceIdsShared: string | ("alloy" | "ash" | "ballad" | "coral" | "echo" | "sage" | "shimmer" | "verse" | "marin" | "cedar");
+    VoiceIdsShared:
+      | string
+      | (
+          | "alloy"
+          | "ash"
+          | "ballad"
+          | "coral"
+          | "echo"
+          | "sage"
+          | "shimmer"
+          | "verse"
+          | "marin"
+          | "cedar"
+        );
     /**
      * Wait
      * @description A wait action.
@@ -16857,7 +17842,10 @@ export interface components {
        * @description An object describing the specific action taken in this web search call.
        *     Includes details on how the model used the web (search, open_page, find).
        */
-      action: components["schemas"]["WebSearchActionSearch"] | components["schemas"]["WebSearchActionOpenPage"] | components["schemas"]["WebSearchActionFind"];
+      action:
+        | components["schemas"]["WebSearchActionSearch"]
+        | components["schemas"]["WebSearchActionOpenPage"]
+        | components["schemas"]["WebSearchActionFind"];
     };
     /**
      * batch.cancelled
@@ -17252,11 +18240,27 @@ export interface components {
      *     - `reasoning.encrypted_content`: Includes an encrypted version of reasoning tokens in reasoning item outputs. This enables reasoning items to be used in multi-turn conversations when using the Responses API statelessly (like when the `store` parameter is set to `false`, or when an organization is enrolled in the zero data retention program).
      * @enum {string}
      */
-    IncludeEnum: "file_search_call.results" | "web_search_call.results" | "web_search_call.action.sources" | "message.input_image.image_url" | "computer_call_output.output.image_url" | "code_interpreter_call.outputs" | "reasoning.encrypted_content" | "message.output_text.logprobs";
+    IncludeEnum:
+      | "file_search_call.results"
+      | "web_search_call.results"
+      | "web_search_call.action.sources"
+      | "message.input_image.image_url"
+      | "computer_call_output.output.image_url"
+      | "code_interpreter_call.outputs"
+      | "reasoning.encrypted_content"
+      | "message.output_text.logprobs";
     /** @enum {string} */
     MessageStatus: "in_progress" | "completed" | "incomplete";
     /** @enum {string} */
-    MessageRole: "unknown" | "user" | "assistant" | "system" | "critic" | "discriminator" | "developer" | "tool";
+    MessageRole:
+      | "unknown"
+      | "user"
+      | "assistant"
+      | "system"
+      | "critic"
+      | "discriminator"
+      | "developer"
+      | "tool";
     /**
      * Input text
      * @description A text input to the model.
@@ -17331,7 +18335,11 @@ export interface components {
       /** @description The filename of the container file cited. */
       filename: string;
     };
-    Annotation: components["schemas"]["FileCitationBody"] | components["schemas"]["UrlCitationBody"] | components["schemas"]["ContainerFileCitationBody"] | components["schemas"]["FilePath"];
+    Annotation:
+      | components["schemas"]["FileCitationBody"]
+      | components["schemas"]["UrlCitationBody"]
+      | components["schemas"]["ContainerFileCitationBody"]
+      | components["schemas"]["FilePath"];
     /**
      * Top log probability
      * @description The top log probability of a token.
@@ -17491,7 +18499,17 @@ export interface components {
       /** @description The role of the message. One of `unknown`, `user`, `assistant`, `system`, `critic`, `discriminator`, `developer`, or `tool`. */
       role: components["schemas"]["MessageRole"];
       /** @description The content of the message */
-      content: (components["schemas"]["InputTextContent"] | components["schemas"]["OutputTextContent"] | components["schemas"]["TextContent"] | components["schemas"]["SummaryTextContent"] | components["schemas"]["ReasoningTextContent"] | components["schemas"]["RefusalContent"] | components["schemas"]["InputImageContent"] | components["schemas"]["ComputerScreenshotContent"] | components["schemas"]["InputFileContent"])[];
+      content: (
+        | components["schemas"]["InputTextContent"]
+        | components["schemas"]["OutputTextContent"]
+        | components["schemas"]["TextContent"]
+        | components["schemas"]["SummaryTextContent"]
+        | components["schemas"]["ReasoningTextContent"]
+        | components["schemas"]["RefusalContent"]
+        | components["schemas"]["InputImageContent"]
+        | components["schemas"]["ComputerScreenshotContent"]
+        | components["schemas"]["InputFileContent"]
+      )[];
     };
     /** @enum {string} */
     ClickButtonType: "left" | "right" | "wheel" | "back" | "forward";
@@ -17610,7 +18628,12 @@ export interface components {
       user?: string | null;
     };
     /** @enum {string} */
-    MCPToolCallStatus: "in_progress" | "completed" | "incomplete" | "calling" | "failed";
+    MCPToolCallStatus:
+      | "in_progress"
+      | "completed"
+      | "incomplete"
+      | "calling"
+      | "failed";
     /** @enum {string} */
     DetailEnum: "low" | "high" | "auto";
     /** @enum {string} */
@@ -17630,7 +18653,9 @@ export interface components {
        */
       type: "computer_call_output";
       output: components["schemas"]["ComputerScreenshotImage"];
-      acknowledged_safety_checks?: components["schemas"]["ComputerCallSafetyCheckParam"][] | null;
+      acknowledged_safety_checks?:
+        | components["schemas"]["ComputerCallSafetyCheckParam"][]
+        | null;
       status?: components["schemas"]["FunctionCallItemStatus"] | null;
     };
     /**
@@ -17693,7 +18718,13 @@ export interface components {
        */
       type: "function_call_output";
       /** @description Text, image, or file output of the function tool call. */
-      output: string | (components["schemas"]["InputTextContentParam"] | components["schemas"]["InputImageContentParamAutoParam"] | components["schemas"]["InputFileContentParam"])[];
+      output:
+        | string
+        | (
+            | components["schemas"]["InputTextContentParam"]
+            | components["schemas"]["InputImageContentParamAutoParam"]
+            | components["schemas"]["InputFileContentParam"]
+          )[];
       status?: components["schemas"]["FunctionCallItemStatus"] | null;
     };
     /**
@@ -17749,7 +18780,9 @@ export interface components {
       /** @description The score threshold for the file search, a number between 0 and 1. Numbers closer to 1 will attempt to return only the most relevant results, but may return fewer results. */
       score_threshold?: number;
     };
-    Filters: components["schemas"]["ComparisonFilter"] | components["schemas"]["CompoundFilter"];
+    Filters:
+      | components["schemas"]["ComparisonFilter"]
+      | components["schemas"]["CompoundFilter"];
     /**
      * File search
      * @description A tool that searches for relevant content from uploaded files. Learn more about the [file search tool](https://platform.openai.com/docs/guides/tools-file-search).
@@ -17844,7 +18877,9 @@ export interface components {
       /** @description Optional description of the custom tool, used to provide more context. */
       description?: string;
       /** @description The input format for the custom tool. Default is unconstrained text. */
-      format?: components["schemas"]["CustomTextFormatParam"] | components["schemas"]["CustomGrammarFormatParam"];
+      format?:
+        | components["schemas"]["CustomTextFormatParam"]
+        | components["schemas"]["CustomGrammarFormatParam"];
     };
     ApproximateLocation: {
       /**
@@ -18360,7 +19395,10 @@ export interface components {
        */
       type: "chatkit.user_message";
       /** @description Ordered content elements supplied by the user. */
-      content: (components["schemas"]["UserMessageInputText"] | components["schemas"]["UserMessageQuotedText"])[];
+      content: (
+        | components["schemas"]["UserMessageInputText"]
+        | components["schemas"]["UserMessageQuotedText"]
+      )[];
       /** @description Attachments associated with the user message. Defaults to an empty list. */
       attachments: components["schemas"]["Attachment"][];
       inference_options: components["schemas"]["InferenceOptions"] | null;
@@ -18435,7 +19473,10 @@ export interface components {
       /** @description Assistant generated text. */
       text: string;
       /** @description Ordered list of annotations attached to the response text. */
-      annotations: (components["schemas"]["FileAnnotation"] | components["schemas"]["UrlAnnotation"])[];
+      annotations: (
+        | components["schemas"]["FileAnnotation"]
+        | components["schemas"]["UrlAnnotation"]
+      )[];
     };
     /**
      * Assistant message
@@ -18591,7 +19632,13 @@ export interface components {
       tasks: components["schemas"]["TaskGroupTask"][];
     };
     /** The thread item */
-    ThreadItem: components["schemas"]["UserMessageItem"] | components["schemas"]["AssistantMessageItem"] | components["schemas"]["WidgetMessageItem"] | components["schemas"]["ClientToolCallItem"] | components["schemas"]["TaskItem"] | components["schemas"]["TaskGroupItem"];
+    ThreadItem:
+      | components["schemas"]["UserMessageItem"]
+      | components["schemas"]["AssistantMessageItem"]
+      | components["schemas"]["WidgetMessageItem"]
+      | components["schemas"]["ClientToolCallItem"]
+      | components["schemas"]["TaskItem"]
+      | components["schemas"]["TaskGroupItem"];
     /**
      * Thread Items
      * @description A paginated list of thread items rendered for the ChatKit API.
@@ -18675,7 +19722,10 @@ export interface components {
       created_at: number;
       title: string | null;
       /** @description Current status for the thread. Defaults to `active` for newly created threads. */
-      status: components["schemas"]["ActiveStatus"] | components["schemas"]["LockedStatus"] | components["schemas"]["ClosedStatus"];
+      status:
+        | components["schemas"]["ActiveStatus"]
+        | components["schemas"]["LockedStatus"]
+        | components["schemas"]["ClosedStatus"];
       /** @description Free-form string that identifies your end user who owns the thread. */
       user: string;
     };
@@ -18749,12 +19799,20 @@ export interface components {
     };
     ComparisonFilterValueItems: string | number;
     /** @description The strategy used to chunk the file. */
-    ChunkingStrategyResponse: components["schemas"]["StaticChunkingStrategyResponseParam"] | components["schemas"]["OtherChunkingStrategyResponseParam"];
+    ChunkingStrategyResponse:
+      | components["schemas"]["StaticChunkingStrategyResponseParam"]
+      | components["schemas"]["OtherChunkingStrategyResponseParam"];
     /**
      * @description The intended purpose of the uploaded file. One of: - `assistants`: Used in the Assistants API - `batch`: Used in the Batch API - `fine-tune`: Used for fine-tuning - `vision`: Images used for vision fine-tuning - `user_data`: Flexible file type for any purpose - `evals`: Used for eval data sets
      * @enum {string}
      */
-    FilePurpose: "assistants" | "batch" | "fine-tune" | "vision" | "user_data" | "evals";
+    FilePurpose:
+      | "assistants"
+      | "batch"
+      | "fine-tune"
+      | "vision"
+      | "user_data"
+      | "evals";
     BatchError: {
       /** @description An error code identifying the error type. */
       code?: string;
@@ -18772,15 +19830,98 @@ export interface components {
       /** @description Number of requests that have failed. */
       failed: number;
     };
-    AssistantTool: components["schemas"]["AssistantToolsCode"] | components["schemas"]["AssistantToolsFileSearch"] | components["schemas"]["AssistantToolsFunction"];
-    TextAnnotationDelta: components["schemas"]["MessageDeltaContentTextAnnotationsFileCitationObject"] | components["schemas"]["MessageDeltaContentTextAnnotationsFilePathObject"];
-    TextAnnotation: components["schemas"]["MessageContentTextAnnotationsFileCitationObject"] | components["schemas"]["MessageContentTextAnnotationsFilePathObject"];
-    RunStepDetailsToolCall: components["schemas"]["RunStepDetailsToolCallsCodeObject"] | components["schemas"]["RunStepDetailsToolCallsFileSearchObject"] | components["schemas"]["RunStepDetailsToolCallsFunctionObject"];
-    RunStepDeltaStepDetailsToolCall: components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeObject"] | components["schemas"]["RunStepDeltaStepDetailsToolCallsFileSearchObject"] | components["schemas"]["RunStepDeltaStepDetailsToolCallsFunctionObject"];
-    MessageContent: components["schemas"]["MessageContentImageFileObject"] | components["schemas"]["MessageContentImageUrlObject"] | components["schemas"]["MessageContentTextObject"] | components["schemas"]["MessageContentRefusalObject"];
-    MessageContentDelta: components["schemas"]["MessageDeltaContentImageFileObject"] | components["schemas"]["MessageDeltaContentTextObject"] | components["schemas"]["MessageDeltaContentRefusalObject"] | components["schemas"]["MessageDeltaContentImageUrlObject"];
+    AssistantTool:
+      | components["schemas"]["AssistantToolsCode"]
+      | components["schemas"]["AssistantToolsFileSearch"]
+      | components["schemas"]["AssistantToolsFunction"];
+    TextAnnotationDelta:
+      | components["schemas"]["MessageDeltaContentTextAnnotationsFileCitationObject"]
+      | components["schemas"]["MessageDeltaContentTextAnnotationsFilePathObject"];
+    TextAnnotation:
+      | components["schemas"]["MessageContentTextAnnotationsFileCitationObject"]
+      | components["schemas"]["MessageContentTextAnnotationsFilePathObject"];
+    RunStepDetailsToolCall:
+      | components["schemas"]["RunStepDetailsToolCallsCodeObject"]
+      | components["schemas"]["RunStepDetailsToolCallsFileSearchObject"]
+      | components["schemas"]["RunStepDetailsToolCallsFunctionObject"];
+    RunStepDeltaStepDetailsToolCall:
+      | components["schemas"]["RunStepDeltaStepDetailsToolCallsCodeObject"]
+      | components["schemas"]["RunStepDeltaStepDetailsToolCallsFileSearchObject"]
+      | components["schemas"]["RunStepDeltaStepDetailsToolCallsFunctionObject"];
+    MessageContent:
+      | components["schemas"]["MessageContentImageFileObject"]
+      | components["schemas"]["MessageContentImageUrlObject"]
+      | components["schemas"]["MessageContentTextObject"]
+      | components["schemas"]["MessageContentRefusalObject"];
+    MessageContentDelta:
+      | components["schemas"]["MessageDeltaContentImageFileObject"]
+      | components["schemas"]["MessageDeltaContentTextObject"]
+      | components["schemas"]["MessageDeltaContentRefusalObject"]
+      | components["schemas"]["MessageDeltaContentImageUrlObject"];
     /** @enum {string} */
-    ChatModel: "gpt-5" | "gpt-5-mini" | "gpt-5-nano" | "gpt-5-2025-08-07" | "gpt-5-mini-2025-08-07" | "gpt-5-nano-2025-08-07" | "gpt-5-chat-latest" | "gpt-4.1" | "gpt-4.1-mini" | "gpt-4.1-nano" | "gpt-4.1-2025-04-14" | "gpt-4.1-mini-2025-04-14" | "gpt-4.1-nano-2025-04-14" | "o4-mini" | "o4-mini-2025-04-16" | "o3" | "o3-2025-04-16" | "o3-mini" | "o3-mini-2025-01-31" | "o1" | "o1-2024-12-17" | "o1-preview" | "o1-preview-2024-09-12" | "o1-mini" | "o1-mini-2024-09-12" | "gpt-4o" | "gpt-4o-2024-11-20" | "gpt-4o-2024-08-06" | "gpt-4o-2024-05-13" | "gpt-4o-audio-preview" | "gpt-4o-audio-preview-2024-10-01" | "gpt-4o-audio-preview-2024-12-17" | "gpt-4o-audio-preview-2025-06-03" | "gpt-4o-mini-audio-preview" | "gpt-4o-mini-audio-preview-2024-12-17" | "gpt-4o-search-preview" | "gpt-4o-mini-search-preview" | "gpt-4o-search-preview-2025-03-11" | "gpt-4o-mini-search-preview-2025-03-11" | "chatgpt-4o-latest" | "codex-mini-latest" | "gpt-4o-mini" | "gpt-4o-mini-2024-07-18" | "gpt-4-turbo" | "gpt-4-turbo-2024-04-09" | "gpt-4-0125-preview" | "gpt-4-turbo-preview" | "gpt-4-1106-preview" | "gpt-4-vision-preview" | "gpt-4" | "gpt-4-0314" | "gpt-4-0613" | "gpt-4-32k" | "gpt-4-32k-0314" | "gpt-4-32k-0613" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5-turbo-0301" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-1106" | "gpt-3.5-turbo-0125" | "gpt-3.5-turbo-16k-0613";
+    ChatModel:
+      | "gpt-5"
+      | "gpt-5-mini"
+      | "gpt-5-nano"
+      | "gpt-5-2025-08-07"
+      | "gpt-5-mini-2025-08-07"
+      | "gpt-5-nano-2025-08-07"
+      | "gpt-5-chat-latest"
+      | "gpt-4.1"
+      | "gpt-4.1-mini"
+      | "gpt-4.1-nano"
+      | "gpt-4.1-2025-04-14"
+      | "gpt-4.1-mini-2025-04-14"
+      | "gpt-4.1-nano-2025-04-14"
+      | "o4-mini"
+      | "o4-mini-2025-04-16"
+      | "o3"
+      | "o3-2025-04-16"
+      | "o3-mini"
+      | "o3-mini-2025-01-31"
+      | "o1"
+      | "o1-2024-12-17"
+      | "o1-preview"
+      | "o1-preview-2024-09-12"
+      | "o1-mini"
+      | "o1-mini-2024-09-12"
+      | "gpt-4o"
+      | "gpt-4o-2024-11-20"
+      | "gpt-4o-2024-08-06"
+      | "gpt-4o-2024-05-13"
+      | "gpt-4o-audio-preview"
+      | "gpt-4o-audio-preview-2024-10-01"
+      | "gpt-4o-audio-preview-2024-12-17"
+      | "gpt-4o-audio-preview-2025-06-03"
+      | "gpt-4o-mini-audio-preview"
+      | "gpt-4o-mini-audio-preview-2024-12-17"
+      | "gpt-4o-search-preview"
+      | "gpt-4o-mini-search-preview"
+      | "gpt-4o-search-preview-2025-03-11"
+      | "gpt-4o-mini-search-preview-2025-03-11"
+      | "chatgpt-4o-latest"
+      | "codex-mini-latest"
+      | "gpt-4o-mini"
+      | "gpt-4o-mini-2024-07-18"
+      | "gpt-4-turbo"
+      | "gpt-4-turbo-2024-04-09"
+      | "gpt-4-0125-preview"
+      | "gpt-4-turbo-preview"
+      | "gpt-4-1106-preview"
+      | "gpt-4-vision-preview"
+      | "gpt-4"
+      | "gpt-4-0314"
+      | "gpt-4-0613"
+      | "gpt-4-32k"
+      | "gpt-4-32k-0314"
+      | "gpt-4-32k-0613"
+      | "gpt-3.5-turbo"
+      | "gpt-3.5-turbo-16k"
+      | "gpt-3.5-turbo-0301"
+      | "gpt-3.5-turbo-0613"
+      | "gpt-3.5-turbo-1106"
+      | "gpt-3.5-turbo-0125"
+      | "gpt-3.5-turbo-16k-0613";
     /**
      * Summary text
      * @description A summary text from the model.
@@ -18800,7 +19941,51 @@ export interface components {
       assistant_id: string;
       thread?: components["schemas"]["CreateThreadRequest"];
       /** @description The ID of the [Model](https://platform.openai.com/docs/api-reference/models) to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used. */
-      model?: (string | ("gpt-5" | "gpt-5-mini" | "gpt-5-nano" | "gpt-5-2025-08-07" | "gpt-5-mini-2025-08-07" | "gpt-5-nano-2025-08-07" | "gpt-4.1" | "gpt-4.1-mini" | "gpt-4.1-nano" | "gpt-4.1-2025-04-14" | "gpt-4.1-mini-2025-04-14" | "gpt-4.1-nano-2025-04-14" | "gpt-4o" | "gpt-4o-2024-11-20" | "gpt-4o-2024-08-06" | "gpt-4o-2024-05-13" | "gpt-4o-mini" | "gpt-4o-mini-2024-07-18" | "gpt-4.5-preview" | "gpt-4.5-preview-2025-02-27" | "gpt-4-turbo" | "gpt-4-turbo-2024-04-09" | "gpt-4-0125-preview" | "gpt-4-turbo-preview" | "gpt-4-1106-preview" | "gpt-4-vision-preview" | "gpt-4" | "gpt-4-0314" | "gpt-4-0613" | "gpt-4-32k" | "gpt-4-32k-0314" | "gpt-4-32k-0613" | "gpt-3.5-turbo" | "gpt-3.5-turbo-16k" | "gpt-3.5-turbo-0613" | "gpt-3.5-turbo-1106" | "gpt-3.5-turbo-0125" | "gpt-3.5-turbo-16k-0613")) | null;
+      model?:
+        | (
+            | string
+            | (
+                | "gpt-5"
+                | "gpt-5-mini"
+                | "gpt-5-nano"
+                | "gpt-5-2025-08-07"
+                | "gpt-5-mini-2025-08-07"
+                | "gpt-5-nano-2025-08-07"
+                | "gpt-4.1"
+                | "gpt-4.1-mini"
+                | "gpt-4.1-nano"
+                | "gpt-4.1-2025-04-14"
+                | "gpt-4.1-mini-2025-04-14"
+                | "gpt-4.1-nano-2025-04-14"
+                | "gpt-4o"
+                | "gpt-4o-2024-11-20"
+                | "gpt-4o-2024-08-06"
+                | "gpt-4o-2024-05-13"
+                | "gpt-4o-mini"
+                | "gpt-4o-mini-2024-07-18"
+                | "gpt-4.5-preview"
+                | "gpt-4.5-preview-2025-02-27"
+                | "gpt-4-turbo"
+                | "gpt-4-turbo-2024-04-09"
+                | "gpt-4-0125-preview"
+                | "gpt-4-turbo-preview"
+                | "gpt-4-1106-preview"
+                | "gpt-4-vision-preview"
+                | "gpt-4"
+                | "gpt-4-0314"
+                | "gpt-4-0613"
+                | "gpt-4-32k"
+                | "gpt-4-32k-0314"
+                | "gpt-4-32k-0613"
+                | "gpt-3.5-turbo"
+                | "gpt-3.5-turbo-16k"
+                | "gpt-3.5-turbo-0613"
+                | "gpt-3.5-turbo-1106"
+                | "gpt-3.5-turbo-0125"
+                | "gpt-3.5-turbo-16k-0613"
+              )
+          )
+        | null;
       /** @description Override the default system message of the assistant. This is useful for modifying the behavior on a per-run basis. */
       instructions?: string | null;
       /** @description Override the tools the assistant can use for this run. This is useful for modifying the behavior on a per-run basis. */
@@ -18839,7 +20024,8 @@ export interface components {
       /** @description The maximum number of completion tokens that may be used over the course of the run. The run will make a best effort to use only the number of completion tokens specified, across multiple turns of the run. If the run exceeds the number of completion tokens specified, the run will end with status `incomplete`. See `incomplete_details` for more info. */
       max_completion_tokens?: number | null;
       truncation_strategy?: components["schemas"]["TruncationObject"] & unknown;
-      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] & unknown;
+      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] &
+        unknown;
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
       response_format?: components["schemas"]["AssistantsApiResponseFormatOption"];
     };
@@ -18847,14 +20033,18 @@ export interface components {
       /** @description The ID of the [assistant](https://platform.openai.com/docs/api-reference/assistants) to use to execute this run. */
       assistant_id: string;
       /** @description The ID of the [Model](https://platform.openai.com/docs/api-reference/models) to be used to execute this run. If a value is provided here, it will override the model associated with the assistant. If not, the model associated with the assistant will be used. */
-      model?: (string | components["schemas"]["AssistantSupportedModels"]) | null;
+      model?:
+        | (string | components["schemas"]["AssistantSupportedModels"])
+        | null;
       reasoning_effort?: components["schemas"]["ReasoningEffort"];
       /** @description Overrides the [instructions](https://platform.openai.com/docs/api-reference/assistants/createAssistant) of the assistant. This is useful for modifying the behavior on a per-run basis. */
       instructions?: string | null;
       /** @description Appends additional instructions at the end of the instructions for the run. This is useful for modifying the behavior on a per-run basis without overriding other instructions. */
       additional_instructions?: string | null;
       /** @description Adds additional messages to the thread before creating the run. */
-      additional_messages?: components["schemas"]["CreateMessageRequest"][] | null;
+      additional_messages?:
+        | components["schemas"]["CreateMessageRequest"][]
+        | null;
       /** @description Override the tools the assistant can use for this run. This is useful for modifying the behavior on a per-run basis. */
       tools?: components["schemas"]["AssistantTool"][] | null;
       metadata?: components["schemas"]["Metadata"];
@@ -18877,7 +20067,8 @@ export interface components {
       /** @description The maximum number of completion tokens that may be used over the course of the run. The run will make a best effort to use only the number of completion tokens specified, across multiple turns of the run. If the run exceeds the number of completion tokens specified, the run will end with status `incomplete`. See `incomplete_details` for more info. */
       max_completion_tokens?: number | null;
       truncation_strategy?: components["schemas"]["TruncationObject"] & unknown;
-      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] & unknown;
+      tool_choice?: components["schemas"]["AssistantsApiToolChoiceOption"] &
+        unknown;
       parallel_tool_calls?: components["schemas"]["ParallelToolCalls"];
       response_format?: components["schemas"]["AssistantsApiResponseFormatOption"];
     };
@@ -18894,11 +20085,22 @@ export interface components {
      * @description The status of the run, which can be either `queued`, `in_progress`, `requires_action`, `cancelling`, `cancelled`, `failed`, `completed`, `incomplete`, or `expired`.
      * @enum {string}
      */
-    RunStatus: "queued" | "in_progress" | "requires_action" | "cancelling" | "cancelled" | "failed" | "completed" | "incomplete" | "expired";
+    RunStatus:
+      | "queued"
+      | "in_progress"
+      | "requires_action"
+      | "cancelling"
+      | "cancelled"
+      | "failed"
+      | "completed"
+      | "incomplete"
+      | "expired";
     /** @description The delta containing the fields that have changed on the run step. */
     RunStepDeltaObjectDelta: {
       /** @description The details of the run step. */
-      step_details?: components["schemas"]["RunStepDeltaStepDetailsMessageCreationObject"] | components["schemas"]["RunStepDeltaStepDetailsToolCallsObject"];
+      step_details?:
+        | components["schemas"]["RunStepDeltaStepDetailsMessageCreationObject"]
+        | components["schemas"]["RunStepDeltaStepDetailsToolCallsObject"];
     };
     /**
      * CodeInterpreterToolAuto
@@ -19095,7 +20297,10 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CreateTranscriptionResponseJson"] | components["schemas"]["CreateTranscriptionResponseDiarizedJson"] | components["schemas"]["CreateTranscriptionResponseVerboseJson"];
+          "application/json":
+            | components["schemas"]["CreateTranscriptionResponseJson"]
+            | components["schemas"]["CreateTranscriptionResponseDiarizedJson"]
+            | components["schemas"]["CreateTranscriptionResponseVerboseJson"];
           "text/event-stream": components["schemas"]["CreateTranscriptionResponseStreamEvent"];
         };
       };
@@ -19120,7 +20325,9 @@ export interface operations {
           [name: string]: unknown;
         };
         content: {
-          "application/json": components["schemas"]["CreateTranslationResponseJson"] | components["schemas"]["CreateTranslationResponseVerboseJson"];
+          "application/json":
+            | components["schemas"]["CreateTranslationResponseJson"]
+            | components["schemas"]["CreateTranslationResponseVerboseJson"];
         };
       };
     };
@@ -19172,7 +20379,11 @@ export interface operations {
            * @description The endpoint to be used for all requests in the batch. Currently `/v1/responses`, `/v1/chat/completions`, `/v1/embeddings`, and `/v1/completions` are supported. Note that `/v1/embeddings` batches are also restricted to a maximum of 50,000 embedding inputs across all requests in the batch.
            * @enum {string}
            */
-          endpoint: "/v1/responses" | "/v1/chat/completions" | "/v1/embeddings" | "/v1/completions";
+          endpoint:
+            | "/v1/responses"
+            | "/v1/chat/completions"
+            | "/v1/embeddings"
+            | "/v1/completions";
           /**
            * @description The time frame within which the batch should be processed. Currently only `24h` is supported.
            * @enum {string}
@@ -22079,7 +23290,14 @@ export interface operations {
         /** @description If `true`, return batch jobs only. If `false`, return non-batch jobs only. By default, return both. */
         batch?: boolean;
         /** @description Group the usage data by the specified fields. Support fields include `project_id`, `user_id`, `api_key_id`, `model`, `batch`, `service_tier` or any combination of them. */
-        group_by?: ("project_id" | "user_id" | "api_key_id" | "model" | "batch" | "service_tier")[];
+        group_by?: (
+          | "project_id"
+          | "user_id"
+          | "api_key_id"
+          | "model"
+          | "batch"
+          | "service_tier"
+        )[];
         /**
          * @description Specifies the number of buckets to return.
          *     - `bucket_width=1d`: default: 7, max: 31
@@ -22165,7 +23383,13 @@ export interface operations {
         /** @description Return only usages for these sources. Possible values are `image.generation`, `image.edit`, `image.variation` or any combination of them. */
         sources?: ("image.generation" | "image.edit" | "image.variation")[];
         /** @description Return only usages for these image sizes. Possible values are `256x256`, `512x512`, `1024x1024`, `1792x1792`, `1024x1792` or any combination of them. */
-        sizes?: ("256x256" | "512x512" | "1024x1024" | "1792x1792" | "1024x1792")[];
+        sizes?: (
+          | "256x256"
+          | "512x512"
+          | "1024x1024"
+          | "1792x1792"
+          | "1024x1792"
+        )[];
         /** @description Return only usage for these projects. */
         project_ids?: string[];
         /** @description Return only usage for these users. */
@@ -22175,7 +23399,14 @@ export interface operations {
         /** @description Return only usage for these models. */
         models?: string[];
         /** @description Group the usage data by the specified fields. Support fields include `project_id`, `user_id`, `api_key_id`, `model`, `size`, `source` or any combination of them. */
-        group_by?: ("project_id" | "user_id" | "api_key_id" | "model" | "size" | "source")[];
+        group_by?: (
+          | "project_id"
+          | "user_id"
+          | "api_key_id"
+          | "model"
+          | "size"
+          | "source"
+        )[];
         /**
          * @description Specifies the number of buckets to return.
          *     - `bucket_width=1d`: default: 7, max: 31

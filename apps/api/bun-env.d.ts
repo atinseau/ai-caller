@@ -24,12 +24,12 @@ declare module "bun" {
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     CLIENT_URL: string;
-    MAX_ROOM_CALL_DURATION_MINUTE: string
+    MAX_ROOM_CALL_DURATION_MINUTE: string;
   }
 }
 
 declare global {
   namespace NodeJS {
-    interface ProcessEnv extends Bun.Env { }
+    interface ProcessEnv extends Bun.Env {}
   }
 }

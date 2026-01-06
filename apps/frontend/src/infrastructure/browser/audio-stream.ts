@@ -1,16 +1,15 @@
-import { from, Observable } from "rxjs"
-import type { AudioStreamPort } from "@/domain/audio-stream.port";
 import { injectable } from "inversify";
+import { from, type Observable } from "rxjs";
+import type { AudioStreamPort } from "@/domain/audio-stream.port";
 
 @injectable()
 export class AudioStream implements AudioStreamPort {
-
   public asObservable(): Observable<MediaStream> {
-    return from(this.getStream())
+    return from(this.getStream());
   }
 
   public asPromise(): Promise<MediaStream> {
-    return this.getStream()
+    return this.getStream();
   }
 
   private getStream(): Promise<MediaStream> {
@@ -22,7 +21,7 @@ export class AudioStream implements AudioStreamPort {
         channelCount: { ideal: 1 },
         sampleRate: { ideal: 48000 },
         sampleSize: { ideal: 16 },
-      }
-    })
+      },
+    });
   }
 }

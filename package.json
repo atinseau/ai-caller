@@ -2,10 +2,15 @@
   "name": "@ai-caller/root",
   "private": true,
   "scripts": {
+    "postinstall": "lefthook install",
     "dev": "turbo dev --parallel",
+    "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock",
     "up": "docker compose up -d",
     "http": "ngrok --config ngrok.yml http --url=light-grackle-eternal.ngrok-free.app 5678",
-    "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock"
+    "mcp:debug": "bunx @modelcontextprotocol/inspector --config ./mcp-inspector.json --server mcp:debug",
+    "check-types": "turbo check-types --parallel --ui stream",
+    "build": "turbo build --parallel --ui stream",
+    "check": "biome check --write"
   },
   "workspaces": [
     "apps/*",
@@ -14,5 +19,9 @@
   "dependencies": {
     "turbo": "^2.7.2"
   },
-  "packageManager": "bun@1.3.4"
+  "packageManager": "bun@1.3.4",
+  "devDependencies": {
+    "lefthook": "2.0.13",
+    "@biomejs/biome": "2.3.11"
+  }
 }

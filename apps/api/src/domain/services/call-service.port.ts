@@ -8,8 +8,7 @@ export abstract class CallServicePort {
    * @returns the call ID (token)
    */
   abstract createCall(company: CompanyModel): Promise<{
-    token: string,
-    expiresAt: Date
-  }>
-
+    token: string;
+    expiresAt: Date;
+  }>;
 }

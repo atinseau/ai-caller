@@ -1,3 +1,4 @@
+import { inject, injectable } from "inversify";
 import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
@@ -5,7 +6,6 @@ import { prisma } from "@/infrastructure/database/prisma";
 import { logger } from "@/infrastructure/logger";
 import type { IAttachCallToRoomDto } from "@/interfaces/dtos/attach-call-to-room.dto";
 import type { ICreateRoomParamsDto } from "@/interfaces/dtos/create-room-params.dto";
-import { inject, injectable } from "inversify";
 
 @injectable()
 export class RoomUseCase {

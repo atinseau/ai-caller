@@ -1,4 +1,3 @@
-
 export const RealtimeCallMachineEvent = {
   START: "START",
   CONNECTED: "CONNECTED",
@@ -6,4 +5,4 @@ export const RealtimeCallMachineEvent = {
   STOP: "STOP",
   MESSAGE: "MESSAGE",
   ERROR: "ERROR",
-} as const
+} as const;

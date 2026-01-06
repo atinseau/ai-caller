@@ -1,8 +1,8 @@
-import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { injectable } from "inversify";
-import { prisma } from "../prisma";
-import { RoomMapper } from "../mappers/room.mapper";
+import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import type { RoomModel } from "@/types";
+import { RoomMapper } from "../mappers/room.mapper";
+import { prisma } from "../prisma";
 
 @injectable()
 export class RoomRepositoryPrisma implements RoomRepositoryPort {
@@ -11,32 +11,35 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
       data: RoomMapper.toEntity({
         token,
         companyId,
-        expiresAt
-      })
-    })
-    return RoomMapper.toModel(room)
+        expiresAt,
+      }),
+    });
+    return RoomMapper.toModel(room);
   }
 
-  async updateRoomCallId(roomId: string, callId: string): Promise<RoomModel | null> {
+  async updateRoomCallId(
+    roomId: string,
+    callId: string,
+  ): Promise<RoomModel | null> {
     const room = await prisma.room.update({
       where: {
-        id: roomId
+        id: roomId,
       },
       data: {
-        callId
-      }
-    })
-    return RoomMapper.toModel(room)
+        callId,
+      },
+    });
+    return RoomMapper.toModel(room);
   }
 
   async findExpiredRooms(): Promise<RoomModel[]> {
     const rooms = await prisma.room.findMany({
       where: {
         expiresAt: {
-          lt: new Date()
-        }
-      }
-    })
-    return rooms.map(RoomMapper.toModel)
+          lt: new Date(),
+        },
+      },
+    });
+    return rooms.map(RoomMapper.toModel);
   }
 }

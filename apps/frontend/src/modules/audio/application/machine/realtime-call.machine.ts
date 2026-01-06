@@ -1,19 +1,23 @@
 // import { stopAudioStream } from "@/shared/utils/stopAudioStream"
-import { assign, fromCallback, fromObservable, fromPromise, setup } from "xstate"
+
 // import { handleAudioWebRtcUseCase } from "../use-cases/handle-audio-webrtc.use-case"
 // import { stopPeerConnection } from "@/shared/utils/stopPeerConnection"
-import { inject, injectable } from "inversify"
-import { AudioStreamPort } from "@/domain/audio-stream.port"
-import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum"
-import { RealtimeCallMachineEvent } from "../../domain/enums/realtime-call-machine-event.enum"
-import { RealtimeWebRtcUseCase } from "../use-cases/realtime-webrtc.use-case"
-import type { RealtimeCallMachineContext, RealtimeCallMachineEvents } from "../../domain/types/realtime-call-machine.types"
+import { inject, injectable } from "inversify";
+import { assign, fromCallback, fromPromise, setup } from "xstate";
+import { AudioStreamPort } from "@/domain/audio-stream.port";
+import { RealtimeCallMachineEvent } from "../../domain/enums/realtime-call-machine-event.enum";
+import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum";
+import type {
+  RealtimeCallMachineContext,
+  RealtimeCallMachineEvents,
+} from "../../domain/types/realtime-call-machine.types";
+import { RealtimeWebRtcUseCase } from "../use-cases/realtime-webrtc.use-case";
 
 @injectable()
 export class RealtimeCallMachine {
-  private readonly name = "REALTIME_CALL_MACHINE"
+  private readonly name = "REALTIME_CALL_MACHINE";
 
-  private machine
+  private machine;
 
   constructor(
     @inject(AudioStreamPort) private readonly audioStream: AudioStreamPort,
@@ -174,6 +178,6 @@ export class RealtimeCallMachine {
   }
 
   public getMachine() {
-    return this.machine
+    return this.machine;
   }
 }

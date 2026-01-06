@@ -1,8 +1,19 @@
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/shared/components/ui/card";
-import { Button } from "@/shared/components/ui/button";
-import { Badge } from "@/shared/components/ui/badge";
-import { ExclamationTriangleIcon, HomeIcon, ArrowUturnLeftIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowUturnLeftIcon,
+  ExclamationTriangleIcon,
+  HomeIcon,
+} from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router";
+import { Badge } from "@/shared/components/ui/badge";
+import { Button } from "@/shared/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/shared/components/ui/card";
 
 export function NotFound() {
   const navigate = useNavigate();

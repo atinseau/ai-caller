@@ -1,12 +1,8 @@
 import "@/styles/app.css";
 
-import { Meta, Outlet } from "react-router";
-
-import type { Route } from "./+types/root";
+import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { GenericErrorBoundary } from "@/shared/components/GenericErrorBoundary";
-import { Links } from "react-router";
-import { ScrollRestoration } from "react-router";
-import { Scripts } from "react-router";
+import type { Route } from "./+types/root";
 import { QueryProvider } from "./providers/QueryProvider";
 
 export const links: Route.LinksFunction = () => [
@@ -23,21 +19,23 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export default function App() {
-  return <html lang="en">
-    <head>
-      <meta charSet="utf-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1" />
-      <Meta />
-      <Links />
-    </head>
-    <body>
-      <QueryProvider>
-        <Outlet />
-      </QueryProvider>
-      <ScrollRestoration />
-      <Scripts />
-    </body>
-  </html>;
+  return (
+    <html lang="en">
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <QueryProvider>
+          <Outlet />
+        </QueryProvider>
+        <ScrollRestoration />
+        <Scripts />
+      </body>
+    </html>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

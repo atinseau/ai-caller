@@ -6,7 +6,8 @@
   "scripts": {
     "postinstall": "prisma generate",
     "dev": "bun --watch src/index.ts",
-    "start": "NODE_ENV=production bun src/index.ts",
+    "build": "bun build ./src/index.ts --outdir ./dist --target bun --format esm --minify --splitting",
+    "start": "NODE_ENV=production bun dist/index.js",
     "check-types": "tsc --noEmit",
     "hurl": "hurl --variable url=http://localhost:8000",
     "db:re-migrate": "rm -rf prisma/migrations && bunx prisma migrate reset --force && bunx prisma migrate dev -n default && bunx prisma generate"
@@ -21,6 +22,7 @@
     "@ai-caller/shared": "workspace:*",
     "@prisma/adapter-pg": "7.1.0",
     "@prisma/client": "7.1.0",
+    "@scalar/hono-api-reference": "^0.9.30",
     "better-auth": "1.4.7",
     "cron": "4.4.0",
     "dayjs": "1.11.19",

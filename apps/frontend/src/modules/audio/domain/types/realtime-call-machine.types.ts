@@ -1,20 +1,27 @@
-import { RealtimeCallMachineEvent } from "../enums/realtime-call-machine-event.enum"
+import type { RealtimeCallMachineEvent } from "../enums/realtime-call-machine-event.enum";
 
 export type RealtimeCallMachineContext = {
-  companyId?: string
-  audioStream?: MediaStream,
-  peerConnection?: RTCPeerConnection,
-  dataChannel?: RTCDataChannel,
-  audioRef?: React.RefObject<HTMLAudioElement>,
-}
-
+  companyId?: string;
+  audioStream?: MediaStream;
+  peerConnection?: RTCPeerConnection;
+  dataChannel?: RTCDataChannel;
+  audioRef?: React.RefObject<HTMLAudioElement>;
+};
 
 export type RealtimeCallMachineEvents =
-  | { type: typeof RealtimeCallMachineEvent.ERROR, error?: Error }
-  | { type: typeof RealtimeCallMachineEvent.START, companyId: string, audioRef: React.RefObject<HTMLAudioElement> }
-  | { type: typeof RealtimeCallMachineEvent.CONNECTED, pc: RTCPeerConnection, dc: RTCDataChannel }
+  | { type: typeof RealtimeCallMachineEvent.ERROR; error?: Error }
+  | {
+      type: typeof RealtimeCallMachineEvent.START;
+      companyId: string;
+      audioRef: React.RefObject<HTMLAudioElement>;
+    }
+  | {
+      type: typeof RealtimeCallMachineEvent.CONNECTED;
+      pc: RTCPeerConnection;
+      dc: RTCDataChannel;
+    }
   | { type: typeof RealtimeCallMachineEvent.STOP }
-  | { type: typeof RealtimeCallMachineEvent.MESSAGE, message: string }
+  | { type: typeof RealtimeCallMachineEvent.MESSAGE; message: string };
 // | { type: "STOP_CALL" }
 // | { type: "RTC_OPEN", pc: RTCPeerConnection, dc: RTCDataChannel }
 // | { type: "RTC_ERROR" }

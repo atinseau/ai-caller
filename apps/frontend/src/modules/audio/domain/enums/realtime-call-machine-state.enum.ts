@@ -3,5 +3,5 @@ export const RealtimeCallMachineState = {
   INITIALIZING: "INITIALIZING",
   CALLING: "CALLING",
   CONNECTING: "CONNECTING",
-  CONNECTED: "CONNECTED"
-} as const
+  CONNECTED: "CONNECTED",
+} as const;

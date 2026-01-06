@@ -1,12 +1,8 @@
 import { Container } from "inversify";
 import { repositoryModule } from "./modules/repository.module";
-import { useCaseModule } from "./modules/use-case.module";
 import { serviceModule } from "./modules/service.module";
+import { useCaseModule } from "./modules/use-case.module";
 
-export const container = new Container()
+export const container = new Container();
 
-await container.load(
-  repositoryModule,
-  useCaseModule,
-  serviceModule
-)
+await container.load(repositoryModule, useCaseModule, serviceModule);

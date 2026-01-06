@@ -1,6 +1,6 @@
-import type { ICreateCompanyDto } from "@/interfaces/dtos/create-company.dto";
-import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { inject, injectable } from "inversify";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
+import type { ICreateCompanyDto } from "@/interfaces/dtos/create-company.dto";
 
 @injectable()
 export class CompanyUseCase {

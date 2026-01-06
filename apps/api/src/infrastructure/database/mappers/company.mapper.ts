@@ -2,7 +2,6 @@ import { randomUUIDv7 } from "bun";
 import type { CompanyModel } from "@/domain/models/company.model";
 import type { Company } from "@/generated/prisma/client";
 
-
 export abstract class CompanyMapper {
   static toModel(prismaCompany: Company): CompanyModel {
     return {
@@ -12,11 +11,16 @@ export abstract class CompanyMapper {
       mcpUrl: prismaCompany.mcpUrl,
       mcpTestUrl: prismaCompany.mcpTestUrl,
       name: prismaCompany.name,
-      updatedAt: prismaCompany.updatedAt
-    }
+      updatedAt: prismaCompany.updatedAt,
+    };
   }
 
-  static toEntity(modelCompany: Omit<CompanyModel, 'id' | 'createdAt' | 'updatedAt' | 'mcpTestUrl'> & { mcpTestUrl?: string }): Company {
+  static toEntity(
+    modelCompany: Omit<
+      CompanyModel,
+      "id" | "createdAt" | "updatedAt" | "mcpTestUrl"
+    > & { mcpTestUrl?: string },
+  ): Company {
     return {
       id: randomUUIDv7(),
       createdAt: new Date(),
@@ -25,6 +29,6 @@ export abstract class CompanyMapper {
       mcpTestUrl: modelCompany.mcpTestUrl || modelCompany.mcpUrl,
       mcpUrl: modelCompany.mcpUrl,
       name: modelCompany.name,
-    }
+    };
   }
 }

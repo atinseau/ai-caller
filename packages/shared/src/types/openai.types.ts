@@ -3,31 +3,29 @@ import type { paths } from "./openapi-openai.types";
 // UTILS
 export type JsonRouteBody<
   T extends keyof paths,
-  Method extends keyof paths[T]
+  Method extends keyof paths[T],
 > = paths[T][Method] extends { requestBody: infer Body }
   ? Body extends { content: infer Content }
-  ? Content extends { "application/json": infer Json }
-  ? Json
-  : never
-  : never
-  : never
-
+    ? Content extends { "application/json": infer Json }
+      ? Json
+      : never
+    : never
+  : never;
 
 export type JsonRouteResponse<
   T extends keyof paths,
   Method extends keyof paths[T],
   Status extends paths[T][Method] extends { responses: infer Responses }
-  ? keyof Responses
-  : never
+    ? keyof Responses
+    : never,
 > = paths[T][Method] extends { responses: infer Responses }
   ? Responses extends { [K in Status]: infer Response }
-  ? Response extends { content: infer Content }
-  ? Content extends { "application/json": infer Json }
-  ? Json
-  : never
-  : never
-  : never
-  : never
+    ? Response extends { content: infer Content }
+      ? Content extends { "application/json": infer Json }
+        ? Json
+        : never
+      : never
+    : never
+  : never;
 
-
-type M = JsonRouteResponse<"/realtime/client_secrets", "post", 200>
+type M = JsonRouteResponse<"/realtime/client_secrets", "post", 200>;
