@@ -1,4 +1,15 @@
 pre-commit:
   jobs:
-    - name: Hello
-      run: echo "Hello, Lefthook!"
+    - name: Build
+      run: bun run build
+    - name: Quality Checks
+      group:
+        parallel: true
+        jobs:
+          - name: Typings Check
+            run: bun run check-types
+          # - name: Tests
+          #   run: TODO
+          - name: Lint and format staged files
+            run: bun biome check --write {staged_files} --no-errors-on-unmatched
+            stage_fixed: true
