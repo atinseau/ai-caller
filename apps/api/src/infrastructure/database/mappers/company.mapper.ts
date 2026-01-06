@@ -1,9 +1,9 @@
 import { randomUUIDv7 } from "bun";
-import type { CompanyModel } from "@/domain/models/company.model";
+import type { ICompanyModel } from "@/domain/models/company.model";
 import type { Company } from "@/generated/prisma/client";
 
 export abstract class CompanyMapper {
-  static toModel(prismaCompany: Company): CompanyModel {
+  static toModel(prismaCompany: Company): ICompanyModel {
     return {
       promptId: prismaCompany.promptId,
       createdAt: prismaCompany.createdAt,
@@ -17,7 +17,7 @@ export abstract class CompanyMapper {
 
   static toEntity(
     modelCompany: Omit<
-      CompanyModel,
+      ICompanyModel,
       "id" | "createdAt" | "updatedAt" | "mcpTestUrl"
     > & { mcpTestUrl?: string },
   ): Company {

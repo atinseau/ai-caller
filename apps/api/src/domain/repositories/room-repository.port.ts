@@ -1,14 +1,14 @@
-import type { RoomModel } from "../models/room.model";
+import type { IRoomModel } from "../models/room.model";
 
 export abstract class RoomRepositoryPort {
   abstract createRoom(
     companyId: string,
     token: string,
     expiresAt?: Date,
-  ): Promise<RoomModel>;
+  ): Promise<IRoomModel>;
   abstract updateRoomCallId(
     roomId: string,
     callId: string,
-  ): Promise<RoomModel | null>;
-  abstract findExpiredRooms(): Promise<RoomModel[]>;
+  ): Promise<IRoomModel | null>;
+  abstract findExpiredRooms(): Promise<IRoomModel[]>;
 }

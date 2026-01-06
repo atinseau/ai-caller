@@ -1,6 +1,6 @@
 import { injectable } from "inversify";
+import type { IRoomModel } from "@/domain/models/room.model";
 import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import type { RoomModel } from "@/types";
 import { RoomMapper } from "../mappers/room.mapper";
 import { prisma } from "../prisma";
 
@@ -20,7 +20,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
   async updateRoomCallId(
     roomId: string,
     callId: string,
-  ): Promise<RoomModel | null> {
+  ): Promise<IRoomModel | null> {
     const room = await prisma.room.update({
       where: {
         id: roomId,
@@ -32,7 +32,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     return RoomMapper.toModel(room);
   }
 
-  async findExpiredRooms(): Promise<RoomModel[]> {
+  async findExpiredRooms(): Promise<IRoomModel[]> {
     const rooms = await prisma.room.findMany({
       where: {
         expiresAt: {

@@ -1,10 +1,10 @@
 import { randomUUIDv7 } from "bun";
 import dayjs from "dayjs";
-import type { RoomModel } from "@/domain/models/room.model";
+import type { IRoomModel } from "@/domain/models/room.model";
 import type { Room } from "@/generated/prisma/client";
 
 export abstract class RoomMapper {
-  static toModel(prismaRoom: Room): RoomModel {
+  static toModel(prismaRoom: Room): IRoomModel {
     return {
       companyId: prismaRoom.companyId,
       id: prismaRoom.id,
@@ -18,7 +18,7 @@ export abstract class RoomMapper {
 
   static toEntity(
     modelRoom: Omit<
-      RoomModel,
+      IRoomModel,
       "id" | "createdAt" | "updatedAt" | "expiresAt"
     > & {
       expiresAt?: Date;

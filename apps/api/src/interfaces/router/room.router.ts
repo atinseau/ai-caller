@@ -1,35 +1,73 @@
-import { Hono } from "hono";
-import { validator } from "hono/validator";
+import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
 import { RoomUseCase } from "@/application/use-cases/room.use-case";
 import { container } from "@/infrastructure/di/container";
-import { AttachCallToRoomDto } from "../dtos/attach-call-to-room.dto";
-import { CreateRoomParamsDto } from "../dtos/create-room-params.dto";
+import { AttachCallToRoomRequestDto } from "../dtos/room/attach-call-to-room-request.dto";
+import { AttachCallToRoomResponseDto } from "../dtos/room/attach-call-to-room-response.dto";
+import { CreateRoomParamsRequestDto } from "../dtos/room/create-room-params-request.dto";
+import { CreateRoomResponseDto } from "../dtos/room/create-room-response.dto";
 
-export const roomRouter = new Hono();
+export const roomRouter = new OpenAPIHono();
 
-roomRouter.post(
-  "/create",
-  validator("json", (value) => CreateRoomParamsDto.parse(value)),
-  async (ctx) => {
-    const roomUseCase = container.get(RoomUseCase);
-    return ctx.json({
-      message: "Room created successfully",
-      data: await roomUseCase.createRoom(ctx.req.valid("json")),
-    });
+const createRoomRoute = createRoute({
+  method: "post",
+  path: "/create",
+  request: {
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: CreateRoomParamsRequestDto,
+        },
+      },
+    },
   },
-);
-
-roomRouter.patch(
-  "/:roomId/attach/:id",
-  validator("param", (value) => AttachCallToRoomDto.parse(value)),
-  async (ctx) => {
-    const roomUseCase = container.get(RoomUseCase);
-    await roomUseCase.attachCallToRoom(ctx.req.valid("param"));
-    return ctx.json({
-      message: "Call attached to room successfully",
-    });
+  responses: {
+    200: {
+      description: "Room created successfully",
+      content: {
+        "application/json": {
+          schema: CreateRoomResponseDto,
+        },
+      },
+    },
   },
-);
+});
+
+roomRouter.openapi(createRoomRoute, async (ctx) => {
+  const roomUseCase = container.get(RoomUseCase);
+  const room = await roomUseCase.createRoom(ctx.req.valid("json"));
+
+  return ctx.json({
+    message: "Room created successfully",
+    data: room,
+  });
+});
+
+const attachCallToRoomRoute = createRoute({
+  method: "patch",
+  path: "/:roomId/attach/:id",
+  request: {
+    params: AttachCallToRoomRequestDto,
+  },
+  responses: {
+    200: {
+      description: "Call attached to room successfully",
+      content: {
+        "application/json": {
+          schema: AttachCallToRoomResponseDto,
+        },
+      },
+    },
+  },
+});
+
+roomRouter.openapi(attachCallToRoomRoute, async (ctx) => {
+  const roomUseCase = container.get(RoomUseCase);
+  await roomUseCase.attachCallToRoom(ctx.req.valid("param"));
+  return ctx.json({
+    message: "Call attached to room successfully",
+  });
+});
 
 // export const openAiRouter = new Hono()
 

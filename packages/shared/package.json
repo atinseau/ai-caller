@@ -9,6 +9,9 @@
       "types": "./src/index.ts"
     }
   },
+  "dependencies": {
+    "openapi-fetch": "0.15.0"
+  },
   "devDependencies": {
     "typescript": "5.9.3"
   }

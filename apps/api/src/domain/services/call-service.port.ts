@@ -1,4 +1,4 @@
-import type { CompanyModel } from "@/types";
+import type { ICompanyModel } from "../models/company.model";
 
 export abstract class CallServicePort {
   /**
@@ -7,7 +7,7 @@ export abstract class CallServicePort {
    * @param company the company for where the call will start
    * @returns the call ID (token)
    */
-  abstract createCall(company: CompanyModel): Promise<{
+  abstract createCall(company: ICompanyModel): Promise<{
     token: string;
     expiresAt: Date;
   }>;

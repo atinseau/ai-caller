@@ -1,43 +1,49 @@
 import type {
   JsonRouteBody,
   JsonRouteResponse,
+  OpenAIConfig,
 } from "../../types/openai.types";
-import type { BaseOpenAI } from "./base-openai";
+import { openAiClient } from "./openai-client";
 
 export class OpenAIRealtime {
-  constructor(private readonly client: BaseOpenAI) {}
+  constructor(private readonly config: OpenAIConfig) {}
 
   public async calls(
     offer: RTCSessionDescriptionInit,
   ): Promise<{ answer: RTCSessionDescriptionInit; location: string | null }> {
-    if (!this.client.config.model) {
+    if (!this.config.model) {
       throw new Error(
         "Model is not specified in the OpenAI client configuration",
       );
     }
 
-    const sdpResponse = await this.client.fetch(
-      `/realtime/calls?model=${this.client.config.model}`,
-      {
-        method: "POST",
-        body: offer.sdp,
-        headers: {
-          Authorization: `Bearer ${this.client.config.apiKey}`,
-          "Content-Type": "application/sdp",
-        },
-      },
-    );
+    if (offer.type !== "offer" || !offer.sdp) {
+      throw new Error("Invalid RTCSessionDescriptionInit: missing offer SDP");
+    }
 
-    const location = sdpResponse.headers.get("Location");
+    const sdpResponse = await openAiClient.POST(`/realtime/calls`, {
+      body: offer.sdp,
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+        "Content-Type": "application/sdp",
+      },
+    });
+
+    const location = sdpResponse.response.headers.get("Location");
     if (!location) {
       throw new Error(
         "Location header is missing in the response from OpenAI Realtime API",
       );
     }
-    const sdp = await sdpResponse.text();
-    console.log("Received SDP answer from OpenAI Realtime API:", sdp);
+    console.log(
+      "Received SDP answer from OpenAI Realtime API:",
+      sdpResponse.data,
+    );
     return {
-      answer: { type: "answer", sdp },
+      answer: {
+        type: "answer",
+        sdp: sdpResponse.data,
+      },
       location,
     };
   }
@@ -45,30 +51,37 @@ export class OpenAIRealtime {
   public async clientSecrets(
     sessionConfig: JsonRouteBody<"/realtime/client_secrets", "post">,
   ): Promise<JsonRouteResponse<"/realtime/client_secrets", "post", 200>> {
-    const response = await fetch(
-      "https://api.openai.com/v1/realtime/client_secrets",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${this.client.config.apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(sessionConfig),
+    const response = await openAiClient.POST("/realtime/client_secrets", {
+      body: sessionConfig,
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+        "Content-Type": "application/json",
       },
-    );
-    return response.json();
+    });
+
+    if (!response.data) {
+      throw new Error(
+        "Failed to obtain client secrets from OpenAI Realtime API",
+      );
+    }
+
+    return response.data;
   }
 
   public async hangups(callId: string) {
-    const response = await this.client.fetch(
-      `/realtime/calls/${callId}/hangup`,
+    const response = await openAiClient.POST(
+      `/realtime/calls/{call_id}/hangup`,
       {
-        method: "POST",
+        params: {
+          path: {
+            call_id: callId,
+          },
+        },
         headers: {
-          Authorization: `Bearer ${this.client.config.apiKey}`,
+          Authorization: `Bearer ${this.config.apiKey}`,
         },
       },
     );
-    return response.ok;
+    return response.response.ok;
   }
 }

@@ -28,4 +28,7 @@ export type JsonRouteResponse<
     : never
   : never;
 
-type M = JsonRouteResponse<"/realtime/client_secrets", "post", 200>;
+export type OpenAIConfig = {
+  model?: string;
+  apiKey: string;
+};

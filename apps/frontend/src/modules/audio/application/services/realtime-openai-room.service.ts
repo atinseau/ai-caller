@@ -1,13 +1,10 @@
-import type { RoomModel } from "@ai-caller/api/types";
 import { OpenAI } from "@ai-caller/shared";
 import { injectable } from "inversify";
-import { Api } from "@/infrastructure/http/api";
+import { api } from "@/infrastructure/http/api";
 import type { RealtimeRoomServicePort } from "../../domain/ports/realtime-room-service.port";
 
 @injectable()
 export class RealtimeOpenAiRoomService implements RealtimeRoomServicePort {
-  constructor(private readonly api = new Api()) {}
-
   async createRoom(companyId: string) {
     const roomData = await this.getRoomData(companyId);
     const pc = new RTCPeerConnection();
@@ -40,23 +37,30 @@ export class RealtimeOpenAiRoomService implements RealtimeRoomServicePort {
       throw new Error("Failed to retrieve call ID from OpenAI response");
     }
 
-    const response = await this.api.patch(`/room/${roomId}/attach/${callId}`);
+    const { response } = await api.PATCH("/api/v1/room/:roomId/attach/:id", {
+      params: {
+        path: {
+          roomId,
+          id: callId,
+        },
+      },
+    });
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.message || "Failed to attach call to room");
+      throw new Error("Failed to attach call to room");
     }
 
     await pc.setRemoteDescription(answer);
   }
 
-  private async getRoomData(companyId: string): Promise<RoomModel> {
-    const response = await this.api.post("/room/create", {
-      companyId,
+  private async getRoomData(companyId: string) {
+    const { response, data } = await api.POST("/api/v1/room/create", {
+      body: {
+        companyId,
+      },
     });
-    const body = await response.json();
-    if (!response.ok || !body?.data) {
-      throw new Error(body.message || "Failed to create room");
+    if (!response.ok || !data) {
+      throw new Error("Failed to create room");
     }
-    return body.data;
+    return data.data;
   }
 }

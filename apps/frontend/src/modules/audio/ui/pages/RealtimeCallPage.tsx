@@ -91,7 +91,11 @@ export function RealtimeCallPage() {
         </Button>
       ) : null}
 
-      <audio ref={audioRef} autoPlay className="hidden" />
+      <audio ref={audioRef} autoPlay className="hidden">
+        <track kind="captions" />
+        <caption>Realtime Call Audio</caption>
+      </audio>
+
       <p>{JSON.stringify(state.value)}</p>
 
       {typeof state.value === "object" &&

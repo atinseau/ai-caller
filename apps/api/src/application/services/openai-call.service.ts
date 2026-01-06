@@ -1,15 +1,15 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
+import type { ICompanyModel } from "@/domain/models/company.model";
 import type { CallServicePort } from "@/domain/services/call-service.port";
-import type { CompanyModel } from "@/types";
 
 export class OpenAICallService implements CallServicePort {
-  async createCall(company: CompanyModel) {
+  async createCall(company: ICompanyModel) {
     const openai = new OpenAI({
       apiKey: Bun.env.OPENAI_API_KEY,
     });
 
-    const FAKE_COMPANY_NAME = "Acme Corp";
+    // const FAKE_COMPANY_NAME = "Acme Corp";
 
     const maxRoomCallDurationMinute = parseInt(
       Bun.env.MAX_ROOM_CALL_DURATION_MINUTE,

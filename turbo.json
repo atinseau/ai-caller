@@ -7,12 +7,10 @@
       "persistent": true
     },
     "check-types": {
-      "outputLogs": "errors-only",
       "cache": false,
       "outputs": []
     },
     "build": {
-      "outputLogs": "errors-only",
       "dependsOn": ["^build"],
       "outputs": []
     }
