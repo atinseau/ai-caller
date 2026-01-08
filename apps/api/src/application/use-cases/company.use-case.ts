@@ -12,8 +12,6 @@ export class CompanyUseCase {
   async create(dto: ICreateCompanyRequestDto) {
     return this.companyRepository.createCompany({
       name: dto.name,
-      mcpUrl: dto.mcpUrl,
-      mcpTestUrl: dto.mcpTestUrl,
       promptId: dto.promptId,
     });
   }

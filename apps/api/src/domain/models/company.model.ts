@@ -6,14 +6,6 @@ export const CompanyModel = z
       description: "The name of the company",
       example: "Acme Corp",
     }),
-    mcpUrl: z.url().openapi({
-      description: "The MCP URL of the company",
-      example: "https://mcp.acme-corp.com",
-    }),
-    mcpTestUrl: z.url().openapi({
-      description: "The MCP Test URL of the company",
-      example: "https://mcp-test.acme-corp.com",
-    }),
     promptId: z.string().openapi({
       description: "The prompt ID associated with the company",
       example: "prompt_123456",

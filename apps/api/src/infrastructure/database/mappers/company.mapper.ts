@@ -8,8 +8,6 @@ export abstract class CompanyMapper {
       promptId: prismaCompany.promptId,
       createdAt: prismaCompany.createdAt,
       id: prismaCompany.id,
-      mcpUrl: prismaCompany.mcpUrl,
-      mcpTestUrl: prismaCompany.mcpTestUrl,
       name: prismaCompany.name,
       updatedAt: prismaCompany.updatedAt,
     };
@@ -26,8 +24,6 @@ export abstract class CompanyMapper {
       createdAt: new Date(),
       updatedAt: new Date(),
       promptId: modelCompany.promptId,
-      mcpTestUrl: modelCompany.mcpTestUrl || modelCompany.mcpUrl,
-      mcpUrl: modelCompany.mcpUrl,
       name: modelCompany.name,
     };
   }

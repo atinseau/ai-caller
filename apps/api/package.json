@@ -9,7 +9,6 @@
     "build": "bun build ./src/index.ts --outdir ./dist --target bun --format esm --minify --splitting",
     "start": "NODE_ENV=production bun dist/index.js",
     "check-types": "tsc --noEmit",
-    "hurl": "hurl --variable url=http://localhost:8000",
     "db:re-migrate": "rm -rf prisma/migrations && bunx prisma migrate reset --force && bunx prisma migrate dev -n default && bunx prisma generate"
   },
   "exports": {

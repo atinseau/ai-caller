@@ -37,7 +37,7 @@ export class RealtimeOpenAiRoomService implements RealtimeRoomServicePort {
       throw new Error("Failed to retrieve call ID from OpenAI response");
     }
 
-    const { response } = await api.PATCH("/api/v1/room/:roomId/attach/:id", {
+    const { response } = await api.PATCH("/api/v1/room/{roomId}/attach/{id}", {
       params: {
         path: {
           roomId,

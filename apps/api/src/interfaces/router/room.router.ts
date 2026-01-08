@@ -45,7 +45,7 @@ roomRouter.openapi(createRoomRoute, async (ctx) => {
 
 const attachCallToRoomRoute = createRoute({
   method: "patch",
-  path: "/:roomId/attach/:id",
+  path: "/{roomId}/attach/{id}",
   request: {
     params: AttachCallToRoomRequestDto,
   },

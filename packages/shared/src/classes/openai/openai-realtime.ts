@@ -23,11 +23,17 @@ export class OpenAIRealtime {
 
     const sdpResponse = await openAiClient.POST(`/realtime/calls`, {
       body: offer.sdp,
+      bodySerializer: (body) => (typeof body === "object" ? body.sdp : body),
+      parseAs: "text",
       headers: {
         Authorization: `Bearer ${this.config.apiKey}`,
         "Content-Type": "application/sdp",
       },
     });
+
+    if (!sdpResponse.response.ok || !sdpResponse.data) {
+      throw new Error(`Failed to create OpenAI Realtime call`);
+    }
 
     const location = sdpResponse.response.headers.get("Location");
     if (!location) {
