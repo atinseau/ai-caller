@@ -29,6 +29,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
         headers: {
           Authorization: `Bearer ${room.token}`,
         },
+        // biome-ignore lint/suspicious/noExplicitAny: Bad typing from WebSocket lib
       } as any,
     );
 
