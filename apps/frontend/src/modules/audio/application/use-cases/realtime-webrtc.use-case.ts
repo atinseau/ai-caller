@@ -2,33 +2,41 @@ import { inject, injectable } from "inversify";
 import { RealtimeRoomServicePort } from "../../domain/ports/realtime-room-service.port";
 
 type RealtimeWebRtcUseCaseParams = {
-  audioStream: MediaStream,
-  audioRef: React.RefObject<HTMLAudioElement>,
-  companyId: string,
-  onConnected: (pc: RTCPeerConnection, dc: RTCDataChannel) => void,
-  onError: (error: Error) => void,
-  onClosed: () => void,
-  onMessage: (data: any) => void,
-}
+  audioStream: MediaStream;
+  audioRef: React.RefObject<HTMLAudioElement>;
+  companyId: string;
+  onConnected: (pc: RTCPeerConnection, dc: RTCDataChannel) => void;
+  onError: (error: Error) => void;
+  onClosed: () => void;
+  onMessage: (data: any) => void;
+};
 
 @injectable()
 export class RealtimeWebRtcUseCase {
   constructor(
-    @inject(RealtimeRoomServicePort) private readonly realtimeRoomServicePort: RealtimeRoomServicePort
-  ) { }
+    @inject(RealtimeRoomServicePort)
+    private readonly realtimeRoomServicePort: RealtimeRoomServicePort,
+  ) {}
 
   async execute(params: RealtimeWebRtcUseCaseParams) {
     try {
-      const { pc, dc, roomId, roomToken } = await this.realtimeRoomServicePort.createRoom(params.companyId)
+      const { pc, dc, roomId, roomToken } =
+        await this.realtimeRoomServicePort.createRoom(params.companyId);
 
       pc.addTrack(params.audioStream.getTracks()[0]);
-      pc.ontrack = (e) => (params.audioRef.current!.srcObject = e.streams[0]);
+      pc.ontrack = (e) => {
+        params.audioRef.current.srcObject = e.streams[0];
+      };
 
-      await this.realtimeRoomServicePort.attachCallToRoom(pc, roomId, roomToken)
+      await this.realtimeRoomServicePort.attachCallToRoom(
+        pc,
+        roomId,
+        roomToken,
+      );
 
-      params.onConnected(pc, dc)
+      params.onConnected(pc, dc);
     } catch (error) {
-      params.onError(error as Error)
+      params.onError(error as Error);
     }
     // try {
     //   const token = await this.audioCallService.getToken(params.companyId)
@@ -44,7 +52,6 @@ export class RealtimeWebRtcUseCase {
     //   params.onError(error as Error)
     // }
   }
-
 }
 
 // 019a8237-d30c-7000-a211-c01a756390e0

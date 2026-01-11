@@ -1,4 +1,4 @@
-import type { paths } from "./openapi-openai.types";
+import type { components, paths } from "./openapi-openai.types";
 
 // UTILS
 export type JsonRouteBody<
@@ -27,6 +27,8 @@ export type JsonRouteResponse<
       : never
     : never
   : never;
+
+export type Schema = components["schemas"];
 
 export type OpenAIConfig = {
   model?: string;

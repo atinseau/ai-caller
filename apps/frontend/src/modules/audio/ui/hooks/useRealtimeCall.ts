@@ -13,10 +13,13 @@ export function useRealtimeCall(audioRef: React.RefObject<HTMLAudioElement>) {
   const sendMessage = (message: string) =>
     send({ type: RealtimeCallMachineEvent.MESSAGE, message });
 
+  const muteToggle = () => send({ type: RealtimeCallMachineEvent.MUTE_TOGGLE });
+
   return {
     sendMessage,
     state,
     start,
     stop,
+    muteToggle,
   };
 }

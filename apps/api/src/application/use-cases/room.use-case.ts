@@ -5,14 +5,18 @@ import { CallServicePort } from "@/domain/services/call-service.port";
 import { logger } from "@/infrastructure/logger";
 import type { IAttachCallToRoomRequestDto } from "@/interfaces/dtos/room/attach-call-to-room-request.dto";
 import type { ICreateRoomParamsRequestDto } from "@/interfaces/dtos/room/create-room-params-request.dto";
+import { RoomReadyEvent } from "../events/room-ready.event";
+import { EventBusPort } from "../ports/event-bus.port";
 
 @injectable()
 export class RoomUseCase {
   constructor(
-    @inject(CallServicePort) private callService: CallServicePort,
+    @inject(CallServicePort) private readonly callService: CallServicePort,
     @inject(CompanyRepositoryPort)
-    private companyRepository: CompanyRepositoryPort,
-    @inject(RoomRepositoryPort) private roomRepository: RoomRepositoryPort,
+    private readonly companyRepository: CompanyRepositoryPort,
+    @inject(RoomRepositoryPort)
+    private readonly roomRepository: RoomRepositoryPort,
+    @inject(EventBusPort) private readonly eventBus: EventBusPort,
   ) {}
 
   async createRoom(createRoomParamsDto: ICreateRoomParamsRequestDto) {
@@ -36,10 +40,14 @@ export class RoomUseCase {
   }
 
   async attachCallToRoom(attachCallToRoom: IAttachCallToRoomRequestDto) {
-    await this.roomRepository.updateRoomCallId(
+    const roomModel = await this.roomRepository.updateRoomCallId(
       attachCallToRoom.roomId,
       attachCallToRoom.id,
     );
+    if (!roomModel) {
+      throw new Error("Room not found");
+    }
+    this.eventBus.publish(new RoomReadyEvent(roomModel));
     logger.info(
       `Call with ID: ${attachCallToRoom.id} attached to Room ID: ${attachCallToRoom.roomId}`,
     );

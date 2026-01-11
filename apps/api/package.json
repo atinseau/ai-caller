@@ -16,7 +16,8 @@
     "./openapi": "./dist/openapi.d.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/lodash-es": "4.17.12"
   },
   "dependencies": {
     "@ai-caller/shared": "workspace:*",
@@ -29,8 +30,10 @@
     "dayjs": "1.11.19",
     "dotenv": "17.2.3",
     "dotenv-expand": "12.0.3",
+    "handlebars": "4.7.8",
     "hono": "4.11.1",
     "inversify": "7.10.6",
+    "lodash-es": "4.17.22",
     "openai": "6.13.0",
     "openapi-typescript": "7.10.1",
     "pino": "10.1.0",

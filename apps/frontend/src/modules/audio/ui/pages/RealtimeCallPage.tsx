@@ -2,13 +2,14 @@ import { type RefObject, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { useCompanies } from "@/shared/hooks/useCompanies";
 import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum";
+import { MuteToggleButton } from "../components/MuteToggleButton";
 import { useRealtimeCall } from "../hooks/useRealtimeCall";
 
 export function RealtimeCallPage() {
   const { companies, isLoading } = useCompanies();
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { start, stop, state, sendMessage } = useRealtimeCall(
+  const { start, stop, state, sendMessage, muteToggle } = useRealtimeCall(
     audioRef as RefObject<HTMLAudioElement>,
   );
 
@@ -71,7 +72,7 @@ export function RealtimeCallPage() {
           />
           <Button
             type="submit"
-            className="h-[42px] flex items-center justify-center"
+            className="h-10.5 flex items-center justify-center"
           >
             Send
           </Button>
@@ -83,7 +84,7 @@ export function RealtimeCallPage() {
         RealtimeCallMachineState.CONNECTED ? (
         <Button
           variant="destructive"
-          className="h-[42px] flex items-center justify-center"
+          className="h-10.5 flex items-center justify-center"
           onClick={stop}
         >
           {" "}
@@ -93,7 +94,6 @@ export function RealtimeCallPage() {
 
       <audio ref={audioRef} autoPlay className="hidden">
         <track kind="captions" />
-        <caption>Realtime Call Audio</caption>
       </audio>
 
       <p>{JSON.stringify(state.value)}</p>
@@ -101,21 +101,29 @@ export function RealtimeCallPage() {
       {typeof state.value === "object" &&
       state.value[RealtimeCallMachineState.CALLING] ===
         RealtimeCallMachineState.CONNECTED ? (
-        <form className="flex gap-2" onSubmit={handleMessageSubmit}>
-          <input
-            name="message"
-            type="text"
-            placeholder="Type your message..."
-            className="border rounded px-3 py-2 w-64"
-            autoComplete="off"
+        <div className="flex flex-col gap-4 items-center">
+          <form className="flex gap-2" onSubmit={handleMessageSubmit}>
+            <input
+              name="message"
+              type="text"
+              placeholder="Type your message..."
+              className="border rounded px-3 py-2 w-64"
+              autoComplete="off"
+            />
+            <Button
+              type="submit"
+              className="h-10.5 flex items-center justify-center"
+            >
+              Send
+            </Button>
+          </form>
+
+          {/* MUTE */}
+          <MuteToggleButton
+            isMuted={state.context.muted}
+            onToggle={muteToggle}
           />
-          <Button
-            type="submit"
-            className="h-[42px] flex items-center justify-center"
-          >
-            Send
-          </Button>
-        </form>
+        </div>
       ) : null}
     </div>
   );

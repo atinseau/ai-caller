@@ -6,6 +6,7 @@ export type RealtimeCallMachineContext = {
   peerConnection?: RTCPeerConnection;
   dataChannel?: RTCDataChannel;
   audioRef?: React.RefObject<HTMLAudioElement>;
+  muted: boolean;
 };
 
 export type RealtimeCallMachineEvents =
@@ -21,7 +22,8 @@ export type RealtimeCallMachineEvents =
       dc: RTCDataChannel;
     }
   | { type: typeof RealtimeCallMachineEvent.STOP }
-  | { type: typeof RealtimeCallMachineEvent.MESSAGE; message: string };
+  | { type: typeof RealtimeCallMachineEvent.MESSAGE; message: string }
+  | { type: typeof RealtimeCallMachineEvent.MUTE_TOGGLE };
 // | { type: "STOP_CALL" }
 // | { type: "RTC_OPEN", pc: RTCPeerConnection, dc: RTCDataChannel }
 // | { type: "RTC_ERROR" }

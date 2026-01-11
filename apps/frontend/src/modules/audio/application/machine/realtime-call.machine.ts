@@ -21,61 +21,102 @@ export class RealtimeCallMachine {
 
   constructor(
     @inject(AudioStreamPort) private readonly audioStream: AudioStreamPort,
-    @inject(RealtimeWebRtcUseCase) private readonly realtimeWebRtcUseCase: RealtimeWebRtcUseCase
+    @inject(RealtimeWebRtcUseCase)
+    private readonly realtimeWebRtcUseCase: RealtimeWebRtcUseCase,
   ) {
     this.machine = setup({
       types: {} as {
-        events: RealtimeCallMachineEvents,
-        context: RealtimeCallMachineContext
+        events: RealtimeCallMachineEvents;
+        context: RealtimeCallMachineContext;
       },
       guards: {},
       actions: {},
       actors: {
         handleMediaStream: fromPromise(() => this.audioStream.asPromise()),
-        handleRealtimeWebRtc: fromCallback<any, { audioStream: MediaStream, companyId: string, audioRef: React.RefObject<HTMLAudioElement> }, any>(({ sendBack, input }) => {
+        handleRealtimeWebRtc: fromCallback<
+          any,
+          {
+            audioStream: MediaStream;
+            companyId: string;
+            audioRef: React.RefObject<HTMLAudioElement>;
+          },
+          any
+        >(({ sendBack, input }) => {
           this.realtimeWebRtcUseCase.execute({
             ...input,
             onConnected: (pc, dc) => sendBack({ type: "CONNECTED", pc, dc }),
             onError: (error) => sendBack({ type: "ERROR", error }),
             onClosed: () => sendBack({ type: "CLOSED" }),
             onMessage: () => sendBack({ type: "MESSAGE" }),
-          })
+          });
         }),
-        handleDataChannelEvents: fromCallback<any, { dataChannel: RTCDataChannel }>(({ sendBack, input }) => {
-          input.dataChannel.addEventListener('message', (event) => {
-            console.log('Data channel message received', event.data)
-          })
-        })
+        handleDataChannelEvents: fromCallback<
+          any,
+          { dataChannel: RTCDataChannel }
+        >(({ sendBack, input }) => {
+          input.dataChannel.addEventListener("message", (event) => {
+            console.log("Data channel message received", event.data);
+          });
+
+          input.dataChannel.addEventListener("close", (event) => {
+            console.log("Data channel closed", event);
+            sendBack({ type: "STOP" });
+          });
+        }),
       },
     }).createMachine({
       id: this.name,
+      context: {
+        muted: false,
+      },
       entry: () => console.log("Audio call machine booted"),
       initial: RealtimeCallMachineState.IDLE,
       on: {
         [RealtimeCallMachineEvent.ERROR]: {
           target: `.${RealtimeCallMachineState.IDLE}`,
           actions: ({ event }) => {
-            console.log("An error occurred during the audio call", event.error)
-          }
+            console.log("An error occurred during the audio call", event.error);
+          },
         },
         [RealtimeCallMachineEvent.STOP]: {
           target: `.${RealtimeCallMachineState.IDLE}`,
           actions: ({ context }) => {
-            console.log("Stopping audio call")
+            console.log("Stopping audio call");
 
             if (context.audioStream) {
-              context.audioStream.getTracks().forEach((track) => track.stop())
+              context.audioStream.getTracks().forEach((track) => {
+                track.stop();
+              });
             }
 
             if (context.dataChannel) {
-              context.dataChannel.close()
+              context.dataChannel.close();
             }
 
             if (context.peerConnection) {
-              context.peerConnection.close()
+              context.peerConnection.close();
             }
-          }
-        }
+          },
+        },
+        [RealtimeCallMachineEvent.MUTE_TOGGLE]: {
+          actions: assign({
+            muted: ({ context }) => {
+              console.log(
+                "Toggling mute state from",
+                context.muted,
+                "to",
+                !context.muted,
+              );
+              const newMutedState = !context.muted;
+              if (context.audioStream) {
+                context.audioStream.getAudioTracks().forEach((track) => {
+                  track.enabled = !newMutedState;
+                });
+              }
+              return newMutedState;
+            },
+          }),
+        },
       },
       states: {
         [RealtimeCallMachineState.IDLE]: {
@@ -84,10 +125,10 @@ export class RealtimeCallMachine {
               target: RealtimeCallMachineState.INITIALIZING,
               actions: assign({
                 companyId: ({ event }) => event.companyId,
-                audioRef: ({ event }) => event.audioRef
-              })
-            }
-          }
+                audioRef: ({ event }) => event.audioRef,
+              }),
+            },
+          },
         },
         [RealtimeCallMachineState.INITIALIZING]: {
           invoke: {
@@ -95,10 +136,10 @@ export class RealtimeCallMachine {
             onDone: {
               target: RealtimeCallMachineState.CALLING,
               actions: assign({
-                audioStream: ({ event }) => event.output
-              })
-            }
-          }
+                audioStream: ({ event }) => event.output,
+              }),
+            },
+          },
         },
         [RealtimeCallMachineState.CALLING]: {
           initial: RealtimeCallMachineState.CONNECTING,
@@ -106,9 +147,9 @@ export class RealtimeCallMachine {
             input: ({ context }) => ({
               audioStream: context.audioStream!,
               companyId: context.companyId!,
-              audioRef: context.audioRef!
+              audioRef: context.audioRef!,
             }),
-            src: "handleRealtimeWebRtc"
+            src: "handleRealtimeWebRtc",
           },
           states: {
             [RealtimeCallMachineState.CONNECTING]: {
@@ -117,11 +158,11 @@ export class RealtimeCallMachine {
                 [RealtimeCallMachineEvent.CONNECTED]: {
                   actions: assign({
                     peerConnection: ({ event }) => event.pc,
-                    dataChannel: ({ event }) => event.dc
+                    dataChannel: ({ event }) => event.dc,
                   }),
-                  target: RealtimeCallMachineState.CONNECTED
-                }
-              }
+                  target: RealtimeCallMachineState.CONNECTED,
+                },
+              },
             },
             [RealtimeCallMachineState.CONNECTED]: {
               entry: () => console.log("WebRTC connected!"),
@@ -130,51 +171,66 @@ export class RealtimeCallMachine {
                 input: ({ context }) => ({ dataChannel: context.dataChannel! }),
                 onError: {
                   actions: ({ event, self }) => {
-                    self.send({ type: RealtimeCallMachineEvent.ERROR, error: event.error as Error })
-                  }
-                }
+                    self.send({
+                      type: RealtimeCallMachineEvent.ERROR,
+                      error: event.error as Error,
+                    });
+                  },
+                },
               },
               on: {
                 [RealtimeCallMachineEvent.MESSAGE]: {
-                  guard: ({ context }) => context.dataChannel?.readyState === "open",
+                  guard: ({ context }) =>
+                    context.dataChannel?.readyState === "open",
                   actions: ({ context, event }) => {
-
-                    if (event.message === "stop") {
-                      context.dataChannel!.send(JSON.stringify({
-                        type: "output_audio_buffer.clear"
-                      }))
-                      context.dataChannel!.send(JSON.stringify({
-                        // type: ""
-                      }))
-                      return
+                    if (!context.dataChannel) {
+                      console.error("Data channel is not available");
+                      return;
                     }
 
-                    context.dataChannel!.send(JSON.stringify({
-                      type: "conversation.item.create",
-                      item: {
-                        type: "message",
-                        role: "user",
-                        content: [
-                          {
-                            type: "input_text",
-                            text: event.message
-                          }
-                        ]
-                      }
-                    }))
+                    if (event.message === "stop") {
+                      context.dataChannel.send(
+                        JSON.stringify({
+                          type: "output_audio_buffer.clear",
+                        }),
+                      );
+                      context.dataChannel.send(
+                        JSON.stringify({
+                          // type: ""
+                        }),
+                      );
+                      return;
+                    }
 
-                    context.dataChannel!.send(JSON.stringify({
-                      type: "response.create",
-                    }));
-                  }
+                    context.dataChannel.send(
+                      JSON.stringify({
+                        type: "conversation.item.create",
+                        item: {
+                          type: "message",
+                          role: "user",
+                          content: [
+                            {
+                              type: "input_text",
+                              text: event.message,
+                            },
+                          ],
+                        },
+                      }),
+                    );
+
+                    context.dataChannel.send(
+                      JSON.stringify({
+                        type: "response.create",
+                      }),
+                    );
+                  },
                 },
-                [RealtimeCallMachineEvent.CLOSED]: {}
-              }
-            }
-          }
-        }
-      }
-    })
+              },
+            },
+          },
+        },
+      },
+    });
   }
 
   public getMachine() {

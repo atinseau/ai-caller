@@ -12,7 +12,7 @@ export class CompanyUseCase {
   async create(dto: ICreateCompanyRequestDto) {
     return this.companyRepository.createCompany({
       name: dto.name,
-      promptId: dto.promptId,
+      mcpUrl: dto.mcpUrl,
     });
   }
 

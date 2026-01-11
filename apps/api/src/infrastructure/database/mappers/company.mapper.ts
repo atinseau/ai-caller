@@ -5,7 +5,7 @@ import type { Company } from "@/generated/prisma/client";
 export abstract class CompanyMapper {
   static toModel(prismaCompany: Company): ICompanyModel {
     return {
-      promptId: prismaCompany.promptId,
+      mcpUrl: prismaCompany.mcpUrl,
       createdAt: prismaCompany.createdAt,
       id: prismaCompany.id,
       name: prismaCompany.name,
@@ -23,7 +23,7 @@ export abstract class CompanyMapper {
       id: randomUUIDv7(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      promptId: modelCompany.promptId,
+      mcpUrl: modelCompany.mcpUrl,
       name: modelCompany.name,
     };
   }

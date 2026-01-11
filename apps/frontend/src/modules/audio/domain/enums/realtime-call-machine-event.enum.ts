@@ -5,4 +5,5 @@ export const RealtimeCallMachineEvent = {
   STOP: "STOP",
   MESSAGE: "MESSAGE",
   ERROR: "ERROR",
+  MUTE_TOGGLE: "MUTE_TOGGLE",
 } as const;

@@ -6,9 +6,9 @@ export const CompanyModel = z
       description: "The name of the company",
       example: "Acme Corp",
     }),
-    promptId: z.string().openapi({
-      description: "The prompt ID associated with the company",
-      example: "prompt_123456",
+    mcpUrl: z.url().openapi({
+      description: "The MCP server URL of the company",
+      example: "https://mcp.acme-corp.com",
     }),
     id: z.uuidv7().openapi({
       description: "The unique identifier of the company",

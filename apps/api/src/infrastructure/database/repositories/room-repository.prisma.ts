@@ -42,4 +42,13 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     });
     return rooms.map(RoomMapper.toModel);
   }
+
+  async findById(roomId: string): Promise<IRoomModel> {
+    const room = await prisma.room.findUniqueOrThrow({
+      where: {
+        id: roomId,
+      },
+    });
+    return RoomMapper.toModel(room);
+  }
 }

@@ -86,7 +86,7 @@ model Company {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  promptId String
+  mcpUrl String
 
   rooms     Room[]
 }
