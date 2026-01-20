@@ -1,9 +1,10 @@
-import { OpenAI, type Schema } from "@ai-caller/shared";
-import { injectable } from "inversify";
+import type { Schema } from "@ai-caller/shared";
+import { inject, injectable } from "inversify";
 import { merge } from "lodash-es";
 
 import type { RealtimeGatewayPort } from "@/application/ports/realtime-gateway.port";
 import type { IRoomModel } from "@/domain/models/room.model";
+import { CallServicePort } from "@/domain/services/call-service.port";
 import { logger } from "../logger";
 
 type ChannelData = {
@@ -15,7 +16,9 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
   private readonly connectionMap: Map<string, WebSocket> = new Map();
   private readonly channelDataMap: Map<string, ChannelData> = new Map();
 
-  // ------ Public ------
+  constructor(
+    @inject(CallServicePort) private readonly callService: CallServicePort,
+  ) {}
 
   public async openRoomChannel(room: IRoomModel) {
     if (!room.callId) {
@@ -58,24 +61,6 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     });
   }
 
-  private async terminateCall(room: IRoomModel) {
-    const openai = new OpenAI({ apiKey: room.token });
-    if (!room.callId) {
-      logger.error(`Room ${room.id} does not have a call ID.`);
-      return;
-    }
-
-    const result = await openai.realtime.hangups(room.callId);
-    if (!result) {
-      logger.error(`Failed to hang up call for room ${room.id}`);
-      return;
-    }
-
-    logger.info(`Call hung up for room ${room.id}`);
-  }
-
-  // ------ Private ------
-
   private handleMessage(
     ws: WebSocket,
     data: Schema["RealtimeServerEvent"],
@@ -100,7 +85,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       data.type === "output_audio_buffer.stopped" &&
       channelData?.shouldCloseCall
     )
-      return this.terminateCall(room);
+      return this.callService.terminateCall(room);
   }
 
   private async handleFunctionCallDone(
@@ -125,6 +110,8 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       item.output,
       `Handled MCP call done for room ${room.id}, item ID: ${item.id}`,
     );
+
+    console.log(item);
   }
 
   private async autoUnblockConversation(ws: WebSocket) {

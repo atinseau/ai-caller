@@ -4,7 +4,7 @@ import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 import tsconfigPaths from "vite-tsconfig-paths";
 
-const PORT = process.env.PORT ? parseInt(process.env.PORT) : undefined;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : undefined;
 if (!PORT) {
   throw new Error("PORT environment variable is not set or invalid");
 }

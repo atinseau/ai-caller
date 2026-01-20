@@ -96,10 +96,23 @@ model Room {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     expiresAt   DateTime
+    deletedAt   DateTime?
 
     token       String   @unique
     companyId   String
     company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
     callId      String?
+
+    toolInvokes ToolInvoke[]
+}
+
+
+model ToolInvoke {
+    id String @id @default(uuid())
+    createdAt DateTime @default(now())
+    args Json? @default("{}")
+
+    roomId String
+    room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
 }

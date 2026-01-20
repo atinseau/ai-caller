@@ -13,4 +13,6 @@ export abstract class RoomRepositoryPort {
   abstract findExpiredRooms(): Promise<IRoomModel[]>;
 
   abstract findById(roomId: string): Promise<IRoomModel>;
+
+  abstract deleteRoom(roomId: string): Promise<void>;
 }

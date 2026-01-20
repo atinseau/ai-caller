@@ -75,19 +75,24 @@ export class OpenAIRealtime {
   }
 
   public async hangups(callId: string) {
-    const response = await openAiClient.POST(
-      `/realtime/calls/{call_id}/hangup`,
-      {
-        params: {
-          path: {
-            call_id: callId,
-          },
-        },
-        headers: {
-          Authorization: `Bearer ${this.config.apiKey}`,
+    const result = await openAiClient.POST(`/realtime/calls/{call_id}/hangup`, {
+      params: {
+        path: {
+          call_id: callId,
         },
       },
-    );
-    return response.response.ok;
+      headers: {
+        Authorization: `Bearer ${this.config.apiKey}`,
+      },
+    });
+
+    // This is not an error
+    if (result.response.bodyUsed) {
+      return;
+    }
+
+    if (!result.response.ok) {
+      throw new Error("fail to hangups");
+    }
   }
 }

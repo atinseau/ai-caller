@@ -35,12 +35,21 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
   async findExpiredRooms(): Promise<IRoomModel[]> {
     const rooms = await prisma.room.findMany({
       where: {
+        deletedAt: null,
         expiresAt: {
           lt: new Date(),
         },
       },
     });
     return rooms.map(RoomMapper.toModel);
+  }
+
+  async deleteRoom(roomId: string): Promise<void> {
+    await prisma.room.delete({
+      where: {
+        id: roomId,
+      },
+    });
   }
 
   async findById(roomId: string): Promise<IRoomModel> {

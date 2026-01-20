@@ -1,4 +1,5 @@
 import type { ICompanyModel } from "../models/company.model";
+import type { IRoomModel } from "../models/room.model";
 
 export abstract class CallServicePort {
   /**
@@ -11,4 +12,6 @@ export abstract class CallServicePort {
     token: string;
     expiresAt: Date;
   }>;
+
+  abstract terminateCall(room: IRoomModel): Promise<void>;
 }

@@ -14,7 +14,7 @@ const cronJobsToRegister: CronJobParams[] = [
     start: true,
     onTick: async () => {
       const roomUseCase = container.get(RoomUseCase);
-      // await roomUseCase.flushExpiredRooms()
+      await roomUseCase.flushExpiredRooms();
     },
   },
 ];

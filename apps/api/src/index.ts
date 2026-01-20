@@ -4,16 +4,12 @@ import { app } from "./interfaces/application";
 
 import "./infrastructure/cron";
 import type { Serve } from "bun";
-
-const PORT = parseInt(Bun.env.PORT, 10);
-if (Number.isNaN(PORT)) {
-  throw new Error("PORT environment variable must be a valid number");
-}
+import { env } from "./infrastructure/config/env";
 
 initializeOpenApi(app);
 
 export default {
-  port: PORT,
+  port: env.get("PORT"),
   fetch: app.fetch,
   websocket: websocket as BunWebSocketHandler<unknown>,
 } satisfies Serve.Options<undefined>;

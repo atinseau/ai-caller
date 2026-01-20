@@ -55,6 +55,23 @@ export class RoomUseCase {
 
   async flushExpiredRooms() {
     const expiredRooms = await this.roomRepository.findExpiredRooms();
-    console.log(expiredRooms);
+    const results = await Promise.allSettled(
+      expiredRooms.map((expiredRoom) =>
+        this.callService.terminateCall(expiredRoom),
+      ),
+    );
+
+    let fullyfied = 0;
+    for (const result of results) {
+      if (result.status === "rejected") {
+        console.error(result.reason);
+      } else {
+        fullyfied++;
+      }
+    }
+
+    if (fullyfied > 0) {
+      logger.info(`Expired rooms flushed: ${fullyfied}`);
+    }
   }
 }

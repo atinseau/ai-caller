@@ -3,6 +3,7 @@
   "ui": "tui",
   "tasks": {
     "dev": {
+      "with": ["//#http"],
       "cache": false,
       "persistent": true
     },
@@ -13,6 +14,10 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": []
+    },
+    "//#http": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

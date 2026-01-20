@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import dayjs from "dayjs";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { Room } from "@/generated/prisma/client";
+import { env } from "@/infrastructure/config/env";
 
 export abstract class RoomMapper {
   static toModel(prismaRoom: Room): IRoomModel {
@@ -24,18 +25,17 @@ export abstract class RoomMapper {
       expiresAt?: Date;
     },
   ): Room {
-    const maxDurationMinutes = parseInt(
-      Bun.env.MAX_ROOM_CALL_DURATION_MINUTE,
-      10,
-    );
     const now = dayjs();
-    const maxAllowedExpiry = now.add(maxDurationMinutes, "minute");
+
+    // Default
+    const defaultExpiresAt = now.add(
+      env.get("ROOM_CALL_DURATION_MINUTE"),
+      "minute",
+    );
 
     const expiresAt = !modelRoom.expiresAt
-      ? maxAllowedExpiry.toDate()
-      : dayjs(modelRoom.expiresAt).isBefore(maxAllowedExpiry)
-        ? modelRoom.expiresAt
-        : maxAllowedExpiry.toDate();
+      ? defaultExpiresAt.toDate()
+      : modelRoom.expiresAt;
 
     return {
       id: randomUUIDv7(),

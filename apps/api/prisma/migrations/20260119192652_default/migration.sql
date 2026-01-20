@@ -80,6 +80,16 @@ CREATE TABLE "Room" (
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "ToolUsage" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "args" JSONB DEFAULT '{}',
+    "roomId" TEXT NOT NULL,
+
+    CONSTRAINT "ToolUsage_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "user_email_key" ON "user"("email");
 
@@ -109,3 +119,6 @@ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ToolUsage" ADD CONSTRAINT "ToolUsage_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;
