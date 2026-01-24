@@ -1,3 +1,6 @@
+-- CreateEnum
+CREATE TYPE "ToolInvokeStatus" AS ENUM ('RUNNING', 'COMPLETED', 'FAILED');
+
 -- CreateTable
 CREATE TABLE "user" (
     "id" TEXT NOT NULL,
@@ -73,6 +76,7 @@ CREATE TABLE "Room" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "expiresAt" TIMESTAMP(3) NOT NULL,
+    "deletedAt" TIMESTAMP(3),
     "token" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "callId" TEXT,
@@ -81,13 +85,16 @@ CREATE TABLE "Room" (
 );
 
 -- CreateTable
-CREATE TABLE "ToolUsage" (
+CREATE TABLE "ToolInvoke" (
     "id" TEXT NOT NULL,
+    "entityId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "args" JSONB DEFAULT '{}',
+    "results" JSONB DEFAULT '{}',
+    "status" "ToolInvokeStatus" NOT NULL DEFAULT 'RUNNING',
     "roomId" TEXT NOT NULL,
 
-    CONSTRAINT "ToolUsage_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "ToolInvoke_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -121,4 +128,4 @@ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Room" ADD CONSTRAINT "Room_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "ToolUsage" ADD CONSTRAINT "ToolUsage_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "ToolInvoke" ADD CONSTRAINT "ToolInvoke_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;

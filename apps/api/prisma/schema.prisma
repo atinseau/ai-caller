@@ -107,11 +107,20 @@ model Room {
     toolInvokes ToolInvoke[]
 }
 
+enum ToolInvokeStatus {
+  RUNNING
+  COMPLETED
+  FAILED
+}
 
 model ToolInvoke {
     id String @id @default(uuid())
+    entityId  String
     createdAt DateTime @default(now())
     args Json? @default("{}")
+    results Json? @default("{}")
+
+    status ToolInvokeStatus @default(RUNNING)
 
     roomId String
     room Room @relation(fields: [roomId], references: [id], onDelete: Cascade)

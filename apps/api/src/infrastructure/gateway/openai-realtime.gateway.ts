@@ -4,6 +4,7 @@ import { merge } from "lodash-es";
 
 import type { RealtimeGatewayPort } from "@/application/ports/realtime-gateway.port";
 import type { IRoomModel } from "@/domain/models/room.model";
+// import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
 import { logger } from "../logger";
 
@@ -18,6 +19,8 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
 
   constructor(
     @inject(CallServicePort) private readonly callService: CallServicePort,
+    // @inject(ToolRepositoryPort)
+    // private readonly toolRepository: ToolRepositoryPort,
   ) {}
 
   public async openRoomChannel(room: IRoomModel) {
@@ -74,10 +77,9 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
 
     if (
       data.type === "response.output_item.done" &&
-      data.item.type === "function_call" &&
-      data.item.status === "completed"
+      data.item.type === "function_call"
     )
-      return this.handleFunctionCallDone(ws, data.item, room);
+      return this.handleFunctionCall(ws, data.item, room);
 
     const channelData = this.channelDataMap.get(room.id);
 
@@ -88,15 +90,34 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       return this.callService.terminateCall(room);
   }
 
-  private async handleFunctionCallDone(
+  private async handleFunctionCall(
     ws: WebSocket,
     item: Schema["RealtimeConversationItemFunctionCall"],
     room: IRoomModel,
   ) {
-    this.updateChannelData(room.id, { shouldCloseCall: true });
-    this.autoUnblockConversation(ws);
-    logger.info(
-      `Handled function call done for room ${room.id}, item ID: ${item.id}`,
+    // if (item.id && item.status === "in_progress") {
+    //   await this.toolRepository.createToolInvoke(
+    //     room.id,
+    //     item.id,
+    //     JSON.parse(item.arguments),
+    //   );
+    //   logger.info(
+    //     `Handled function call in progress for room ${room.id}, item ID: ${item.id}`,
+    //   );
+    //   return;
+    // }
+
+    if (item.id && item.status === "completed") {
+      this.updateChannelData(room.id, { shouldCloseCall: true });
+      this.autoUnblockConversation(ws);
+      logger.info(
+        `Handled function call done for room ${room.id}, item ID: ${item.id}`,
+      );
+      return;
+    }
+
+    logger.warn(
+      `Function call item with ID ${item.id} has unhandled status: ${item.status}`,
     );
   }
 
@@ -110,8 +131,6 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       item.output,
       `Handled MCP call done for room ${room.id}, item ID: ${item.id}`,
     );
-
-    console.log(item);
   }
 
   private async autoUnblockConversation(ws: WebSocket) {

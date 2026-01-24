@@ -42,6 +42,7 @@ export abstract class RoomMapper {
       companyId: modelRoom.companyId,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
       expiresAt,
       callId: modelRoom.callId || null,
       token: modelRoom.token,
