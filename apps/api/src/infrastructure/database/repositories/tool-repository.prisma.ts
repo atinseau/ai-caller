@@ -19,4 +19,11 @@ export class ToolRepositoryPrisma implements ToolRepositoryPort {
     // Convert Prisma entity to domain model
     return ToolInvokeMapper.toModel(toolInvoke);
   }
+
+  public completeToolInvokeByEntityId(
+    entityId: string,
+    results: Record<string, unknown>,
+  ): Promise<IToolInvokeModel> {}
+
+  public failToolInvoke(toolInvokeId: string): Promise<IToolInvokeModel> {}
 }

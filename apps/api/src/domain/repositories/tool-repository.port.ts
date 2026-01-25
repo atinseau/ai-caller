@@ -1,4 +1,3 @@
-import type { ToolInvokeMapper } from "@/infrastructure/database/mappers/tool.mapper";
 import type { IToolInvokeModel } from "../models/tool.model";
 
 /**
@@ -23,8 +22,8 @@ export abstract class ToolRepositoryPort {
     args?: Record<string, never>,
   ): Promise<IToolInvokeModel>;
 
-  abstract completeToolInvoke(
-    toolInvokeId: string,
+  abstract completeToolInvokeByEntityId(
+    entityId: string,
     results: Record<string, unknown>,
   ): Promise<IToolInvokeModel>;
 
