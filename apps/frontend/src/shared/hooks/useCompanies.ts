@@ -5,7 +5,7 @@ export function useCompanies() {
   const { data, isLoading } = useSuspenseQuery({
     queryKey: ["companies"],
     queryFn: async () => {
-      const response = await api.GET("/api/v1/company/all");
+      const response = await api.GET("/api/v1/company/me");
       return response.data?.companies || [];
     },
   });

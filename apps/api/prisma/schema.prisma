@@ -23,6 +23,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  companyUsers  CompanyUser[]
 
   @@unique([email])
   @@map("user")
@@ -89,6 +90,66 @@ model Company {
   mcpUrl String
 
   rooms     Room[]
+  calls     Call[]
+  users     CompanyUser[]
+}
+
+enum CompanyUserRole {
+  ROOT
+  MEMBER
+}
+
+model CompanyUser {
+  id        String   @id @default(uuid())
+  userId    String
+  companyId String
+  role      CompanyUserRole @default(MEMBER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, userId])
+  @@index([userId])
+  @@index([companyId])
+  @@map("company_user")
+}
+
+enum CallStatus {
+  CREATED
+  CONNECTED
+  ENDED
+  FAILED
+}
+
+enum CallProvider {
+  DEV
+  TWILIO
+}
+
+model Call {
+  id              String       @id @default(uuid())
+  companyId       String
+  roomId          String?
+  externalCallId  String?
+  status          CallStatus   @default(CREATED)
+  provider        CallProvider @default(DEV)
+  startedAt       DateTime?
+  endedAt         DateTime?
+  durationSeconds Int?
+  transcript      Json?
+  metadata        Json?
+  costCents       Int?
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  company Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  room    Room?   @relation(fields: [roomId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([roomId])
+  @@map("call")
 }
 
 model Room {
@@ -105,6 +166,7 @@ model Room {
     callId      String?
 
     toolInvokes ToolInvoke[]
+    calls       Call[]
 }
 
 enum ToolInvokeStatus {

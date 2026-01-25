@@ -1,14 +1,23 @@
-import { type RefObject, useRef } from "react";
+import { type RefObject, useRef, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
+import { Input } from "@/shared/components/ui/input";
 import { useCompanies } from "@/shared/hooks/useCompanies";
 import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum";
+import { RealtimeCallMode } from "../../domain/enums/realtime-call-mode.enum";
 import { MuteToggleButton } from "../components/MuteToggleButton";
 import { useRealtimeCall } from "../hooks/useRealtimeCall";
 
-export function RealtimeCallPage() {
+type RealtimeCallPageProps = {
+  initialMode?: RealtimeCallMode;
+};
+
+export function RealtimeCallPage({
+  initialMode = RealtimeCallMode.DEVELOPMENT,
+}: RealtimeCallPageProps) {
   const { companies, isLoading } = useCompanies();
 
   const audioRef = useRef<HTMLAudioElement>(null);
+  const [mode, setMode] = useState<RealtimeCallMode>(initialMode);
   const { start, stop, state, sendMessage, muteToggle } = useRealtimeCall(
     audioRef as RefObject<HTMLAudioElement>,
   );
@@ -35,7 +44,7 @@ export function RealtimeCallPage() {
       return;
     }
 
-    start(companyId);
+    start(companyId, mode);
     input.value = "";
   };
 
@@ -62,14 +71,27 @@ export function RealtimeCallPage() {
 
       {typeof state.value === "string" &&
       state.value === RealtimeCallMachineState.IDLE ? (
-        <form className="flex gap-2" onSubmit={handleCompanyIdSubmit}>
-          <input
+        <form className="flex flex-wrap gap-2" onSubmit={handleCompanyIdSubmit}>
+          <Input
             name="companyId"
             type="text"
             placeholder="enter company id..."
-            className="border rounded px-3 py-2 w-64"
+            className="w-64"
             autoComplete="off"
           />
+          <select
+            name="mode"
+            className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+            value={mode}
+            onChange={(event) =>
+              setMode(event.target.value as RealtimeCallMode)
+            }
+          >
+            <option value={RealtimeCallMode.DEVELOPMENT}>
+              Dev (OpenAI realtime)
+            </option>
+            <option value={RealtimeCallMode.SANDBOX}>Sandbox (mock)</option>
+          </select>
           <Button
             type="submit"
             className="h-10.5 flex items-center justify-center"
@@ -103,11 +125,11 @@ export function RealtimeCallPage() {
         RealtimeCallMachineState.CONNECTED ? (
         <div className="flex flex-col gap-4 items-center">
           <form className="flex gap-2" onSubmit={handleMessageSubmit}>
-            <input
+            <Input
               name="message"
               type="text"
               placeholder="Type your message..."
-              className="border rounded px-3 py-2 w-64"
+              className="w-64"
               autoComplete="off"
             />
             <Button

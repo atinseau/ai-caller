@@ -1,19 +1,23 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
 import { compile } from "handlebars";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import type { ICompanyModel } from "@/domain/models/company.model";
 import type { IRoomModel } from "@/domain/models/room.model";
+import { CallRepositoryPort } from "@/domain/repositories/call-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import type { CallServicePort } from "@/domain/services/call-service.port";
 import { env } from "@/infrastructure/config/env";
 import { logger } from "@/infrastructure/logger";
 import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum";
 
+@injectable()
 export class OpenAICallService implements CallServicePort {
   constructor(
     @inject(RoomRepositoryPort)
     private readonly roomRepository: RoomRepositoryPort,
+    @inject(CallRepositoryPort)
+    private readonly callRepository: CallRepositoryPort,
   ) {}
 
   async createCall(company: ICompanyModel) {
@@ -78,6 +82,22 @@ export class OpenAICallService implements CallServicePort {
       return;
     }
     await openai.realtime.hangups(room.callId);
+
+    const call = await this.callRepository.findByRoomId(room.id);
+    if (call) {
+      const durationSeconds = call.startedAt
+        ? dayjs().diff(dayjs(call.startedAt), "second")
+        : undefined;
+      const estimatedCostCents = this.estimateDevCostCents(durationSeconds);
+
+      await this.callRepository.updateCall(call.id, {
+        status: "ENDED",
+        endedAt: new Date(),
+        durationSeconds,
+        costCents: estimatedCostCents,
+      });
+    }
+
     await this.roomRepository.deleteRoom(room.id);
 
     logger.info(`Call hung up for room ${room.id}`);
@@ -109,6 +129,16 @@ export class OpenAICallService implements CallServicePort {
     logger.info({ prompts, company }, `Compiled OpenAI prompt templates`);
 
     return prompts;
+  }
+
+  private estimateDevCostCents(durationSeconds?: number) {
+    if (!durationSeconds || durationSeconds <= 0) {
+      return undefined;
+    }
+
+    const minutes = Math.ceil(durationSeconds / 60);
+    const pricePerMinuteCents = 5;
+    return minutes * pricePerMinuteCents;
   }
 
   private async compileTemplate(promptFile: Bun.BunFile) {

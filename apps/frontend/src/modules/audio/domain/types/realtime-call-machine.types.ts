@@ -1,4 +1,5 @@
 import type { RealtimeCallMachineEvent } from "../enums/realtime-call-machine-event.enum";
+import type { RealtimeCallMode } from "../enums/realtime-call-mode.enum";
 
 export type RealtimeCallMachineContext = {
   companyId?: string;
@@ -6,6 +7,7 @@ export type RealtimeCallMachineContext = {
   peerConnection?: RTCPeerConnection;
   dataChannel?: RTCDataChannel;
   audioRef?: React.RefObject<HTMLAudioElement>;
+  mode?: RealtimeCallMode;
   muted: boolean;
 };
 
@@ -15,6 +17,7 @@ export type RealtimeCallMachineEvents =
       type: typeof RealtimeCallMachineEvent.START;
       companyId: string;
       audioRef: React.RefObject<HTMLAudioElement>;
+      mode?: RealtimeCallMode;
     }
   | {
       type: typeof RealtimeCallMachineEvent.CONNECTED;

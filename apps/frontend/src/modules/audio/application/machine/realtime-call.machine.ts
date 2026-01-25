@@ -7,6 +7,7 @@ import { assign, fromCallback, fromPromise, setup } from "xstate";
 import { AudioStreamPort } from "@/domain/audio-stream.port";
 import { RealtimeCallMachineEvent } from "../../domain/enums/realtime-call-machine-event.enum";
 import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum";
+import { RealtimeCallMode } from "../../domain/enums/realtime-call-mode.enum";
 import type {
   RealtimeCallMachineContext,
   RealtimeCallMachineEvents,
@@ -39,6 +40,7 @@ export class RealtimeCallMachine {
             audioStream: MediaStream;
             companyId: string;
             audioRef: React.RefObject<HTMLAudioElement>;
+            mode?: RealtimeCallMode;
           },
           any
         >(({ sendBack, input }) => {
@@ -126,6 +128,7 @@ export class RealtimeCallMachine {
               actions: assign({
                 companyId: ({ event }) => event.companyId,
                 audioRef: ({ event }) => event.audioRef,
+                mode: ({ event }) => event.mode ?? RealtimeCallMode.DEVELOPMENT,
               }),
             },
           },
@@ -148,6 +151,7 @@ export class RealtimeCallMachine {
               audioStream: context.audioStream!,
               companyId: context.companyId!,
               audioRef: context.audioRef!,
+              mode: context.mode,
             }),
             src: "handleRealtimeWebRtc",
           },
@@ -181,10 +185,24 @@ export class RealtimeCallMachine {
               on: {
                 [RealtimeCallMachineEvent.MESSAGE]: {
                   guard: ({ context }) =>
-                    context.dataChannel?.readyState === "open",
+                    context.dataChannel?.readyState === "open" ||
+                    context.mode === RealtimeCallMode.SANDBOX,
                   actions: ({ context, event }) => {
                     if (!context.dataChannel) {
                       console.error("Data channel is not available");
+                      return;
+                    }
+
+                    if (context.mode === RealtimeCallMode.SANDBOX) {
+                      context.dataChannel.send(
+                        JSON.stringify({
+                          type: "sandbox.message",
+                          payload: {
+                            role: "user",
+                            text: event.message,
+                          },
+                        }),
+                      );
                       return;
                     }
 

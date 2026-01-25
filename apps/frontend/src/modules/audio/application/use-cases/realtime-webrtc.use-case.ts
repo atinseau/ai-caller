@@ -1,10 +1,13 @@
 import { inject, injectable } from "inversify";
+import { RealtimeCallMode } from "../../domain/enums/realtime-call-mode.enum";
 import { RealtimeRoomServicePort } from "../../domain/ports/realtime-room-service.port";
+import { SandboxRealtimeRoomService } from "../services/sandbox-realtime-room.service";
 
 type RealtimeWebRtcUseCaseParams = {
   audioStream: MediaStream;
   audioRef: React.RefObject<HTMLAudioElement>;
   companyId: string;
+  mode?: RealtimeCallMode;
   onConnected: (pc: RTCPeerConnection, dc: RTCDataChannel) => void;
   onError: (error: Error) => void;
   onClosed: () => void;
@@ -16,10 +19,31 @@ export class RealtimeWebRtcUseCase {
   constructor(
     @inject(RealtimeRoomServicePort)
     private readonly realtimeRoomServicePort: RealtimeRoomServicePort,
+    @inject(SandboxRealtimeRoomService)
+    private readonly sandboxRoomService: SandboxRealtimeRoomService,
   ) {}
 
   async execute(params: RealtimeWebRtcUseCaseParams) {
     try {
+      if (params.mode === RealtimeCallMode.SANDBOX) {
+        const { pc, dc, roomId, roomToken } =
+          await this.sandboxRoomService.createRoom(params.companyId);
+
+        pc.addTrack(params.audioStream.getTracks()[0]);
+        pc.ontrack = (e) => {
+          params.audioRef.current.srcObject = e.streams[0];
+        };
+
+        if (params.audioRef.current) {
+          params.audioRef.current.srcObject = params.audioStream;
+        }
+
+        await this.sandboxRoomService.attachCallToRoom(pc, roomId, roomToken);
+
+        params.onConnected(pc, dc);
+        return;
+      }
+
       const { pc, dc, roomId, roomToken } =
         await this.realtimeRoomServicePort.createRoom(params.companyId);
 

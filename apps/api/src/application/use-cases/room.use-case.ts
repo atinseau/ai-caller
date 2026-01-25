@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { CallRepositoryPort } from "@/domain/repositories/call-repository.port";
 import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
@@ -16,6 +17,8 @@ export class RoomUseCase {
     private readonly companyRepository: CompanyRepositoryPort,
     @inject(RoomRepositoryPort)
     private readonly roomRepository: RoomRepositoryPort,
+    @inject(CallRepositoryPort)
+    private readonly callRepository: CallRepositoryPort,
     @inject(EventBusPort) private readonly eventBus: EventBusPort,
   ) {}
 
@@ -33,6 +36,17 @@ export class RoomUseCase {
       token,
       expiresAt,
     );
+
+    await this.callRepository.createCall(createRoomParamsDto.companyId, {
+      roomId: room.id,
+      status: "CREATED",
+      provider: "DEV",
+      startedAt: new Date(),
+      metadata: {
+        origin: "realtime-dev",
+      },
+    });
+
     logger.info(
       `Room created with ID: ${room.id} for Company ID: ${createRoomParamsDto.companyId}`,
     );
@@ -47,6 +61,19 @@ export class RoomUseCase {
     if (!roomModel) {
       throw new Error("Room not found");
     }
+
+    const call = await this.callRepository.findByRoomId(roomModel.id);
+    if (!call) {
+      throw new Error("Call not found for room");
+    }
+
+    await this.callRepository.updateCall(call.id, {
+      roomId: roomModel.id,
+      externalCallId: attachCallToRoom.id,
+      status: "CONNECTED",
+      metadata: call.metadata ?? undefined,
+    });
+
     this.eventBus.publish(new RoomReadyEvent(roomModel));
     logger.info(
       `Call with ID: ${attachCallToRoom.id} attached to Room ID: ${attachCallToRoom.roomId}`,
