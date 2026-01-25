@@ -4,7 +4,7 @@ import { merge } from "lodash-es";
 
 import type { RealtimeGatewayPort } from "@/application/ports/realtime-gateway.port";
 import type { IRoomModel } from "@/domain/models/room.model";
-// import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
 import { logger } from "../logger";
 
@@ -19,8 +19,8 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
 
   constructor(
     @inject(CallServicePort) private readonly callService: CallServicePort,
-    // @inject(ToolRepositoryPort)
-    // private readonly toolRepository: ToolRepositoryPort,
+    @inject(ToolRepositoryPort)
+    private readonly toolRepository: ToolRepositoryPort,
   ) {}
 
   public async openRoomChannel(room: IRoomModel) {
@@ -73,7 +73,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       data.type === "response.output_item.done" &&
       data.item.type === "mcp_call"
     )
-      return this.handleMcpCallDone(ws, data.item, room);
+      return this.handleMcpCall(ws, data.item, room);
 
     if (
       data.type === "response.output_item.done" &&
@@ -95,21 +95,10 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     item: Schema["RealtimeConversationItemFunctionCall"],
     room: IRoomModel,
   ) {
-    // if (item.id && item.status === "in_progress") {
-    //   await this.toolRepository.createToolInvoke(
-    //     room.id,
-    //     item.id,
-    //     JSON.parse(item.arguments),
-    //   );
-    //   logger.info(
-    //     `Handled function call in progress for room ${room.id}, item ID: ${item.id}`,
-    //   );
-    //   return;
-    // }
-
     if (item.id && item.status === "completed") {
       this.updateChannelData(room.id, { shouldCloseCall: true });
       this.autoUnblockConversation(ws);
+
       logger.info(
         `Handled function call done for room ${room.id}, item ID: ${item.id}`,
       );
@@ -121,11 +110,13 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     );
   }
 
-  private async handleMcpCallDone(
+  private async handleMcpCall(
     ws: WebSocket,
     item: Schema["RealtimeMCPToolCall"],
     room: IRoomModel,
   ) {
+    console.log(item);
+
     this.autoUnblockConversation(ws);
     logger.info(
       item.output,
