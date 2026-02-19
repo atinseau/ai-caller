@@ -1,0 +1,214 @@
+{
+  "name": "execution environment",
+  "nodes": [
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"env\": \"dev\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-16, 48],
+      "id": "b3790184-09a6-4cc9-8c09-b9ed2a6ffa97",
+      "name": "dev variables"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"env\": \"prod\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [-16, -144],
+      "id": "98f44440-509a-4dc9-a2dd-6a34b4e56c77",
+      "name": "prod variables",
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [240, -48],
+      "id": "aa18eca1-4609-434a-9530-f01960cd8d67",
+      "name": "output variables",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "inputSource": "jsonExample",
+        "jsonExample": "{\n  \"env\": \"prod\",\n  \"args\": {}\n}"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-624, -48],
+      "id": "7228ddde-9ca1-4648-904d-6a2730a9675a",
+      "name": "variables"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a8ca5d25-7e1f-43e9-aae6-c274522a0918",
+                    "leftValue": "={{ $json?.env ?? \"dev\" }}",
+                    "rightValue": "prod",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "prod"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json?.env ?? \"dev\" }}",
+                    "rightValue": "prod",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEquals"
+                    },
+                    "id": "cbb7990a-d7b9-42e4-9d59-eb5576d68e51"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "dev"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [-400, -48],
+      "id": "0d6e76e2-3b3b-4942-aaec-9ac7f023b4ba",
+      "name": "env dispatcher"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={{ $('output variables').item.json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [464, -48],
+      "id": "afaab61a-b012-4ae9-b886-83ccd5973df9",
+      "name": "Edit Fields"
+    }
+  ],
+  "pinData": {
+    "variables": [
+      {
+        "json": {
+          "env": "prod",
+          "args": {
+            "value": "salut"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "dev variables": {
+      "main": [
+        [
+          {
+            "node": "output variables",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "prod variables": {
+      "main": [
+        [
+          {
+            "node": "output variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "variables": {
+      "main": [
+        [
+          {
+            "node": "env dispatcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "env dispatcher": {
+      "main": [
+        [
+          {
+            "node": "prod variables",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "dev variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "output variables": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [[]]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "b615a397-5e9f-4f8a-98b9-837c0de0316b",
+  "meta": {
+    "instanceId": "6184e1afa301f25a1cf75f619fd5916c48a753207fc6d805c573e3e816bfea27"
+  },
+  "id": "sGtdsgqw1glt1Gsk",
+  "tags": []
+}

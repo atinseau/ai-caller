@@ -1,9 +1,14 @@
 import z from "zod";
 
 const envDto = z.object({
+  // SERVER
   PORT: z.coerce.number(),
   CLIENT_URL: z.url(),
+
+  // DATABASE
   DATABASE_URL: z.url({ protocol: /^postgres$/ }),
+
+  // OPENAI
   OPENAI_API_KEY: z.string(),
 
   // GOOGLE

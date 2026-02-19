@@ -1,0 +1,137 @@
+{
+  "name": "mcp server for company 1",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "56e31f2d-26dd-4251-9651-46409f24c14d"
+      },
+      "type": "@n8n/n8n-nodes-langchain.mcpTrigger",
+      "typeVersion": 2,
+      "position": [
+        -1392,
+        -432
+      ],
+      "id": "a373a4df-a233-43e8-ac92-096f14f4ae3f",
+      "name": "MCP Server Trigger",
+      "webhookId": "56e31f2d-26dd-4251-9651-46409f24c14d"
+    },
+    {
+      "parameters": {
+        "description": "call this tool to magically transform input data to a new value and an magically get a new value, return the transformed value",
+        "workflowId": {
+          "__rl": true,
+          "value": "LSAthHlDbmkeRxvX",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/LSAthHlDbmkeRxvX",
+          "cachedResultName": "Magic string transform"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "args": "={{ \n\n{\n    \"value\": $fromAI(\"value\", \"The value to magically transform\")\n}\n\n}}",
+            "env": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('env', `prod or dev, if the env is prod, real action will be taken, if the env is dev, only a log will be created in database, no real action will be taken`, 'string') }}"
+          },
+          "matchingColumns": [
+            "value"
+          ],
+          "schema": [
+            {
+              "id": "env",
+              "displayName": "env",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "string",
+              "removed": false
+            },
+            {
+              "id": "args",
+              "displayName": "args",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "canBeUsedToMatch": true,
+              "type": "object",
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 2.2,
+      "position": [
+        -1520,
+        -176
+      ],
+      "id": "7ab08f74-7362-4a4d-966e-d0d12645b630",
+      "name": "Magic string transform"
+    },
+    {
+      "parameters": {
+        "calendar": {
+          "__rl": true,
+          "value": "arthurtweak@gmail.com",
+          "mode": "list",
+          "cachedResultName": "arthurtweak@gmail.com"
+        },
+        "start": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Start', ``, 'string') }}",
+        "end": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('End', ``, 'string') }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.googleCalendarTool",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        -176
+      ],
+      "id": "d930896f-357a-43e1-83c8-80d307bef848",
+      "name": "Create an event in Google Calendar",
+      "credentials": {
+        "googleCalendarOAuth2Api": {
+          "id": "FuoWUJFMsBR3F34w",
+          "name": "google-1"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Magic string transform": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create an event in Google Calendar": {
+      "ai_tool": [
+        [
+          {
+            "node": "MCP Server Trigger",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "8049d1d7-9757-4d50-a466-fc822dcaf1fa",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6184e1afa301f25a1cf75f619fd5916c48a753207fc6d805c573e3e816bfea27"
+  },
+  "id": "oCjJ2m2TTJfHhCl3",
+  "tags": []
+}
