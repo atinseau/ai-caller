@@ -22,14 +22,14 @@ export const ToolInvokeModel = z.object({
     example: "RUNNING",
   }),
   args: z
-    .record(z.unknown())
+    .record(z.string(), z.unknown())
     .optional()
     .openapi({
       description: "Arguments passed to the tool",
       example: { name: "John doe", age: 30 },
     }),
   results: z
-    .record(z.unknown())
+    .record(z.string(), z.unknown())
     .optional()
     .openapi({
       description: "Results returned from the tool",

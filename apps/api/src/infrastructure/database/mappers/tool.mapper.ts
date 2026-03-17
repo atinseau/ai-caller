@@ -1,3 +1,4 @@
+import type { JsonValue } from "@prisma/client/runtime/client";
 import { randomUUIDv7 } from "bun";
 import type { IToolInvokeModel } from "@/domain/models/tool.model";
 import type { ToolInvoke } from "@/generated/prisma/client";
@@ -9,8 +10,8 @@ export abstract class ToolInvokeMapper {
       id: prismaToolInvoke.id,
       entityId: prismaToolInvoke.entityId,
       createdAt: prismaToolInvoke.createdAt,
-      args: prismaToolInvoke.args,
-      results: prismaToolInvoke.results,
+      args: prismaToolInvoke.args as Record<string, unknown> | undefined,
+      results: prismaToolInvoke.results as Record<string, unknown> | undefined,
       roomId: prismaToolInvoke.roomId,
       status: prismaToolInvoke.status,
     };
@@ -24,9 +25,10 @@ export abstract class ToolInvokeMapper {
     return {
       id: randomUUIDv7(),
       entityId: modelToolInvoke.entityId,
+      updatedAt: new Date(),
       createdAt: new Date(),
-      args: modelToolInvoke.args,
-      results: modelToolInvoke.results,
+      args: modelToolInvoke.args as JsonValue,
+      results: modelToolInvoke.results as JsonValue,
       roomId: modelToolInvoke.roomId,
       status: modelToolInvoke.status || ToolInvokeStatus.RUNNING,
     };
