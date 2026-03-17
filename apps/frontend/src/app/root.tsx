@@ -4,6 +4,7 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { GenericErrorBoundary } from "@/shared/components/GenericErrorBoundary";
 import type { Route } from "./+types/root";
 import { QueryProvider } from "./providers/QueryProvider";
+import { ServicesProvider } from "./providers/ServicesProvider";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -29,7 +30,9 @@ export default function App() {
       </head>
       <body>
         <QueryProvider>
-          <Outlet />
+          <ServicesProvider>
+            <Outlet />
+          </ServicesProvider>
         </QueryProvider>
         <ScrollRestoration />
         <Scripts />

@@ -50,12 +50,12 @@ export class ApiWebSocket {
     // Regular listeners
     const listeners = this.eventListeners.get(eventName);
     if (listeners) {
-      listeners.forEach((cb) => cb(event));
+      for (const cb of listeners) cb(event);
     }
     // Once listeners
     const onceSet = this.onceListeners.get(eventName);
     if (onceSet) {
-      onceSet.forEach((cb) => cb(event));
+      for (const cb of onceSet) cb(event);
       this.onceListeners.delete(eventName);
     }
   }
@@ -82,8 +82,8 @@ export class ApiWebSocket {
       this.eventListeners.set(event, new Set());
     }
     this.eventListeners
-      .get(event)!
-      .add(callback as ApiWebSocketEventCallback<ApiWebSocketEventEnum>);
+      .get(event)
+      ?.add(callback as ApiWebSocketEventCallback<ApiWebSocketEventEnum>);
   }
 
   once(event: string, callback: (data: Event) => void) {
@@ -96,7 +96,7 @@ export class ApiWebSocket {
     if (!this.onceListeners.has(event)) {
       this.onceListeners.set(event, new Set());
     }
-    this.onceListeners.get(event)!.add(callback);
+    this.onceListeners.get(event)?.add(callback);
   }
 
   off(event: string, callback?: (data: Event) => void) {

@@ -14,22 +14,20 @@ export default function HomeRoute() {
       {isPending && <p>Loading...</p>}
 
       {!isPending ? (
-        <>
-          {!data ? (
-            <Button
-              onClick={() =>
-                signIn.social({
-                  provider: "google",
-                  callbackURL: window.location.origin,
-                })
-              }
-            >
-              signIn
-            </Button>
-          ) : (
-            <pre>{JSON.stringify(data, null, 2)}</pre>
-          )}
-        </>
+        !data ? (
+          <Button
+            onClick={() =>
+              signIn.social({
+                provider: "google",
+                callbackURL: window.location.origin,
+              })
+            }
+          >
+            signIn
+          </Button>
+        ) : (
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        )
       ) : null}
     </div>
   );

@@ -1,7 +1,6 @@
 import { type RefObject, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { useCompanies } from "@/shared/hooks/useCompanies";
-import { RealtimeCallMachineState } from "../../domain/enums/realtime-call-machine-state.enum";
 import { MuteToggleButton } from "../components/MuteToggleButton";
 import { useRealtimeCall } from "../hooks/useRealtimeCall";
 
@@ -9,7 +8,7 @@ export function RealtimeCallPage() {
   const { companies, isLoading } = useCompanies();
 
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { start, stop, state, sendMessage, muteToggle } = useRealtimeCall(
+  const { start, stop, state, sendMessage, toggleMute } = useRealtimeCall(
     audioRef as RefObject<HTMLAudioElement>,
   );
 
@@ -60,8 +59,7 @@ export function RealtimeCallPage() {
         </div>
       )}
 
-      {typeof state.value === "string" &&
-      state.value === RealtimeCallMachineState.IDLE ? (
+      {state.status === "idle" ? (
         <form className="flex gap-2" onSubmit={handleCompanyIdSubmit}>
           <input
             name="companyId"
@@ -79,16 +77,13 @@ export function RealtimeCallPage() {
         </form>
       ) : null}
 
-      {typeof state.value === "object" &&
-      state.value[RealtimeCallMachineState.CALLING] ===
-        RealtimeCallMachineState.CONNECTED ? (
+      {state.status === "connected" ? (
         <Button
           variant="destructive"
           className="h-10.5 flex items-center justify-center"
           onClick={stop}
         >
-          {" "}
-          End Call{" "}
+          End Call
         </Button>
       ) : null}
 
@@ -96,11 +91,9 @@ export function RealtimeCallPage() {
         <track kind="captions" />
       </audio>
 
-      <p>{JSON.stringify(state.value)}</p>
+      <p>{state.status}</p>
 
-      {typeof state.value === "object" &&
-      state.value[RealtimeCallMachineState.CALLING] ===
-        RealtimeCallMachineState.CONNECTED ? (
+      {state.status === "connected" ? (
         <div className="flex flex-col gap-4 items-center">
           <form className="flex gap-2" onSubmit={handleMessageSubmit}>
             <input
@@ -118,11 +111,7 @@ export function RealtimeCallPage() {
             </Button>
           </form>
 
-          {/* MUTE */}
-          <MuteToggleButton
-            isMuted={state.context.muted}
-            onToggle={muteToggle}
-          />
+          <MuteToggleButton isMuted={state.muted} onToggle={toggleMute} />
         </div>
       ) : null}
     </div>

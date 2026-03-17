@@ -10,7 +10,7 @@
     }
   },
   "dependencies": {
-    "openapi-fetch": "0.15.0"
+    "openapi-fetch": "0.17.0"
   },
   "devDependencies": {
     "typescript": "5.9.3"

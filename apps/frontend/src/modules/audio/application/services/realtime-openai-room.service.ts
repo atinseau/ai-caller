@@ -1,10 +1,21 @@
 import { OpenAI } from "@ai-caller/shared";
-import { injectable } from "inversify";
 import { api } from "@/infrastructure/http/api";
-import type { RealtimeRoomServicePort } from "../../domain/ports/realtime-room-service.port";
 
-@injectable()
-export class RealtimeOpenAiRoomService implements RealtimeRoomServicePort {
+export interface RealtimeRoomService {
+  createRoom(companyId: string): Promise<{
+    pc: RTCPeerConnection;
+    dc: RTCDataChannel;
+    roomId: string;
+    roomToken: string;
+  }>;
+  attachCallToRoom(
+    pc: RTCPeerConnection,
+    roomId: string,
+    roomToken: string,
+  ): Promise<void>;
+}
+
+export class RealtimeOpenAiRoomService implements RealtimeRoomService {
   async createRoom(companyId: string) {
     const roomData = await this.getRoomData(companyId);
     const pc = new RTCPeerConnection();

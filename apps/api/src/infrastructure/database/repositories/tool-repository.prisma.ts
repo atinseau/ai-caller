@@ -7,9 +7,9 @@ import { prisma } from "../prisma";
 @injectable()
 export class ToolRepositoryPrisma implements ToolRepositoryPort {
   public async createToolInvoke(
-    roomId: string,
-    entityId: string,
-    args?: Record<string, unknown>,
+    _roomId: string,
+    _entityId: string,
+    _args?: Record<string, unknown>,
   ): Promise<IToolInvokeModel> {
     // Create the database record
     const toolInvoke = await prisma.toolInvoke.create({
@@ -21,9 +21,9 @@ export class ToolRepositoryPrisma implements ToolRepositoryPort {
   }
 
   public completeToolInvokeByEntityId(
-    entityId: string,
-    results: Record<string, unknown>,
+    _entityId: string,
+    _results: Record<string, unknown>,
   ): Promise<IToolInvokeModel> {}
 
-  public failToolInvoke(toolInvokeId: string): Promise<IToolInvokeModel> {}
+  public failToolInvoke(_toolInvokeId: string): Promise<IToolInvokeModel> {}
 }

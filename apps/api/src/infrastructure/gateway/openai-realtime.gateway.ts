@@ -19,8 +19,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
 
   constructor(
     @inject(CallServicePort) private readonly callService: CallServicePort,
-    @inject(ToolRepositoryPort)
-    private readonly toolRepository: ToolRepositoryPort,
+    @inject(ToolRepositoryPort) readonly _toolRepository: ToolRepositoryPort,
   ) {}
 
   public async openRoomChannel(room: IRoomModel) {

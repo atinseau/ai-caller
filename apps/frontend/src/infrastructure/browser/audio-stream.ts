@@ -1,18 +1,9 @@
-import { injectable } from "inversify";
-import { from, type Observable } from "rxjs";
-import type { AudioStreamPort } from "@/domain/audio-stream.port";
+export interface AudioStreamService {
+  asPromise(): Promise<MediaStream>;
+}
 
-@injectable()
-export class AudioStream implements AudioStreamPort {
-  public asObservable(): Observable<MediaStream> {
-    return from(this.getStream());
-  }
-
-  public asPromise(): Promise<MediaStream> {
-    return this.getStream();
-  }
-
-  private getStream(): Promise<MediaStream> {
+export class AudioStream implements AudioStreamService {
+  asPromise(): Promise<MediaStream> {
     return navigator.mediaDevices.getUserMedia({
       audio: {
         echoCancellation: true,
