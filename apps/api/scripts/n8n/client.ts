@@ -1,3 +1,11 @@
+export interface N8nWorkflowPayload {
+  name: string;
+  nodes: N8nNode[];
+  connections: Record<string, unknown>;
+  settings?: Record<string, unknown>;
+  tags?: { name: string }[];
+}
+
 export interface N8nWorkflow {
   id: string;
   name: string;
@@ -32,11 +40,8 @@ interface N8nListResponse<T> {
 export interface N8nClient {
   getWorkflow(id: string): Promise<N8nWorkflow>;
   listWorkflows(): Promise<N8nWorkflow[]>;
-  createWorkflow(data: Omit<N8nWorkflow, "id">): Promise<N8nWorkflow>;
-  updateWorkflow(
-    id: string,
-    data: Partial<N8nWorkflow>,
-  ): Promise<N8nWorkflow>;
+  createWorkflow(data: N8nWorkflowPayload): Promise<N8nWorkflow>;
+  updateWorkflow(id: string, data: N8nWorkflowPayload): Promise<N8nWorkflow>;
   deleteWorkflow(id: string): Promise<void>;
   activateWorkflow(id: string): Promise<N8nWorkflow>;
   deactivateWorkflow(id: string): Promise<N8nWorkflow>;

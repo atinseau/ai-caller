@@ -67,6 +67,8 @@ export class RealtimeOpenAiRoomService implements RealtimeRoomService {
     const { response, data } = await api.POST("/api/v1/room/create", {
       body: {
         companyId,
+        modality: "AUDIO",
+        isTest: false,
       },
     });
     if (!response.ok || !data) {

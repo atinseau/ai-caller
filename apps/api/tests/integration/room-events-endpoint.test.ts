@@ -44,7 +44,7 @@ beforeAll(async () => {
 
   // Create a room for our event tests
   const roomRepo = container.get(RoomRepositoryPort);
-  const room = await roomRepo.createRoom(testCompanyId, `token-events-${Date.now()}`, undefined, "TEXT", true);
+  const room = await roomRepo.createRoom(testCompanyId, `token-events-${Date.now()}`, undefined, "TEXT");
   testRoomId = room.id;
 });
 

@@ -73,9 +73,9 @@ describe("sanitizeWorkflow", () => {
     });
     const result = sanitizeWorkflow(workflow);
 
-    expect(result.nodes[0]).not.toHaveProperty("id");
-    expect(result.nodes[0]).not.toHaveProperty("webhookId");
-    expect(result.nodes[0].name).toBe("Trigger");
+    expect(result.nodes[0]!).not.toHaveProperty("id");
+    expect(result.nodes[0]!).not.toHaveProperty("webhookId");
+    expect(result.nodes[0]!.name).toBe("Trigger");
   });
 
   it("preserves node parameters and structure", () => {

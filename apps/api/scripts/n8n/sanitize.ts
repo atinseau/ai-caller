@@ -1,4 +1,4 @@
-import type { N8nNode, N8nWorkflow } from "./client";
+import type { N8nNode, N8nWorkflow, N8nWorkflowPayload } from "./client";
 
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -38,9 +38,7 @@ export function sanitizeWorkflow(workflow: N8nWorkflow): GenericWorkflow {
   };
 }
 
-export function prepareForPush(
-  generic: GenericWorkflow,
-): Omit<N8nWorkflow, "id"> {
+export function prepareForPush(generic: GenericWorkflow): N8nWorkflowPayload {
   const { pinData, ...rest } = generic;
   return {
     ...rest,
