@@ -11,7 +11,7 @@ export default defineConfig({
   test: {
     environment: "happy-dom",
     globals: true,
-    setupFiles: ["./src/__tests__/setup.ts"],
+    setupFiles: ["./tests/setup.ts"],
     env: {
       // Matches the default dev API URL — override in CI with env var
       VITE_API_URL: "http://localhost:3000",
@@ -21,7 +21,7 @@ export default defineConfig({
       reporter: ["text", "html"],
       include: ["src/**/*.{ts,tsx}"],
       exclude: [
-        "src/__tests__/**",
+        "tests/**",
         "src/app/routes.ts",
         "src/**/*.d.ts",
       ],
