@@ -9,6 +9,7 @@ export abstract class ToolInvokeMapper {
     return {
       id: prismaToolInvoke.id,
       entityId: prismaToolInvoke.entityId,
+      toolName: prismaToolInvoke.toolName ?? undefined,
       createdAt: prismaToolInvoke.createdAt,
       args: prismaToolInvoke.args as Record<string, unknown> | undefined,
       results: prismaToolInvoke.results as Record<string, unknown> | undefined,
@@ -25,6 +26,7 @@ export abstract class ToolInvokeMapper {
     return {
       id: randomUUIDv7(),
       entityId: modelToolInvoke.entityId,
+      toolName: modelToolInvoke.toolName ?? null,
       updatedAt: new Date(),
       createdAt: new Date(),
       args: modelToolInvoke.args as JsonValue,

@@ -23,6 +23,9 @@ export const RoomModel = z
       .nullable()
       .optional()
       .openapi({ description: "The associated call ID, if any" }),
+    modality: z
+      .enum(["AUDIO", "TEXT"])
+      .openapi({ description: "The communication modality of the room" }),
   })
   .openapi("RoomModel", {
     description: "Represents a room entity",

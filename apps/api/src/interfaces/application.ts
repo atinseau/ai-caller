@@ -5,6 +5,7 @@ import { env } from "@/infrastructure/config/env";
 import { globalErrorHandler } from "@/infrastructure/error/global-error-handler";
 import { loggerMiddleware } from "@/infrastructure/middleware/logger.middleware";
 import { companyRouter } from "./router/company.router";
+import { messageRouter } from "./router/message.router";
 import { roomRouter } from "./router/room.router";
 
 const app = new OpenAPIHono();
@@ -21,6 +22,7 @@ app.use("*", loggerMiddleware);
 
 // app.route('/openai', openAiRouter)
 app.route("/api/v1/room", roomRouter);
+app.route("/api/v1/room", messageRouter);
 app.route("/api/v1/company", companyRouter);
 
 app.get("/", (c) => c.json({ message: "API is running", docs: "/docs" }));

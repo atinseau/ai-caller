@@ -8,7 +8,10 @@ export abstract class CallServicePort {
    * @param company the company for where the call will start
    * @returns the call ID (token)
    */
-  abstract createCall(company: ICompanyModel): Promise<{
+  abstract createCall(
+    company: ICompanyModel,
+    modality: "AUDIO" | "TEXT",
+  ): Promise<{
     token: string;
     expiresAt: Date;
   }>;

@@ -10,7 +10,9 @@
     "start": "NODE_ENV=production bun dist/index.js",
     "check-types": "tsc --noEmit",
     "db:re-migrate": "rm -rf prisma/migrations && bunx prisma migrate reset --force && bunx prisma migrate dev -n default && bunx prisma generate",
-    "studio": "bun run prisma studio"
+    "studio": "bun run prisma studio",
+    "test": "bun test",
+    "test:integration": "bun test src/__tests__/integration"
   },
   "exports": {
     "./types": "./src/types.ts",
@@ -23,6 +25,7 @@
   "dependencies": {
     "@ai-caller/shared": "workspace:*",
     "@hono/zod-openapi": "1.2.2",
+    "@modelcontextprotocol/sdk": "^1.27.1",
     "@prisma/adapter-pg": "7.5.0",
     "@prisma/client": "7.5.0",
     "@scalar/hono-api-reference": "0.10.3",

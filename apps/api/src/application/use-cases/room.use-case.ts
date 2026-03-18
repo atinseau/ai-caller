@@ -28,15 +28,26 @@ export class RoomUseCase {
       throw new Error("Company not found");
     }
 
-    const { expiresAt, token } = await this.callService.createCall(company);
+    const modality = createRoomParamsDto.modality ?? "AUDIO";
+    const { expiresAt, token } = await this.callService.createCall(
+      company,
+      modality,
+    );
     const room = await this.roomRepository.createRoom(
       createRoomParamsDto.companyId,
       token,
       expiresAt,
+      modality,
     );
     this.logger.info(
-      `Room created with ID: ${room.id} for Company ID: ${createRoomParamsDto.companyId}`,
+      `Room created with ID: ${room.id} (${modality}) for Company ID: ${createRoomParamsDto.companyId}`,
     );
+
+    // Text mode: fire RoomReadyEvent immediately (no attach step needed)
+    if (modality === "TEXT") {
+      await this.eventBus.publish(new RoomReadyEvent(room));
+    }
+
     return room;
   }
 

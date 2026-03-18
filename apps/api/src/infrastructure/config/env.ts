@@ -17,6 +17,7 @@ const envDto = z.object({
 
   // CONFIG
   ROOM_CALL_DURATION_MINUTE: z.coerce.number().positive(),
+  SUB_AGENT_MODEL: z.string().default("gpt-4o-mini"),
 });
 
 class Env {

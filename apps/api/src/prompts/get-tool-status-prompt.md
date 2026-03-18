@@ -1,0 +1,1 @@
+Check the current execution status of a previously invoked tool. Use this when the user asks about the progress of a running operation. Returns the tool's status (RUNNING, COMPLETED, or FAILED) and its results if available.

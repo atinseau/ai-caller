@@ -91,6 +91,11 @@ model Company {
   rooms     Room[]
 }
 
+enum RoomModality {
+  AUDIO
+  TEXT
+}
+
 model Room {
     id          String   @id @default(uuid())
     createdAt   DateTime @default(now())
@@ -103,6 +108,7 @@ model Room {
     company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
     callId      String?
+    modality    RoomModality @default(AUDIO)
 
     toolInvokes ToolInvoke[]
 }
@@ -116,6 +122,7 @@ enum ToolInvokeStatus {
 model ToolInvoke {
     id String @id @default(uuid())
     entityId  String
+    toolName  String?
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 

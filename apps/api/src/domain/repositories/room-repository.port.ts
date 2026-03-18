@@ -5,6 +5,7 @@ export abstract class RoomRepositoryPort {
     companyId: string,
     token: string,
     expiresAt?: Date,
+    modality?: "AUDIO" | "TEXT",
   ): Promise<IRoomModel>;
   abstract updateRoomCallId(
     roomId: string,

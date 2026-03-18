@@ -9,6 +9,13 @@ export const ToolInvokeModel = z.object({
     description: "Identifier for the entity associated with the tool invoke",
     example: "mcp_call_123456",
   }),
+  toolName: z
+    .string()
+    .optional()
+    .openapi({
+      description: "Name of the tool that was invoked",
+      example: "search_customer",
+    }),
   createdAt: z.date().openapi({
     description: "Timestamp when the tool invoke was created",
     example: "2024-01-01T12:00:00Z",

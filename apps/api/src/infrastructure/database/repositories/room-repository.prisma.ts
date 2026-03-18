@@ -1,17 +1,28 @@
-import { injectable } from "inversify";
+import { inject, injectable } from "inversify";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
+import type { PrismaClient } from "@/generated/prisma/client";
 import { RoomMapper } from "../mappers/room.mapper";
-import { prisma } from "../prisma";
+import { PRISMA_TOKEN } from "../prisma";
 
 @injectable()
 export class RoomRepositoryPrisma implements RoomRepositoryPort {
-  async createRoom(companyId: string, token: string, expiresAt?: Date) {
-    const room = await prisma.room.create({
+  constructor(
+    @inject(PRISMA_TOKEN) private readonly prisma: PrismaClient,
+  ) {}
+
+  async createRoom(
+    companyId: string,
+    token: string,
+    expiresAt?: Date,
+    modality?: "AUDIO" | "TEXT",
+  ) {
+    const room = await this.prisma.room.create({
       data: RoomMapper.toEntity({
         token,
         companyId,
         expiresAt,
+        modality,
       }),
     });
     return RoomMapper.toModel(room);
@@ -21,42 +32,32 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     roomId: string,
     callId: string,
   ): Promise<IRoomModel | null> {
-    const room = await prisma.room.update({
-      where: {
-        id: roomId,
-      },
-      data: {
-        callId,
-      },
+    const room = await this.prisma.room.update({
+      where: { id: roomId },
+      data: { callId },
     });
     return RoomMapper.toModel(room);
   }
 
   async findExpiredRooms(): Promise<IRoomModel[]> {
-    const rooms = await prisma.room.findMany({
+    const rooms = await this.prisma.room.findMany({
       where: {
         deletedAt: null,
-        expiresAt: {
-          lt: new Date(),
-        },
+        expiresAt: { lt: new Date() },
       },
     });
     return rooms.map(RoomMapper.toModel);
   }
 
   async deleteRoom(roomId: string): Promise<void> {
-    await prisma.room.delete({
-      where: {
-        id: roomId,
-      },
+    await this.prisma.room.delete({
+      where: { id: roomId },
     });
   }
 
   async findById(roomId: string): Promise<IRoomModel> {
-    const room = await prisma.room.findUniqueOrThrow({
-      where: {
-        id: roomId,
-      },
+    const room = await this.prisma.room.findUniqueOrThrow({
+      where: { id: roomId },
     });
     return RoomMapper.toModel(room);
   }

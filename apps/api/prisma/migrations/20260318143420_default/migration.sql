@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "RoomModality" AS ENUM ('AUDIO', 'TEXT');
+
+-- CreateEnum
 CREATE TYPE "ToolInvokeStatus" AS ENUM ('RUNNING', 'COMPLETED', 'FAILED');
 
 -- CreateTable
@@ -80,6 +83,7 @@ CREATE TABLE "Room" (
     "token" TEXT NOT NULL,
     "companyId" TEXT NOT NULL,
     "callId" TEXT,
+    "modality" "RoomModality" NOT NULL DEFAULT 'AUDIO',
 
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
 );
@@ -88,6 +92,7 @@ CREATE TABLE "Room" (
 CREATE TABLE "ToolInvoke" (
     "id" TEXT NOT NULL,
     "entityId" TEXT NOT NULL,
+    "toolName" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "args" JSONB DEFAULT '{}',

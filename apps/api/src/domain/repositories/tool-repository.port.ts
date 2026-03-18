@@ -1,24 +1,10 @@
 import type { IToolInvokeModel } from "../models/tool.model";
 
-/**
- * Repository port for managing tool invocations.
- *
- * Tool invocations represent the execution of tools within a room, storing
- * the arguments passed to the tool and the results returned from execution.
- *
- */
 export abstract class ToolRepositoryPort {
-  /**
-   * Creates a new tool invocation record.
-   *
-   * @param roomId - Unique identifier for the room (UUIDv7)
-   * @param entityId - Identifier for the entity associated with the tool invoke
-   * @param args - Optional arguments passed to the tool
-   * @returns Promise that resolves when the tool invoke is created
-   */
   abstract createToolInvoke(
     roomId: string,
     entityId: string,
+    toolName?: string,
     args?: Record<string, unknown>,
   ): Promise<IToolInvokeModel>;
 
@@ -28,4 +14,12 @@ export abstract class ToolRepositoryPort {
   ): Promise<IToolInvokeModel>;
 
   abstract failToolInvoke(toolInvokeId: string): Promise<IToolInvokeModel>;
+
+  abstract findByEntityId(
+    entityId: string,
+  ): Promise<IToolInvokeModel | null>;
+
+  abstract findActiveByRoomId(
+    roomId: string,
+  ): Promise<IToolInvokeModel[]>;
 }

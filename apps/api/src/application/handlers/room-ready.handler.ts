@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { RoomReadyEvent } from "../events/room-ready.event";
 import { EventBusPort } from "../../domain/ports/event-bus.port";
@@ -9,6 +10,8 @@ export class RoomReadyHandler {
   constructor(
     @inject(RoomRepositoryPort)
     private readonly roomRepository: RoomRepositoryPort,
+    @inject(CompanyRepositoryPort)
+    private readonly companyRepository: CompanyRepositoryPort,
     @inject(EventBusPort) private readonly eventBus: EventBusPort,
     @inject(RealtimeGatewayPort)
     private readonly realtimeGateway: RealtimeGatewayPort,
@@ -18,6 +21,7 @@ export class RoomReadyHandler {
 
   private async handle(event: RoomReadyEvent) {
     const room = await this.roomRepository.findById(event.roomId);
-    await this.realtimeGateway.openRoomChannel(room);
+    const company = await this.companyRepository.findById(room.companyId);
+    await this.realtimeGateway.openRoomChannel(room, company?.mcpUrl);
   }
 }
