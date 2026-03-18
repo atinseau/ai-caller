@@ -19,7 +19,7 @@ export abstract class ToolRepositoryPort {
   abstract createToolInvoke(
     roomId: string,
     entityId: string,
-    args?: Record<string, never>,
+    args?: Record<string, unknown>,
   ): Promise<IToolInvokeModel>;
 
   abstract completeToolInvokeByEntityId(

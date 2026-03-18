@@ -9,14 +9,14 @@ if (!PORT) {
 }
 
 export default defineConfig({
-  ...(process.env.ENV === "production" && {
-    resolve: {
-      tsconfigPaths: true,
+  resolve: {
+    tsconfigPaths: true,
+    ...(process.env.ENV === "production" && {
       alias: {
         "react-dom/server": "react-dom/server.node",
       },
-    },
-  }),
+    }),
+  },
   server: {
     port: PORT,
   },

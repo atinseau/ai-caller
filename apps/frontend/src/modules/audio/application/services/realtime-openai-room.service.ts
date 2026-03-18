@@ -38,7 +38,7 @@ export class RealtimeOpenAiRoomService implements RealtimeRoomService {
     await pc.setLocalDescription(offer);
 
     const openai = new OpenAI({
-      model: "gpt-realtime",
+      model: "gpt-realtime-1.5",
       apiKey: roomToken,
     });
 

@@ -2,10 +2,10 @@ import type { Class } from "@/types";
 
 export type EventHandler<TEvent extends Class> = (
   event: InstanceType<TEvent>,
-) => void;
+) => void | Promise<void>;
 
 export abstract class EventBusPort {
-  abstract publish<TEvent extends InstanceType<Class>>(event: TEvent): void;
+  abstract publish<TEvent extends InstanceType<Class>>(event: TEvent): Promise<void>;
   abstract subscribe<TEvent extends Class>(
     event: TEvent,
     handler: EventHandler<TEvent>,

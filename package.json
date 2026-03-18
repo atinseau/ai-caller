@@ -5,7 +5,7 @@
     "postinstall": "lefthook install",
     "dev": "turbo dev --parallel",
     "fclean": "rm -rf node_modules apps/*/node_modules apps/*/.turbo apps/*/build apps/*/.react-router .turbo bun.lock",
-    "up": "docker compose --env-file ./apps/api/.env up",
+    "up": "docker compose --env-file ./apps/api/.env up -d",
     "down": "docker compose --env-file ./apps/api/.env down",
     "http": "ngrok --config ngrok.yml http --url=light-grackle-eternal.ngrok-free.app 5678",
     "mcp:debug": "bunx @modelcontextprotocol/inspector --config ./mcp-inspector.json --server mcp:debug",

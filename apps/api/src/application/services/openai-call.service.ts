@@ -1,23 +1,25 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
 import { compile } from "handlebars";
-import { inject } from "inversify";
+import { inject, injectable } from "inversify";
 import type { ICompanyModel } from "@/domain/models/company.model";
 import type { IRoomModel } from "@/domain/models/room.model";
+import { LoggerPort } from "@/domain/ports/logger.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import type { CallServicePort } from "@/domain/services/call-service.port";
 import { env } from "@/infrastructure/config/env";
-import { logger } from "@/infrastructure/logger";
 import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum";
 
+@injectable()
 export class OpenAICallService implements CallServicePort {
   constructor(
     @inject(RoomRepositoryPort)
     private readonly roomRepository: RoomRepositoryPort,
+    @inject(LoggerPort) private readonly logger: LoggerPort,
   ) {}
 
   async createCall(company: ICompanyModel) {
-    logger.info(company, `Creating OpenAI Realtime call`);
+    this.logger.info(company, `Creating OpenAI Realtime call`);
 
     const openai = new OpenAI({
       apiKey: env.get("OPENAI_API_KEY"),
@@ -45,7 +47,7 @@ export class OpenAICallService implements CallServicePort {
             description: prompts.tools.callClose,
           },
           {
-            type: "mcp",
+            type: "mcp" as "MCPTool",
             server_label: "mcp_server",
             require_approval: "never",
             server_url: company.mcpUrl,
@@ -53,7 +55,7 @@ export class OpenAICallService implements CallServicePort {
         ],
         tool_choice: "auto",
         type: "realtime",
-        model: "gpt-realtime",
+        model: "gpt-realtime-1.5",
         tracing: {
           workflow_name: "realtime-audio-call",
           metadata: {
@@ -74,13 +76,13 @@ export class OpenAICallService implements CallServicePort {
   async terminateCall(room: IRoomModel) {
     const openai = new OpenAI({ apiKey: room.token });
     if (!room.callId) {
-      logger.error(`Room ${room.id} does not have a call ID.`);
+      this.logger.error(`Room ${room.id} does not have a call ID.`);
       return;
     }
     await openai.realtime.hangups(room.callId);
     await this.roomRepository.deleteRoom(room.id);
 
-    logger.info(`Call hung up for room ${room.id}`);
+    this.logger.info(`Call hung up for room ${room.id}`);
   }
 
   private async getPrompts(company: ICompanyModel) {
@@ -106,7 +108,7 @@ export class OpenAICallService implements CallServicePort {
       },
     };
 
-    logger.info({ prompts, company }, `Compiled OpenAI prompt templates`);
+    this.logger.info({ prompts, company }, `Compiled OpenAI prompt templates`);
 
     return prompts;
   }

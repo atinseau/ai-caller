@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
+import { LoggerPort } from "@/domain/ports/logger.port";
 import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
-import { logger } from "@/infrastructure/logger";
 import type { IAttachCallToRoomRequestDto } from "@/interfaces/dtos/room/attach-call-to-room-request.dto";
 import type { ICreateRoomParamsRequestDto } from "@/interfaces/dtos/room/create-room-params-request.dto";
 import { RoomReadyEvent } from "../events/room-ready.event";
-import { EventBusPort } from "../ports/event-bus.port";
+import { EventBusPort } from "../../domain/ports/event-bus.port";
 
 @injectable()
 export class RoomUseCase {
@@ -17,6 +17,7 @@ export class RoomUseCase {
     @inject(RoomRepositoryPort)
     private readonly roomRepository: RoomRepositoryPort,
     @inject(EventBusPort) private readonly eventBus: EventBusPort,
+    @inject(LoggerPort) private readonly logger: LoggerPort,
   ) {}
 
   async createRoom(createRoomParamsDto: ICreateRoomParamsRequestDto) {
@@ -33,7 +34,7 @@ export class RoomUseCase {
       token,
       expiresAt,
     );
-    logger.info(
+    this.logger.info(
       `Room created with ID: ${room.id} for Company ID: ${createRoomParamsDto.companyId}`,
     );
     return room;
@@ -47,8 +48,8 @@ export class RoomUseCase {
     if (!roomModel) {
       throw new Error("Room not found");
     }
-    this.eventBus.publish(new RoomReadyEvent(roomModel));
-    logger.info(
+    await this.eventBus.publish(new RoomReadyEvent(roomModel));
+    this.logger.info(
       `Call with ID: ${attachCallToRoom.id} attached to Room ID: ${attachCallToRoom.roomId}`,
     );
   }
@@ -64,14 +65,14 @@ export class RoomUseCase {
     let fullyfied = 0;
     for (const result of results) {
       if (result.status === "rejected") {
-        console.error(result.reason);
+        this.logger.error(result.reason, "Failed to flush expired room");
       } else {
         fullyfied++;
       }
     }
 
     if (fullyfied > 0) {
-      logger.info(`Expired rooms flushed: ${fullyfied}`);
+      this.logger.info(`Expired rooms flushed: ${fullyfied}`);
     }
   }
 }

@@ -1,6 +1,6 @@
 import { ContainerModule } from "inversify";
 import { RoomReadyHandler } from "@/application/handlers/room-ready.handler";
-import { EventBusPort } from "@/application/ports/event-bus.port";
+import { EventBusPort } from "@/domain/ports/event-bus.port";
 import { InMemoryEventBus } from "@/infrastructure/event-bus/in-memory-event-bus";
 
 export const HANDLERS = [RoomReadyHandler];

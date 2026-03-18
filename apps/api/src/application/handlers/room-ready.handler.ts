@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { RoomReadyEvent } from "../events/room-ready.event";
-import { EventBusPort } from "../ports/event-bus.port";
-import { RealtimeGatewayPort } from "../ports/realtime-gateway.port";
+import { EventBusPort } from "../../domain/ports/event-bus.port";
+import { RealtimeGatewayPort } from "../../domain/ports/realtime-gateway.port";
 
 @injectable()
 export class RoomReadyHandler {

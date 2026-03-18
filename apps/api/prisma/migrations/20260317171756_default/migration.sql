@@ -89,6 +89,7 @@ CREATE TABLE "ToolInvoke" (
     "id" TEXT NOT NULL,
     "entityId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
     "args" JSONB DEFAULT '{}',
     "results" JSONB DEFAULT '{}',
     "status" "ToolInvokeStatus" NOT NULL DEFAULT 'RUNNING',

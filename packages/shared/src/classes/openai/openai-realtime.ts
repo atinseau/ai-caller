@@ -67,7 +67,7 @@ export class OpenAIRealtime {
 
     if (!response.data) {
       throw new Error(
-        "Failed to obtain client secrets from OpenAI Realtime API",
+        `Failed to obtain client secrets from OpenAI Realtime API: ${JSON.stringify(response.error)}`,
       );
     }
 

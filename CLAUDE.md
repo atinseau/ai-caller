@@ -42,51 +42,6 @@ This is an **AI-powered real-time voice calling platform** using OpenAI's Realti
 - `apps/frontend/` — Frontend (React 19 + React Router v7)
 - `packages/shared/` — Shared types including OpenAI OpenAPI-generated types
 
-### API — Clean Architecture
-
-```
-apps/api/src/
-├── interfaces/        # HTTP routers + DTOs (Hono + Zod OpenAPI)
-├── application/       # Use cases + event handlers + ports
-├── domain/            # Models + repository/service port interfaces
-├── infrastructure/    # Concrete implementations
-│   ├── auth/          # Better-auth (Google OAuth) + Prisma adapter
-│   ├── database/      # Prisma + PostgreSQL + mappers
-│   ├── di/            # Inversify DI container
-│   ├── gateway/       # OpenAI Realtime WebSocket gateway
-│   ├── event-bus/     # RxJS in-memory event bus
-│   └── cron/          # Room expiration cleanup
-└── prompts/           # AI system prompts
-```
-
-Key domain concepts:
-- **Room** — a realtime voice call session with expiration, token, and associated OpenAI call ID
-- **Company** — has an MCP server URL for tool access
-- **ToolInvoke** — tracks individual tool/function call executions (RUNNING/COMPLETED/FAILED)
-
-**Call lifecycle**: `POST /rooms` → creates OpenAI call → stores room → client attaches callId → `RoomReadyEvent` fires → WebSocket gateway opens to OpenAI Realtime → audio streams bidirectionally until expiration.
-
-### Frontend — Module-Based
-
-```
-apps/frontend/src/
-├── app/
-│   ├── root.tsx       # Root with providers (Query + Services + Auth)
-│   └── routes.ts      # Route definitions
-├── modules/
-│   └── audio/         # All realtime call UI + logic
-│       ├── application/ # Call state management
-│       ├── ui/          # Components (RealtimeCallPage, MuteToggleButton)
-│       └── hooks/       # useRealtimeCall
-└── shared/            # Reusable UI components
-```
-
-Uses `openapi-fetch` with types generated from the API's OpenAPI spec. Authentication via Better-auth.
-
-### Shared Package
-
-`packages/shared/` exports OpenAI types (generated from OpenAPI spec at postinstall) plus utilities for OpenAI Realtime communication. The `postinstall` script auto-fetches the OpenAI OpenAPI spec.
-
 ## Tech Stack
 
 | Layer | Technology |
@@ -108,3 +63,11 @@ Uses `openapi-fetch` with types generated from the API's OpenAPI spec. Authentic
 API requires `apps/api/.env` with: `PORT`, `CLIENT_URL`, `DATABASE_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ROOM_CALL_DURATION_MINUTE`, `N8N_PORT`, `DATABASE_PORT/NAME/USERNAME/PASSWORD`.
 
 Docker Compose provides PostgreSQL and n8n (workflow automation).
+
+
+
+## Instructions
+
+- Always update CLAUDE.md when important information is explicited
+- Always update CLAUDE.md when structural modification is made
+- Always update CLAUDE.md when an important discovery is made to improve agentic development (faster coding process, better conversation size optimization)
