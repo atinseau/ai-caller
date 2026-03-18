@@ -15,16 +15,18 @@ export abstract class RoomMapper {
       createdAt: prismaRoom.createdAt,
       token: prismaRoom.token,
       modality: prismaRoom.modality,
+      isTest: prismaRoom.isTest,
     };
   }
 
   static toEntity(
     modelRoom: Omit<
       IRoomModel,
-      "id" | "createdAt" | "updatedAt" | "expiresAt" | "modality"
+      "id" | "createdAt" | "updatedAt" | "expiresAt" | "modality" | "isTest"
     > & {
       expiresAt?: Date;
       modality?: "AUDIO" | "TEXT";
+      isTest?: boolean;
     },
   ): Room {
     const now = dayjs();
@@ -48,6 +50,7 @@ export abstract class RoomMapper {
       callId: modelRoom.callId || null,
       token: modelRoom.token,
       modality: modelRoom.modality || "AUDIO",
+      isTest: modelRoom.isTest ?? false,
     };
   }
 }

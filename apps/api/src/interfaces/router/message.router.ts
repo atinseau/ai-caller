@@ -2,6 +2,7 @@ import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { streamSSE } from "hono/streaming";
 import { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port";
 import { TextStreamPort } from "@/domain/ports/text-stream.port";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
 import { container } from "@/infrastructure/di/container";
 import { SendMessageRequestDto } from "../dtos/room/send-message-request.dto";
 import { SendMessageResponseDto } from "../dtos/room/send-message-response.dto";
@@ -56,7 +57,7 @@ messageRouter.openapi(sendMessageRoute, async (ctx) => {
   return ctx.json({ message: "Message sent" });
 });
 
-// GET /api/v1/room/:roomId/stream — SSE stream of text responses
+// GET /api/v1/room/:roomId/stream — SSE stream of real-time session events
 messageRouter.get("/:roomId/stream", async (ctx) => {
   const roomId = ctx.req.param("roomId");
   const textStream = container.get(TextStreamPort);
@@ -71,4 +72,12 @@ messageRouter.get("/:roomId/stream", async (ctx) => {
       });
     }
   });
+});
+
+// GET /api/v1/room/:roomId/events — Historical session events (persisted)
+messageRouter.get("/:roomId/events", async (ctx) => {
+  const roomId = ctx.req.param("roomId");
+  const roomEventRepository = container.get(RoomEventRepositoryPort);
+  const events = await roomEventRepository.findByRoomId(roomId);
+  return ctx.json({ events });
 });

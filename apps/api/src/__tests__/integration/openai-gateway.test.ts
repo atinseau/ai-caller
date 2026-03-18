@@ -154,6 +154,7 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
         expiresAt: new Date(),
         createdAt: new Date(),
         updatedAt: new Date(),
+        isTest: false,
       },
       "http://mcp.test",
     );

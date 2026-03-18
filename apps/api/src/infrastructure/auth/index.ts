@@ -16,4 +16,29 @@ export const auth = betterAuth({
       prompt: "select_account consent",
     },
   },
+  user: {
+    additionalFields: {
+      role: {
+        type: "string",
+        defaultValue: "USER",
+        input: false,
+      },
+      companyId: {
+        type: "string",
+        required: false,
+        input: false,
+      },
+    },
+  },
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user) => {
+          const role =
+            user.email === env.get("ROOT_EMAIL") ? "ROOT" : "USER";
+          return { data: { ...user, role } };
+        },
+      },
+    },
+  },
 });

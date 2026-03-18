@@ -4,7 +4,7 @@ import type { RealtimeRoomService } from "./services/realtime-openai-room.servic
 type ConnectWebRtcParams = {
   companyId: string;
   audioStream: MediaStream;
-  audioRef: RefObject<HTMLAudioElement>;
+  audioRef: RefObject<HTMLAudioElement | null>;
   realtimeRoom: RealtimeRoomService;
 };
 
@@ -16,6 +16,7 @@ export async function connectWebRtc({
 }: ConnectWebRtcParams): Promise<{
   pc: RTCPeerConnection;
   dc: RTCDataChannel;
+  roomId: string;
 }> {
   const { pc, dc, roomId, roomToken } =
     await realtimeRoom.createRoom(companyId);
@@ -27,5 +28,5 @@ export async function connectWebRtc({
 
   await realtimeRoom.attachCallToRoom(pc, roomId, roomToken);
 
-  return { pc, dc };
+  return { pc, dc, roomId };
 }

@@ -13,6 +13,7 @@ describe("RoomReadyHandler", () => {
       expiresAt: new Date(),
       createdAt: new Date(),
       updatedAt: new Date(),
+      isTest: false,
     };
 
     const roomRepository = {

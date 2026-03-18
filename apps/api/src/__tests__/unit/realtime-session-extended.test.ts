@@ -44,9 +44,15 @@ function createFakes() {
 
   const subAgent = { execute: mock(() => Promise.resolve({})) };
 
+  const roomEventRepository = {
+    create: mock(() => Promise.resolve({})),
+    findByRoomId: mock(() => Promise.resolve([])),
+  };
+
   const service = new RealtimeSessionService(
     callService as never,
     toolRepository as never,
+    roomEventRepository as never,
     logger as never,
     textStream as never,
     subAgent as never,
@@ -64,6 +70,7 @@ const ROOM: IRoomModel = {
   createdAt: new Date(),
   updatedAt: new Date(),
   modality: "TEXT",
+  isTest: false,
 };
 
 describe("RealtimeSessionService — extended", () => {

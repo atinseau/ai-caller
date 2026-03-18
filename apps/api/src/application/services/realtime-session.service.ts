@@ -5,6 +5,7 @@ import { LoggerPort } from "@/domain/ports/logger.port";
 import { RealtimeSessionPort } from "@/domain/ports/realtime-session.port";
 import { SubAgentPort } from "@/domain/ports/sub-agent.port";
 import { TextStreamPort } from "@/domain/ports/text-stream.port";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
 import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
 import { env } from "@/infrastructure/config/env";
@@ -26,6 +27,8 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     @inject(CallServicePort) private readonly callService: CallServicePort,
     @inject(ToolRepositoryPort)
     private readonly toolRepository: ToolRepositoryPort,
+    @inject(RoomEventRepositoryPort)
+    private readonly roomEventRepository: RoomEventRepositoryPort,
     @inject(LoggerPort) private readonly logger: LoggerPort,
     @inject(TextStreamPort) private readonly textStream: TextStreamPort,
     @inject(SubAgentPort) private readonly subAgent: SubAgentPort,
@@ -52,19 +55,50 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     message: Schema["RealtimeServerEvent"],
     room: IRoomModel,
   ): Promise<Schema["RealtimeClientEvent"][]> {
-    if (message.type === "response.output_text.delta") {
+    // biome-ignore lint/suspicious/noExplicitAny: audio transcript events not yet in shared schema
+    const msg = message as any;
+
+    if (msg.type === "response.audio_transcript.delta") {
+      const text = (msg.delta as string | undefined) ?? "";
       this.textStream.publish(room.id, {
-        type: "text_delta",
-        text: message.delta ?? "",
+        type: "agent_transcript_delta",
+        text,
       });
       return [];
     }
 
-    if (message.type === "response.output_text.done") {
+    if (msg.type === "response.audio_transcript.done") {
+      const text = (msg.transcript as string | undefined) ?? "";
       this.textStream.publish(room.id, {
-        type: "text_done",
-        text: message.text ?? "",
+        type: "agent_transcript_done",
+        text,
       });
+      await this.roomEventRepository.create(room.id, "AGENT_TRANSCRIPT", {
+        text,
+      });
+      return [];
+    }
+
+    if (msg.type === "conversation.item.input_audio_transcription.completed") {
+      const text = (msg.transcript as string | undefined) ?? "";
+      this.textStream.publish(room.id, { type: "user_transcript", text });
+      await this.roomEventRepository.create(room.id, "USER_TRANSCRIPT", {
+        text,
+      });
+      return [];
+    }
+
+    if (message.type === "response.output_text.delta") {
+      const text = message.delta ?? "";
+      this.textStream.publish(room.id, { type: "text_delta", text });
+      await this.roomEventRepository.create(room.id, "TEXT_DELTA", { text });
+      return [];
+    }
+
+    if (message.type === "response.output_text.done") {
+      const text = message.text ?? "";
+      this.textStream.publish(room.id, { type: "text_done", text });
+      await this.roomEventRepository.create(room.id, "TEXT_DONE", { text });
       return [];
     }
 
@@ -107,12 +141,19 @@ export class RealtimeSessionService implements RealtimeSessionPort {
         typeof item.arguments === "string"
           ? (JSON.parse(item.arguments) as Record<string, unknown>)
           : (item.arguments as Record<string, unknown>);
-      await this.toolRepository.createToolInvoke(
+      const toolInvoke = await this.toolRepository.createToolInvoke(
         room.id,
         item.id,
         item.name,
         args,
       );
+      this.textStream.publish(room.id, {
+        type: "tool_invoke_created",
+        toolInvoke,
+      });
+      await this.roomEventRepository.create(room.id, "TOOL_INVOKE_CREATED", {
+        toolInvoke,
+      });
     }
 
     return this.buildUnblockMessages();
@@ -192,6 +233,14 @@ export class RealtimeSessionService implements RealtimeSessionPort {
       args,
     );
 
+    this.textStream.publish(room.id, {
+      type: "tool_invoke_created",
+      toolInvoke,
+    });
+    await this.roomEventRepository.create(room.id, "TOOL_INVOKE_CREATED", {
+      toolInvoke,
+    });
+
     if (state?.companyMcpUrl && state.sendToRoom) {
       const { sendToRoom } = state;
       this.subAgent
@@ -203,7 +252,21 @@ export class RealtimeSessionService implements RealtimeSessionPort {
           functionArgs: args,
           mcpServerUrl: state.companyMcpUrl,
         })
-        .then((result) => {
+        .then(async (result) => {
+          const completed = await this.toolRepository.completeToolInvokeByEntityId(
+            toolInvoke.entityId,
+            { summary: result.summary },
+          );
+          this.textStream.publish(room.id, {
+            type: "tool_invoke_updated",
+            toolInvoke: completed,
+          });
+          await this.roomEventRepository.create(
+            room.id,
+            "TOOL_INVOKE_UPDATED",
+            { toolInvoke: completed },
+          );
+
           sendToRoom({
             type: "conversation.item.create",
             item: {
@@ -221,10 +284,20 @@ export class RealtimeSessionService implements RealtimeSessionPort {
             type: "response.create",
           } as Schema["RealtimeClientEvent"]);
         })
-        .catch((err) => {
+        .catch(async (err) => {
           this.logger.error(
             err,
             `Sub-agent failed for ${item.name} in room ${room.id}`,
+          );
+          const failed = await this.toolRepository.failToolInvoke(toolInvoke.id);
+          this.textStream.publish(room.id, {
+            type: "tool_invoke_updated",
+            toolInvoke: failed,
+          });
+          await this.roomEventRepository.create(
+            room.id,
+            "TOOL_INVOKE_UPDATED",
+            { toolInvoke: failed },
           );
         });
     }

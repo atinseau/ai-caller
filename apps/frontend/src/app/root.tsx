@@ -2,6 +2,7 @@ import "@/styles/app.css";
 
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
 import { GenericErrorBoundary } from "@/shared/components/GenericErrorBoundary";
+import { Toaster } from "@/shared/components/ui/sonner";
 import type { Route } from "./+types/root";
 import { QueryProvider } from "./providers/QueryProvider";
 import { ServicesProvider } from "./providers/ServicesProvider";
@@ -32,6 +33,7 @@ export default function App() {
         <QueryProvider>
           <ServicesProvider>
             <Outlet />
+            <Toaster />
           </ServicesProvider>
         </QueryProvider>
         <ScrollRestoration />

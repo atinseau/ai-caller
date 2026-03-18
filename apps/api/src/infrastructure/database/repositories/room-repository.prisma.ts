@@ -16,6 +16,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     token: string,
     expiresAt?: Date,
     modality?: "AUDIO" | "TEXT",
+    isTest?: boolean,
   ) {
     const room = await this.prisma.room.create({
       data: RoomMapper.toEntity({
@@ -23,6 +24,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
         companyId,
         expiresAt,
         modality,
+        isTest,
       }),
     });
     return RoomMapper.toModel(room);

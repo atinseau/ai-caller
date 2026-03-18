@@ -26,6 +26,10 @@ export const RoomModel = z
     modality: z
       .enum(["AUDIO", "TEXT"])
       .openapi({ description: "The communication modality of the room" }),
+    isTest: z
+      .boolean()
+      .default(false)
+      .openapi({ description: "Whether this room is a test session" }),
   })
   .openapi("RoomModel", {
     description: "Represents a room entity",

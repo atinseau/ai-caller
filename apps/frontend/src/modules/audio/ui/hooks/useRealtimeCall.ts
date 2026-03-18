@@ -7,6 +7,7 @@ export type CallStatus = "idle" | "initializing" | "connecting" | "connected";
 type CallState = {
   status: CallStatus;
   muted: boolean;
+  roomId: string | null;
   audioStream: MediaStream | null;
   peerConnection: RTCPeerConnection | null;
   dataChannel: RTCDataChannel | null;
@@ -15,7 +16,7 @@ type CallState = {
 type CallAction =
   | { type: "START" }
   | { type: "AUDIO_READY"; audioStream: MediaStream }
-  | { type: "CONNECTED"; pc: RTCPeerConnection; dc: RTCDataChannel }
+  | { type: "CONNECTED"; pc: RTCPeerConnection; dc: RTCDataChannel; roomId: string }
   | { type: "STOP" }
   | { type: "ERROR" }
   | { type: "MUTE_TOGGLE" };
@@ -23,6 +24,7 @@ type CallAction =
 const initialState: CallState = {
   status: "idle",
   muted: false,
+  roomId: null,
   audioStream: null,
   peerConnection: null,
   dataChannel: null,
@@ -44,6 +46,7 @@ function reducer(state: CallState, action: CallAction): CallState {
         status: "connected",
         peerConnection: action.pc,
         dataChannel: action.dc,
+        roomId: action.roomId,
       };
     case "STOP":
     case "ERROR":
@@ -69,7 +72,7 @@ function cleanup(
   peerConnection?.close();
 }
 
-export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement>) {
+export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement | null>) {
   const { audioStream: audioStreamService, realtimeRoom } = useServices();
   const [state, dispatch] = useReducer(reducer, initialState);
 
@@ -79,7 +82,7 @@ export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement>) {
       const stream = await audioStreamService.asPromise();
       dispatch({ type: "AUDIO_READY", audioStream: stream });
 
-      const { pc, dc } = await connectWebRtc({
+      const { pc, dc, roomId } = await connectWebRtc({
         companyId,
         audioStream: stream,
         audioRef,
@@ -91,7 +94,7 @@ export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement>) {
         dispatch({ type: "STOP" });
       });
 
-      dispatch({ type: "CONNECTED", pc, dc });
+      dispatch({ type: "CONNECTED", pc, dc, roomId });
     } catch (error) {
       console.error("Error during call setup:", error);
       dispatch({ type: "ERROR" });

@@ -14,6 +14,14 @@ export const CreateRoomParamsRequestDto = z
         description: "The communication modality (AUDIO or TEXT)",
         example: "AUDIO",
       }),
+    isTest: z
+      .boolean()
+      .default(false)
+      .optional()
+      .openapi({
+        description: "Whether this room is a test session",
+        example: true,
+      }),
   })
   .openapi("CreateRoomParamsRequestDto", {
     description: "DTO for creating a room with the associated company ID",

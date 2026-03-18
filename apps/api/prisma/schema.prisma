@@ -13,6 +13,11 @@ datasource db {
   provider = "postgresql"
 }
 
+enum UserRole {
+  ROOT
+  USER
+}
+
 model User {
   id            String    @id
   name          String
@@ -23,6 +28,10 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+
+  role          UserRole  @default(USER)
+  companyId     String?
+  company       Company?  @relation(fields: [companyId], references: [id], onDelete: SetNull)
 
   @@unique([email])
   @@map("user")
@@ -89,6 +98,7 @@ model Company {
   mcpUrl String
 
   rooms     Room[]
+  users     User[]
 }
 
 enum RoomModality {
@@ -109,14 +119,38 @@ model Room {
 
     callId      String?
     modality    RoomModality @default(AUDIO)
+    isTest      Boolean      @default(false)
 
     toolInvokes ToolInvoke[]
+    events      RoomEvent[]
 }
 
 enum ToolInvokeStatus {
   RUNNING
   COMPLETED
   FAILED
+}
+
+enum RoomEventType {
+  USER_TRANSCRIPT
+  AGENT_TRANSCRIPT
+  TOOL_INVOKE_CREATED
+  TOOL_INVOKE_UPDATED
+  TEXT_DELTA
+  TEXT_DONE
+}
+
+model RoomEvent {
+  id        String        @id @default(uuid())
+  createdAt DateTime      @default(now())
+  type      RoomEventType
+  payload   Json
+
+  roomId    String
+  room      Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  @@map("room_event")
 }
 
 model ToolInvoke {

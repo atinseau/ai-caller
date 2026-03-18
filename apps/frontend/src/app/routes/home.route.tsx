@@ -1,34 +1,30 @@
-import { Link } from "react-router";
-import { authClient } from "@/infrastructure/auth";
-import { Button } from "@/shared/components/ui/button";
+import { Navigate } from "react-router";
+import { LoadingSpinner } from "@/shared/components/feedback/LoadingSpinner";
+import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 
 export default function HomeRoute() {
-  const { signIn } = authClient;
-  const { data, isPending } = authClient.useSession();
+  const state = useCurrentUser();
 
-  return (
-    <div className="flex flex-col gap-2 w-fit">
-      <p>salut</p>
-      <Link to="/realtime-call">Go to realtime call</Link>
+  if (state.status === "loading") {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
-      {isPending && <p>Loading...</p>}
+  if (state.status === "unauthenticated") {
+    return <Navigate to="/login" replace />;
+  }
 
-      {!isPending ? (
-        !data ? (
-          <Button
-            onClick={() =>
-              signIn.social({
-                provider: "google",
-                callbackURL: window.location.origin,
-              })
-            }
-          >
-            signIn
-          </Button>
-        ) : (
-          <pre>{JSON.stringify(data, null, 2)}</pre>
-        )
-      ) : null}
-    </div>
-  );
+  if (state.status === "pending_access") {
+    return <Navigate to="/pending-access" replace />;
+  }
+
+  if (state.user.role === UserRoleEnum.ROOT) {
+    return <Navigate to="/dashboard/root" replace />;
+  }
+
+  return <Navigate to="/dashboard" replace />;
 }

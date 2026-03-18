@@ -49,6 +49,7 @@ describe("RoomMapper", () => {
       updatedAt: new Date("2025-01-02"),
       deletedAt: null,
       modality: "TEXT" as const,
+      isTest: false,
     };
 
     const model = RoomMapper.toModel(prismaRoom);

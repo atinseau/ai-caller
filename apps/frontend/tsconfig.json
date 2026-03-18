@@ -22,7 +22,8 @@
       "@/interfaces/*": ["./src/interfaces/*"],
       "@/config/*": ["./src/config/*"],
       "@/modules/*": ["./src/modules/*"],
-      "@/domain/*": ["./src/domain/*"]
+      "@/domain/*": ["./src/domain/*"],
+      "@/shared/lib/*": ["./src/shared/lib/*"]
     },
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,

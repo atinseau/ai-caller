@@ -60,7 +60,7 @@ This is an **AI-powered real-time voice calling platform** using OpenAI's Realti
 
 ## Environment
 
-API requires `apps/api/.env` with: `PORT`, `CLIENT_URL`, `DATABASE_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ROOM_CALL_DURATION_MINUTE`, `N8N_PORT`, `DATABASE_PORT/NAME/USERNAME/PASSWORD`.
+API requires `apps/api/.env` with: `PORT`, `CLIENT_URL`, `DATABASE_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ROOM_CALL_DURATION_MINUTE`, `N8N_PORT`, `DATABASE_PORT/NAME/USERNAME/PASSWORD`, `ROOT_EMAIL` (email auto-assigned ROOT role on first Google sign-in).
 
 Docker Compose provides PostgreSQL and n8n (workflow automation).
 
@@ -111,6 +111,8 @@ Docker Compose provides PostgreSQL and n8n (workflow automation).
 - **Transaction isolation.** Every test that touches the database runs inside a Prisma `$transaction` that is rolled back after the test. Zero data pollution between tests.
 - Use `createTestContext()` for DB tests: `beforeEach(ctx.setup)` / `afterEach(ctx.teardown)`. The container is fresh per test, bound to the transactional client.
 - HTTP endpoint tests use the production Hono `app` and the production DI container. Create test data before tests and clean up in `afterAll`.
+- **Auth in HTTP tests**: all `/api/v1/*` routes require a session. Use `createTestSession()` from `__tests__/helpers/auth-session.ts` to create a real user+session in the DB with a properly signed cookie. Pass it as `{ Cookie: cookie }` in every `app.request()` call. Clean up with `cleanupTestSession(userId)` in `afterAll`.
+- **Spy leak rule**: always call `mock.restore()` in `afterEach`, **never** `beforeEach`, when using `spyOn` on module-level singletons (e.g. `auth.api.getSession`). Bun test files share module instances across workers — an unrestored spy from the last test leaks to other test files and silently breaks auth in integration tests.
 - Tests that call external APIs (OpenAI) must set `setDefaultTimeout(30_000)` or higher. They are slower and cost money — keep them focused.
 - For every new service or feature, write tests at **three levels**:
   1. **Unit** — test the logic in isolation with lightweight fakes for ports.
