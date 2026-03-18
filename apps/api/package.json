@@ -12,8 +12,8 @@
     "db:re-migrate": "rm -rf prisma/migrations && bunx prisma migrate reset --force && bunx prisma migrate dev -n default && bunx prisma generate",
     "studio": "bun run prisma studio",
     "test": "bun test",
-    "test:integration": "bun test src/__tests__/integration",
-    "n8n": "bunx n8nac"
+    "test:integration": "bun test tests/integration",
+    "n8n": "bun scripts/n8n/index.ts"
   },
   "exports": {
     "./types": "./src/types.ts",
@@ -21,8 +21,7 @@
   },
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/lodash-es": "4.17.12",
-    "n8nac": "^1.1.5"
+    "@types/lodash-es": "4.17.12"
   },
   "dependencies": {
     "@ai-caller/shared": "workspace:*",

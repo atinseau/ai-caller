@@ -64,6 +64,27 @@ API requires `apps/api/.env` with: `PORT`, `CLIENT_URL`, `DATABASE_URL`, `OPENAI
 
 Docker Compose provides PostgreSQL and n8n (workflow automation).
 
+### n8n Workflow Management
+
+Multi-company n8n workflow management CLI in `apps/api/scripts/n8n/`. Single n8n instance, multi-user (one account per company).
+
+**Flow**: Dev in n8n UI → `pull` (sanitize, strip credentials) → version in git → `push` to company account → client assigns credentials in UI.
+
+```bash
+cd apps/api
+bun n8n pull <id>                             # Pull workflow from root n8n, sanitize, save
+bun n8n push <company> <file>                 # Push generic workflow to company's n8n
+bun n8n add --name <n> --host <h> --key <k>   # Register a new company account
+bun n8n accounts                              # List registered accounts
+bun n8n list <company>                        # List workflows on company's n8n
+```
+
+Structure:
+- `apps/api/n8n/workflows/` — Generic workflow JSONs (git-versioned, credentials stripped)
+- `apps/api/n8n/accounts.json` — Company registry (names + hosts, no secrets)
+- `~/.config/n8nac/credentials.json` — API keys per company (NOT in git)
+- `apps/api/scripts/n8n/` — CLI modules (client, accounts, sanitize, commands)
+
 
 
 ## Instructions
@@ -111,7 +132,7 @@ Docker Compose provides PostgreSQL and n8n (workflow automation).
 - **Transaction isolation.** Every test that touches the database runs inside a Prisma `$transaction` that is rolled back after the test. Zero data pollution between tests.
 - Use `createTestContext()` for DB tests: `beforeEach(ctx.setup)` / `afterEach(ctx.teardown)`. The container is fresh per test, bound to the transactional client.
 - HTTP endpoint tests use the production Hono `app` and the production DI container. Create test data before tests and clean up in `afterAll`.
-- **Auth in HTTP tests**: all `/api/v1/*` routes require a session. Use `createTestSession()` from `__tests__/helpers/auth-session.ts` to create a real user+session in the DB with a properly signed cookie. Pass it as `{ Cookie: cookie }` in every `app.request()` call. Clean up with `cleanupTestSession(userId)` in `afterAll`.
+- **Auth in HTTP tests**: all `/api/v1/*` routes require a session. Use `createTestSession()` from `tests/helpers/auth-session.ts` to create a real user+session in the DB with a properly signed cookie. Pass it as `{ Cookie: cookie }` in every `app.request()` call. Clean up with `cleanupTestSession(userId)` in `afterAll`.
 - **Spy leak rule**: always call `mock.restore()` in `afterEach`, **never** `beforeEach`, when using `spyOn` on module-level singletons (e.g. `auth.api.getSession`). Bun test files share module instances across workers — an unrestored spy from the last test leaks to other test files and silently breaks auth in integration tests.
 - Tests that call external APIs (OpenAI) must set `setDefaultTimeout(30_000)` or higher. They are slower and cost money — keep them focused.
 - For every new service or feature, write tests at **three levels**:
@@ -119,7 +140,8 @@ Docker Compose provides PostgreSQL and n8n (workflow automation).
   2. **Integration DB** — test with real database in a transaction.
   3. **Integration API** — test with real external APIs when applicable.
 - Test edge cases: missing data, null values, unreachable services, invalid inputs, early returns.
-- The test preload (`__tests__/preload.ts`) resolves `.env` relative to the file, not CWD. Tests work from any directory.
+- The test preload (`tests/preload.ts`) resolves `.env` relative to the file, not CWD. Tests work from any directory.
+- Tests live in `apps/api/tests/` (unit and integration subdirectories).
 
 ### Adding a Feature — Checklist
 
