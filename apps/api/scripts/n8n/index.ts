@@ -12,16 +12,18 @@ enum N8nCommand {
   ADD = "add",
   ACCOUNTS = "accounts",
   LIST = "list",
+  DELETE = "delete",
 }
 
 const USAGE = `Usage: bun n8n <command> [args]
 
 Commands:
-  pull <id>                          Pull workflow from root n8n, sanitize, save
+  pull [id] [--from <company>]       Pull workflow(s), sanitize, save (default: all from root)
   push <company> <file>              Push workflow to company's n8n
   add --name <n> --host <h> --key <k>  Register a new company account
   accounts                           List registered companies
-  list <company>                     List workflows on company's n8n`;
+  list [company]                     List workflows (default: root)
+  delete <id> [--from <company>]     Delete a workflow (default: root)`;
 
 const [command, ...args] = process.argv.slice(2);
 
@@ -33,12 +35,11 @@ if (!command || !Object.values(N8nCommand).includes(command as N8nCommand)) {
 try {
   switch (command as N8nCommand) {
     case N8nCommand.PULL: {
-      if (!args[0]) {
-        console.error("Usage: bun n8n pull <workflow-id>");
-        process.exit(1);
-      }
+      const fromIndex = args.indexOf("--from");
+      const from = fromIndex !== -1 ? args[fromIndex + 1] : undefined;
+      const id = args[0] && args[0] !== "--from" ? args[0] : undefined;
       const { pull } = await import("./commands/pull");
-      await pull(args[0]);
+      await pull(id, from);
       break;
     }
 
@@ -65,12 +66,20 @@ try {
     }
 
     case N8nCommand.LIST: {
-      if (!args[0]) {
-        console.error("Usage: bun n8n list <company>");
-        process.exit(1);
-      }
       const { list } = await import("./commands/list");
       await list(args[0]);
+      break;
+    }
+
+    case N8nCommand.DELETE: {
+      if (!args[0]) {
+        console.error("Usage: bun n8n delete <workflow-id> [--from <company>]");
+        process.exit(1);
+      }
+      const fromIndex = args.indexOf("--from");
+      const from = fromIndex !== -1 ? args[fromIndex + 1] : undefined;
+      const { del } = await import("./commands/delete");
+      await del(args[0], from);
       break;
     }
   }

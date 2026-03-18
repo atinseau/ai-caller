@@ -55,16 +55,14 @@ export async function getCredentials(name: string): Promise<string> {
 }
 
 export function getRootAccount(): { host: string; apiKey: string } {
-  const host = process.env.N8N_HOST;
-  const port = process.env.N8N_PORT;
+  const host = process.env.N8N_URL;
   const apiKey = process.env.N8N_API_KEY;
 
   if (!host || !apiKey) {
-    throw new Error("Missing N8N_HOST or N8N_API_KEY in environment");
+    throw new Error("Missing N8N_URL or N8N_API_KEY in environment");
   }
 
-  const baseUrl = port ? `${host}:${port}` : host;
-  return { host: baseUrl, apiKey };
+  return { host, apiKey };
 }
 
 async function readCredentials(): Promise<CredentialStore> {

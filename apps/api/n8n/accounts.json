@@ -1,1 +1,6 @@
-[]
+[
+  {
+    "name": "arthurtinseau2",
+    "host": "http://localhost:5678"
+  }
+]

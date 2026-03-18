@@ -37,6 +37,7 @@ export interface N8nClient {
     id: string,
     data: Partial<N8nWorkflow>,
   ): Promise<N8nWorkflow>;
+  deleteWorkflow(id: string): Promise<void>;
   activateWorkflow(id: string): Promise<N8nWorkflow>;
   deactivateWorkflow(id: string): Promise<N8nWorkflow>;
 }
@@ -84,6 +85,10 @@ export function createClient(baseUrl: string, apiKey: string): N8nClient {
         method: "POST",
         body: JSON.stringify(data),
       });
+    },
+
+    async deleteWorkflow(id) {
+      await request<void>(`/workflows/${id}`, { method: "DELETE" });
     },
 
     async updateWorkflow(id, data) {

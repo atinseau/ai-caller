@@ -1,5 +1,12 @@
 import type { N8nNode, N8nWorkflow } from "./client";
 
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function isUuid(value: string): boolean {
+  return UUID_RE.test(value);
+}
+
 export interface GenericWorkflow {
   name: string;
   nodes: Omit<N8nNode, "credentials">[];
@@ -11,7 +18,11 @@ export interface GenericWorkflow {
 
 export function sanitizeWorkflow(workflow: N8nWorkflow): GenericWorkflow {
   const nodes = workflow.nodes.map((node) => {
-    const { credentials, ...rest } = node;
+    const { credentials, id, webhookId, ...rest } = node;
+    if (rest.parameters?.path && isUuid(rest.parameters.path as string)) {
+      const { path, ...params } = rest.parameters;
+      return { ...rest, parameters: params };
+    }
     return rest;
   });
 
@@ -30,9 +41,9 @@ export function sanitizeWorkflow(workflow: N8nWorkflow): GenericWorkflow {
 export function prepareForPush(
   generic: GenericWorkflow,
 ): Omit<N8nWorkflow, "id"> {
+  const { pinData, ...rest } = generic;
   return {
-    ...generic,
+    ...rest,
     nodes: generic.nodes as N8nNode[],
-    active: false,
   };
 }

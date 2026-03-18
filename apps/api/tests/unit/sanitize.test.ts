@@ -58,6 +58,26 @@ describe("sanitizeWorkflow", () => {
     }
   });
 
+  it("strips node id and webhookId", () => {
+    const workflow = makeWorkflow({
+      nodes: [
+        {
+          id: "node1",
+          name: "Trigger",
+          type: "n8n-nodes-base.webhook",
+          position: [0, 0],
+          parameters: {},
+          webhookId: "webhook-123",
+        },
+      ],
+    });
+    const result = sanitizeWorkflow(workflow);
+
+    expect(result.nodes[0]).not.toHaveProperty("id");
+    expect(result.nodes[0]).not.toHaveProperty("webhookId");
+    expect(result.nodes[0].name).toBe("Trigger");
+  });
+
   it("preserves node parameters and structure", () => {
     const result = sanitizeWorkflow(makeWorkflow());
     const sheetsNode = result.nodes.find((n) => n.name === "Google Sheets");
@@ -124,11 +144,18 @@ describe("sanitizeWorkflow", () => {
 });
 
 describe("prepareForPush", () => {
-  it("sets active to false", () => {
+  it("does not include active (read-only on create)", () => {
     const generic = sanitizeWorkflow(makeWorkflow());
     const result = prepareForPush(generic);
 
-    expect(result.active).toBe(false);
+    expect(result).not.toHaveProperty("active");
+  });
+
+  it("strips pinData", () => {
+    const generic = sanitizeWorkflow(makeWorkflow());
+    const result = prepareForPush(generic);
+
+    expect(result).not.toHaveProperty("pinData");
   });
 
   it("preserves all generic workflow fields", () => {
