@@ -1,5 +1,7 @@
 import { ContainerModule } from "inversify";
 import { McpToolDiscoveryService } from "@/application/services/mcp-tool-discovery.service";
+import { N8nSanitizeService } from "@/application/services/n8n-sanitize.service";
+import { N8nService } from "@/application/services/n8n.service";
 import { OpenAICallService } from "@/application/services/openai-call.service";
 import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 import { SubAgentService } from "@/application/services/sub-agent.service";
@@ -24,4 +26,6 @@ export const serviceModule = new ContainerModule((module) => {
   module.bind(TextStreamPort).to(InMemoryTextStream).inSingletonScope();
   module.bind(SubAgentPort).to(SubAgentService).inSingletonScope();
   module.bind(McpToolDiscoveryService).toSelf().inSingletonScope();
+  module.bind(N8nSanitizeService).toSelf().inSingletonScope();
+  module.bind(N8nService).toSelf().inSingletonScope();
 });

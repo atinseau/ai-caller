@@ -60,9 +60,20 @@ This is an **AI-powered real-time voice calling platform** using OpenAI's Realti
 
 ## Environment
 
-API requires `apps/api/.env` with: `PORT`, `CLIENT_URL`, `DATABASE_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `ROOM_CALL_DURATION_MINUTE`, `N8N_PORT`, `DATABASE_PORT/NAME/USERNAME/PASSWORD`, `ROOT_EMAIL` (email auto-assigned ROOT role on first Google sign-in).
+API requires `apps/api/.env` with non-sensitive config (`PORT`, `CLIENT_URL`, `ROOM_CALL_DURATION_MINUTE`, `N8N_PORT`, `N8N_URL`, `DATABASE_PORT/NAME/USERNAME`) and either:
+- **Secrets in `.env`** (default, no Infisical): `DATABASE_URL`, `OPENAI_API_KEY`, `GOOGLE_CLIENT_ID/SECRET`, `N8N_API_KEY`, `ROOT_EMAIL`
+- **Secrets in Infisical**: set `INFISICAL_CLIENT_ID`, `INFISICAL_CLIENT_SECRET`, `INFISICAL_PROJECT_ID`, `INFISICAL_SITE_URL`, `INFISICAL_ENVIRONMENT` in `.env`. Secrets are fetched at boot via `env.init()`.
 
-Docker Compose provides PostgreSQL and n8n (workflow automation).
+Docker Compose provides PostgreSQL, n8n, Redis, and Infisical (secret management).
+
+### Secret Management (Infisical)
+
+Self-hosted Infisical instance for centralized secret management. Secrets are organized by path in Infisical projects.
+
+- **Port**: `SecretManagerPort` → `InfisicalSecretAdapter`
+- **Per-company secrets**: stored under `/companies/<name>/` path (e.g., `N8N_API_KEY`)
+- **Boot flow**: `env.init()` fetches secrets from Infisical, merges with `process.env`, validates with Zod
+- **Fallback**: if `INFISICAL_*` vars are not set, app uses `process.env` directly (backward compatible)
 
 ### n8n Workflow Management
 

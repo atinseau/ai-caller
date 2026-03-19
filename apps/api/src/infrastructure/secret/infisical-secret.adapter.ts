@@ -1,0 +1,90 @@
+import { injectable } from "inversify";
+import { InfisicalSDK } from "@infisical/sdk";
+import { SecretManagerPort } from "@/domain/ports/secret-manager.port";
+import { env } from "@/infrastructure/config/env";
+
+@injectable()
+export class InfisicalSecretAdapter extends SecretManagerPort {
+  private client: InfisicalSDK;
+  private projectId: string;
+  private environment: string;
+
+  constructor() {
+    super();
+    this.client = new InfisicalSDK({
+      siteUrl: env.get("INFISICAL_SITE_URL"),
+    });
+    this.projectId = env.get("INFISICAL_PROJECT_ID")!;
+    this.environment = env.get("INFISICAL_ENVIRONMENT");
+  }
+
+  async login(): Promise<void> {
+    await this.client.auth().universalAuth.login({
+      clientId: env.get("INFISICAL_CLIENT_ID")!,
+      clientSecret: env.get("INFISICAL_CLIENT_SECRET")!,
+    });
+  }
+
+  async getSecret(name: string, path = "/"): Promise<string> {
+    const secret = await this.client.secrets().getSecret({
+      environment: this.environment,
+      projectId: this.projectId,
+      secretName: name,
+      secretPath: path,
+      expandSecretReferences: true,
+      viewSecretValue: true,
+    });
+    return secret.secretValue;
+  }
+
+  async setSecret(name: string, value: string, path = "/"): Promise<void> {
+    try {
+      await this.client.secrets().updateSecret(name, {
+        environment: this.environment,
+        projectId: this.projectId,
+        secretValue: value,
+        secretPath: path,
+      });
+    } catch {
+      await this.client.secrets().createSecret(name, {
+        environment: this.environment,
+        projectId: this.projectId,
+        secretValue: value,
+        secretPath: path,
+      });
+    }
+  }
+
+  async deleteSecret(name: string, path = "/"): Promise<void> {
+    await this.client.secrets().deleteSecret(name, {
+      environment: this.environment,
+      projectId: this.projectId,
+      secretPath: path,
+    });
+  }
+
+  async listSecrets(path = "/"): Promise<Map<string, string>> {
+    const result = await this.client.secrets().listSecrets({
+      environment: this.environment,
+      projectId: this.projectId,
+      secretPath: path,
+      expandSecretReferences: true,
+      viewSecretValue: true,
+    });
+
+    const secrets = new Map<string, string>();
+    for (const secret of result.secrets) {
+      secrets.set(secret.secretKey, secret.secretValue);
+    }
+    return secrets;
+  }
+
+  async listFolders(path = "/"): Promise<string[]> {
+    const result = await this.client.folders().listFolders({
+      environment: this.environment,
+      projectId: this.projectId,
+      path,
+    });
+    return result.map((folder) => folder.name);
+  }
+}

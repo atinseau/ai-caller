@@ -24,6 +24,35 @@ services:
       - DB_POSTGRESDB_SCHEMA=n8n
     restart: unless-stopped
 
+  infisical:
+    container_name: ai-caller-infisical
+    image: infisical/infisical:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    networks:
+      - db_network
+    ports:
+      - ${INFISICAL_PORT:-8082}:8080
+    environment:
+      - NODE_ENV=production
+      - DB_CONNECTION_URI=postgres://${DATABASE_USERNAME}:${DATABASE_PASSWORD}@db:5432/infisical
+      - REDIS_URL=redis://redis:6379
+      - ENCRYPTION_KEY=${INFISICAL_ENCRYPTION_KEY}
+      - AUTH_SECRET=${INFISICAL_AUTH_SECRET}
+
+  redis:
+    container_name: ai-caller-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - db_network
+    volumes:
+      - redis_data:/data
+
   db:
     container_name: ai-caller-db
     networks:
@@ -34,11 +63,20 @@ services:
       - ${DATABASE_PORT}:5432
     volumes:
       - ./data/db:/var/lib/postgresql/data
+      - ./docker/init-infisical-db.sql:/docker-entrypoint-initdb.d/init-infisical-db.sql
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
       - POSTGRES_DB=${DATABASE_NAME}
       - POSTGRES_USER=${DATABASE_USERNAME}
       - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USERNAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   db_network:
+
+volumes:
+  redis_data:

@@ -43,7 +43,7 @@ export function createTestContext() {
         async (tx) => {
           const container = new Container();
 
-          await container.load(
+          container.load(
             repositoryModule,
             useCaseModule,
             serviceModule,

@@ -1,6 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { sanitizeWorkflow, prepareForPush } from "../../scripts/n8n/sanitize";
-import type { N8nWorkflow } from "../../scripts/n8n/client";
+import { N8nSanitizeService } from "../../src/application/services/n8n-sanitize.service";
+import type { N8nWorkflow } from "../../src/domain/models/n8n.model";
+
+const svc = new N8nSanitizeService();
+const sanitizeWorkflow = svc.sanitize.bind(svc);
+const prepareForPush = svc.prepareForPush.bind(svc);
 
 const makeWorkflow = (overrides: Partial<N8nWorkflow> = {}): N8nWorkflow => ({
   id: "123",

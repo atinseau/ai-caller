@@ -1,10 +1,14 @@
-import { type BunWebSocketHandler, websocket } from "hono/bun";
-import { initializeOpenApi } from "./infrastructure/openapi";
-import { app } from "./interfaces/application";
-
-import "./infrastructure/cron";
 import type { Serve } from "bun";
+import { type BunWebSocketHandler, websocket } from "hono/bun";
 import { env } from "./infrastructure/config/env";
+
+// Initialize secrets from Infisical (or fallback to process.env)
+await env.init();
+
+// Import app and cron after env is initialized
+const { app } = await import("./interfaces/application");
+const { initializeOpenApi } = await import("./infrastructure/openapi");
+await import("./infrastructure/cron");
 
 initializeOpenApi(app);
 

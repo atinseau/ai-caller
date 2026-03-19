@@ -1,7 +1,27 @@
-import path from "node:path";
-import { config } from "dotenv";
-import { expand } from "dotenv-expand";
+import { beforeAll, mock } from "bun:test";
+import { env } from "../src/infrastructure/config/env"
 
-// Resolve .env relative to this file (apps/api/.env), not CWD
-const envPath = path.resolve(import.meta.dirname, "../.env");
-expand(config({ path: envPath }));
+await env.init();
+
+// Silence pino logger in tests
+mock.module("pino", () => {
+  const noop = () => {};
+  const noopLogger = {
+    info: noop,
+    error: noop,
+    warn: noop,
+    debug: noop,
+    trace: noop,
+    fatal: noop,
+    child: () => noopLogger,
+    level: "silent",
+  };
+  return { pino: () => noopLogger, default: () => noopLogger };
+});
+
+beforeAll(() => {
+  console.log = mock();
+  console.error = mock();
+  console.warn = mock();
+  console.debug = mock();
+});
