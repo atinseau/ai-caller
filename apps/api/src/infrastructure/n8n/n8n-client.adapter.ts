@@ -33,8 +33,7 @@ export class N8nClientAdapter extends N8nClientPort {
           403: "Insufficient permissions",
           404: "Resource not found",
         };
-        const message =
-          messages[response.status] ?? `HTTP ${response.status}`;
+        const message = messages[response.status] ?? `HTTP ${response.status}`;
         throw new Error(`n8n API error: ${message} — ${body}`);
       }
 

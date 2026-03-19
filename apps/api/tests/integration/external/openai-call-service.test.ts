@@ -1,22 +1,21 @@
 import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
   describe,
   expect,
   it,
-  beforeAll,
-  beforeEach,
-  afterAll,
-  afterEach,
   setDefaultTimeout,
 } from "bun:test";
-import { OpenAICallService } from "@/application/services/openai-call.service";
-import { CallServicePort } from "@/domain/services/call-service.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { createTestContext } from "@/tests/helpers/test-context";
+import { CallServicePort } from "@/domain/services/call-service.port";
 import {
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
+import { createTestContext } from "@/tests/helpers/test-context";
 
 setDefaultTimeout(30_000);
 

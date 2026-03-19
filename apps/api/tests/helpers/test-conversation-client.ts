@@ -1,6 +1,6 @@
+import type { Hono } from "hono";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import type { Hono } from "hono";
 
 /**
  * Programmatic client for testing text-mode conversations.
@@ -9,7 +9,7 @@ import type { Hono } from "hono";
 export class TestConversationClient {
   constructor(
     private readonly app: Hono,
-    private readonly baseUrl = "http://localhost",
+    readonly _baseUrl = "http://localhost",
   ) {}
 
   async createTextRoom(companyId: string): Promise<IRoomModel> {
@@ -78,9 +78,7 @@ export class TestConversationClient {
         for (const line of lines) {
           if (line.startsWith("data:")) {
             try {
-              const event = JSON.parse(
-                line.slice(5).trim(),
-              ) as TextStreamEvent;
+              const event = JSON.parse(line.slice(5).trim()) as TextStreamEvent;
               events.push(event);
 
               if (event.type === "text_done") return;

@@ -1,12 +1,9 @@
 import { inject, injectable } from "inversify";
-import { env } from "@/infrastructure/config/env";
-import type {
-  N8nClient,
-  N8nWorkflow,
-} from "@/domain/models/n8n.model";
+import type { N8nClient, N8nWorkflow } from "@/domain/models/n8n.model";
 import { N8nClientPort } from "@/domain/ports/n8n-client.port";
 import { N8nWorkflowStoragePort } from "@/domain/ports/n8n-workflow-storage.port";
 import { SecretManagerPort } from "@/domain/ports/secret-manager.port";
+import { env } from "@/infrastructure/config/env";
 import { N8nSanitizeService } from "./n8n-sanitize.service";
 
 export interface PullResult {
@@ -35,15 +32,16 @@ export class N8nService {
 
   // --- Account management ---
 
-  async addCompanyApiKey(
-    companyName: string,
-    apiKey: string,
-  ): Promise<void> {
+  async addCompanyApiKey(companyName: string, apiKey: string): Promise<void> {
     // Validate by attempting to list workflows
     const host = env.get("N8N_URL");
     const client = this.clientPort.createClient(host, apiKey);
     await client.listWorkflows();
-    await this.secrets.setSecret("N8N_API_KEY", apiKey, `/companies/${companyName}`);
+    await this.secrets.setSecret(
+      "N8N_API_KEY",
+      apiKey,
+      `/companies/${companyName}`,
+    );
   }
 
   async listCompanies(): Promise<string[]> {
@@ -107,10 +105,7 @@ export class N8nService {
 
   // --- Private helpers ---
 
-  private async pullOne(
-    client: N8nClient,
-    id: string,
-  ): Promise<PullResult> {
+  private async pullOne(client: N8nClient, id: string): Promise<PullResult> {
     const workflow = await client.getWorkflow(id);
     const generic = this.sanitize.sanitize(workflow);
     const filename = `${this.sanitize.slugify(workflow.name)}.json`;
@@ -121,10 +116,17 @@ export class N8nService {
   private async resolveClient(companyName?: string): Promise<N8nClient> {
     const host = env.get("N8N_URL");
     if (companyName) {
-      const apiKey = await this.secrets.getSecret(
-        "N8N_API_KEY",
-        `/companies/${companyName}`,
-      );
+      let apiKey: string;
+      try {
+        apiKey = await this.secrets.getSecret(
+          "N8N_API_KEY",
+          `/companies/${companyName}`,
+        );
+      } catch {
+        throw new Error(
+          `Company "${companyName}" not found. Use \`bun n8n add\` to register it.`,
+        );
+      }
       return this.clientPort.createClient(host, apiKey);
     }
     const apiKey = env.get("N8N_API_KEY");

@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeAll, afterAll } from "bun:test";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { app } from "@/interfaces/application";
 import {
-  createTestSession,
   cleanupTestSession,
+  createTestSession,
 } from "@/tests/helpers/auth-session";
 
 let rootCookie: string;

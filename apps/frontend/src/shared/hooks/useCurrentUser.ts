@@ -1,13 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { authClient } from "@/infrastructure/auth";
-import { api } from "@/infrastructure/http/api";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import type { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import type { ICurrentUser } from "@/shared/types/user.types";
 
 export type CurrentUserState =
   | { status: "loading" }
   | { status: "unauthenticated" }
-  | { status: "pending_access"; session: { name: string; email: string; image?: string | null } }
+  | {
+      status: "pending_access";
+      session: { name: string; email: string; image?: string | null };
+    }
   | { status: "authenticated"; user: ICurrentUser };
 
 export function useCurrentUser(): CurrentUserState {

@@ -1,11 +1,11 @@
-import { useEffect, useRef } from "react";
-import { ArrowLeft, Building2, FlaskConical } from "lucide-react";
-import { Link } from "react-router";
 import { useQuery } from "@tanstack/react-query";
+import { ArrowLeft, Building2, FlaskConical } from "lucide-react";
+import { useEffect, useRef } from "react";
+import { Link } from "react-router";
 import { api } from "@/infrastructure/http/api";
 import { useRealtimeCall } from "@/modules/audio/ui/hooks/useRealtimeCall";
-import { StatusBadge } from "@/shared/components/feedback/StatusBadge";
 import { LoadingSpinner } from "@/shared/components/feedback/LoadingSpinner";
+import { StatusBadge } from "@/shared/components/feedback/StatusBadge";
 import { Button } from "@/shared/components/ui/button";
 import { useSessionStream } from "../../application/hooks/useSessionStream";
 import { AudioControls } from "../components/AudioControls";
@@ -18,7 +18,12 @@ interface DebugSessionPageProps {
 
 export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const { state: callState, start, stop, toggleMute } = useRealtimeCall(audioRef);
+  const {
+    state: callState,
+    start,
+    stop,
+    toggleMute,
+  } = useRealtimeCall(audioRef);
   const { transcripts, toolInvokes, sseStatus, connect, disconnect } =
     useSessionStream({ roomId: callState.roomId });
 

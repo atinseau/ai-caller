@@ -8,10 +8,10 @@ export default [
 
   // ROOT dashboard
   route("/dashboard/root", "routes/root-dashboard.route.tsx"),
-  route(
-    "/dashboard/root/session/:companyId",
-    "routes/root-session.route.tsx",
-  ),
+  route("/dashboard/root/session/:companyId", "routes/root-session.route.tsx"),
+
+  // Company detail (ROOT + company users)
+  route("/dashboard/company/:companyId", "routes/company-detail.route.tsx"),
 
   // User dashboard
   route("/dashboard", "routes/user-dashboard.route.tsx"),

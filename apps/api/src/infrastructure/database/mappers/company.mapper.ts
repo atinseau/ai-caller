@@ -1,4 +1,5 @@
 import { randomUUIDv7 } from "bun";
+import { CompanyStatus } from "@/domain/enums/company-status.enum";
 import type { ICompanyModel } from "@/domain/models/company.model";
 import type { Company } from "@/generated/prisma/client";
 
@@ -10,14 +11,15 @@ export abstract class CompanyMapper {
       id: prismaCompany.id,
       name: prismaCompany.name,
       updatedAt: prismaCompany.updatedAt,
+      status: prismaCompany.status as CompanyStatus,
     };
   }
 
   static toEntity(
     modelCompany: Omit<
       ICompanyModel,
-      "id" | "createdAt" | "updatedAt" | "mcpTestUrl"
-    > & { mcpTestUrl?: string },
+      "id" | "createdAt" | "updatedAt" | "status"
+    >,
   ): Company {
     return {
       id: randomUUIDv7(),
@@ -25,6 +27,7 @@ export abstract class CompanyMapper {
       updatedAt: new Date(),
       mcpUrl: modelCompany.mcpUrl,
       name: modelCompany.name,
+      status: CompanyStatus.INACTIVE,
     };
   }
 }

@@ -1,8 +1,8 @@
 import { injectable } from "inversify";
 import type {
+  GenericWorkflow,
   N8nWorkflow,
   N8nWorkflowPayload,
-  GenericWorkflow,
 } from "@/domain/models/n8n.model";
 
 const UUID_RE =

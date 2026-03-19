@@ -2,17 +2,15 @@ import { inject, injectable } from "inversify";
 import type {
   IRoomEvent,
   RoomEventPayload,
+  RoomEventRepositoryPort,
   RoomEventType,
 } from "@/domain/repositories/room-event-repository.port";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { PRISMA_TOKEN } from "../prisma";
 
 @injectable()
 export class RoomEventRepositoryPrisma implements RoomEventRepositoryPort {
-  constructor(
-    @inject(PRISMA_TOKEN) private readonly prisma: PrismaClient,
-  ) {}
+  constructor(@inject(PRISMA_TOKEN) private readonly prisma: PrismaClient) {}
 
   async create(
     roomId: string,

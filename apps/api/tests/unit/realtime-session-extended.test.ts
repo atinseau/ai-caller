@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 
 function createFakes() {
   const publishedEvents: TextStreamEvent[] = [];
@@ -58,7 +58,14 @@ function createFakes() {
     subAgent as never,
   );
 
-  return { service, callService, toolRepository, textStream, publishedEvents, createdInvokes };
+  return {
+    service,
+    callService,
+    toolRepository,
+    textStream,
+    publishedEvents,
+    createdInvokes,
+  };
 }
 
 const ROOM: IRoomModel = {
@@ -172,7 +179,9 @@ describe("RealtimeSessionService — extended", () => {
   describe("audio_buffer.stopped without shouldCloseCall", () => {
     it("should NOT terminate when shouldCloseCall is false", async () => {
       await fakes.service.processMessage(
-        { type: "output_audio_buffer.stopped" } as Schema["RealtimeServerEvent"],
+        {
+          type: "output_audio_buffer.stopped",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 
@@ -183,17 +192,29 @@ describe("RealtimeSessionService — extended", () => {
   describe("multiple text deltas", () => {
     it("should publish each delta independently", async () => {
       await fakes.service.processMessage(
-        { type: "response.output_text.delta", delta: "Hel" } as Schema["RealtimeServerEvent"],
+        {
+          type: "response.output_text.delta",
+          delta: "Hel",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
       await fakes.service.processMessage(
-        { type: "response.output_text.delta", delta: "lo" } as Schema["RealtimeServerEvent"],
+        {
+          type: "response.output_text.delta",
+          delta: "lo",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 
       expect(fakes.publishedEvents).toHaveLength(2);
-      expect(fakes.publishedEvents[0]).toEqual({ type: "text_delta", text: "Hel" });
-      expect(fakes.publishedEvents[1]).toEqual({ type: "text_delta", text: "lo" });
+      expect(fakes.publishedEvents[0]).toEqual({
+        type: "text_delta",
+        text: "Hel",
+      });
+      expect(fakes.publishedEvents[1]).toEqual({
+        type: "text_delta",
+        text: "lo",
+      });
     });
   });
 });

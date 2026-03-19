@@ -2,7 +2,7 @@ import type { Schema } from "@ai-caller/shared";
 import { inject, injectable } from "inversify";
 import type { IRoomModel } from "@/domain/models/room.model";
 import { LoggerPort } from "@/domain/ports/logger.port";
-import { RealtimeSessionPort } from "@/domain/ports/realtime-session.port";
+import type { RealtimeSessionPort } from "@/domain/ports/realtime-session.port";
 import { SubAgentPort } from "@/domain/ports/sub-agent.port";
 import { TextStreamPort } from "@/domain/ports/text-stream.port";
 import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
@@ -186,7 +186,7 @@ export class RealtimeSessionService implements RealtimeSessionPort {
 
   private async handleGetToolStatus(
     item: Schema["RealtimeConversationItemFunctionCall"],
-    room: IRoomModel,
+    _room: IRoomModel,
   ): Promise<Schema["RealtimeClientEvent"][]> {
     const args = item.arguments
       ? (JSON.parse(item.arguments) as { tool_invoke_id?: string })
@@ -253,10 +253,11 @@ export class RealtimeSessionService implements RealtimeSessionPort {
           mcpServerUrl: state.companyMcpUrl,
         })
         .then(async (result) => {
-          const completed = await this.toolRepository.completeToolInvokeByEntityId(
-            toolInvoke.entityId,
-            { summary: result.summary },
-          );
+          const completed =
+            await this.toolRepository.completeToolInvokeByEntityId(
+              toolInvoke.entityId,
+              { summary: result.summary },
+            );
           this.textStream.publish(room.id, {
             type: "tool_invoke_updated",
             toolInvoke: completed,
@@ -289,7 +290,9 @@ export class RealtimeSessionService implements RealtimeSessionPort {
             err,
             `Sub-agent failed for ${item.name} in room ${room.id}`,
           );
-          const failed = await this.toolRepository.failToolInvoke(toolInvoke.id);
+          const failed = await this.toolRepository.failToolInvoke(
+            toolInvoke.id,
+          );
           this.textStream.publish(room.id, {
             type: "tool_invoke_updated",
             toolInvoke: failed,

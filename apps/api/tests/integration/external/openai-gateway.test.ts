@@ -1,6 +1,7 @@
 import { describe, expect, it, setDefaultTimeout } from "bun:test";
 
 setDefaultTimeout(30_000);
+
 import type { Schema } from "@ai-caller/shared";
 import { env } from "@/infrastructure/config/env";
 

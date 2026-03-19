@@ -1,4 +1,4 @@
-import { http, HttpResponse } from "msw";
+import { HttpResponse, http } from "msw";
 
 /**
  * Default MSW handlers — match the real API routes.
@@ -18,9 +18,7 @@ export const handlers = [
     }),
   ),
 
-  http.get("*/api/v1/company/all", () =>
-    HttpResponse.json({ companies: [] }),
-  ),
+  http.get("*/api/v1/company/all", () => HttpResponse.json({ companies: [] })),
 
   http.get("*/api/v1/room/:roomId/events", () =>
     HttpResponse.json({ events: [] }),

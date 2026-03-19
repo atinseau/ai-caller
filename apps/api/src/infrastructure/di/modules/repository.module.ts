@@ -3,7 +3,7 @@ import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.
 import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { prisma, PRISMA_TOKEN } from "@/infrastructure/database/prisma";
+import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma";
 import { CompanyRepositoryPrisma } from "@/infrastructure/database/repositories/company-repository.prisma";
 import { RoomEventRepositoryPrisma } from "@/infrastructure/database/repositories/room-event-repository.prisma";
 import { RoomRepositoryPrisma } from "@/infrastructure/database/repositories/room-repository.prisma";
@@ -15,14 +15,8 @@ export const repositoryModule = new ContainerModule((module) => {
     .bind(CompanyRepositoryPort)
     .to(CompanyRepositoryPrisma)
     .inSingletonScope();
-  module
-    .bind(RoomRepositoryPort)
-    .to(RoomRepositoryPrisma)
-    .inSingletonScope();
-  module
-    .bind(ToolRepositoryPort)
-    .to(ToolRepositoryPrisma)
-    .inSingletonScope();
+  module.bind(RoomRepositoryPort).to(RoomRepositoryPrisma).inSingletonScope();
+  module.bind(ToolRepositoryPort).to(ToolRepositoryPrisma).inSingletonScope();
   module
     .bind(RoomEventRepositoryPort)
     .to(RoomEventRepositoryPrisma)

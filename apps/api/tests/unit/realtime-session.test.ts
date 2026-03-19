@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 
 // Lightweight fakes for ports (no mocking framework needed)
 function createFakes() {
@@ -11,7 +11,9 @@ function createFakes() {
   let terminateCalled = false;
 
   const callService = {
-    createCall: mock(() => Promise.resolve({ token: "t", expiresAt: new Date() })),
+    createCall: mock(() =>
+      Promise.resolve({ token: "t", expiresAt: new Date() }),
+    ),
     terminateCall: mock(() => {
       terminateCalled = true;
       return Promise.resolve();
@@ -100,13 +102,16 @@ describe("RealtimeSessionService", () => {
   describe("text events", () => {
     it("should publish text_delta on response.output_text.delta", async () => {
       const events = await fakes.service.processMessage(
-        { type: "response.output_text.delta", delta: "Hello " } as Schema["RealtimeServerEvent"],
+        {
+          type: "response.output_text.delta",
+          delta: "Hello ",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 
       expect(events).toHaveLength(0); // no client events to send back
       expect(fakes.publishedEvents).toHaveLength(1);
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "text_delta",
         text: "Hello ",
       });
@@ -114,11 +119,14 @@ describe("RealtimeSessionService", () => {
 
     it("should publish text_done on response.output_text.done", async () => {
       await fakes.service.processMessage(
-        { type: "response.output_text.done", text: "Hello world" } as Schema["RealtimeServerEvent"],
+        {
+          type: "response.output_text.done",
+          text: "Hello world",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "text_done",
         text: "Hello world",
       });
@@ -145,7 +153,9 @@ describe("RealtimeSessionService", () => {
 
       // Now audio buffer stopped should trigger terminate
       await fakes.service.processMessage(
-        { type: "output_audio_buffer.stopped" } as Schema["RealtimeServerEvent"],
+        {
+          type: "output_audio_buffer.stopped",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 
@@ -197,7 +207,9 @@ describe("RealtimeSessionService", () => {
 
       // After destroy, audio buffer stopped should NOT trigger terminate
       fakes.service.processMessage(
-        { type: "output_audio_buffer.stopped" } as Schema["RealtimeServerEvent"],
+        {
+          type: "output_audio_buffer.stopped",
+        } as Schema["RealtimeServerEvent"],
         ROOM,
       );
 

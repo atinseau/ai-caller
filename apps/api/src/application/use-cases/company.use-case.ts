@@ -19,4 +19,12 @@ export class CompanyUseCase {
   async list() {
     return this.companyRepository.getAllCompanies();
   }
+
+  async getById(id: string) {
+    return this.companyRepository.findById(id);
+  }
+
+  async delete(id: string) {
+    return this.companyRepository.deleteCompany(id);
+  }
 }

@@ -8,9 +8,7 @@ import { PRISMA_TOKEN } from "../prisma";
 
 @injectable()
 export class ToolRepositoryPrisma implements ToolRepositoryPort {
-  constructor(
-    @inject(PRISMA_TOKEN) private readonly prisma: PrismaClient,
-  ) {}
+  constructor(@inject(PRISMA_TOKEN) private readonly prisma: PrismaClient) {}
 
   async createToolInvoke(
     roomId: string,

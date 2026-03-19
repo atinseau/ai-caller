@@ -1,6 +1,6 @@
 import { renderHook, waitFor } from "@testing-library/react";
-import { http, HttpResponse } from "msw";
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { HttpResponse, http } from "msw";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { server } from "../msw/server";
 import { createWrapper } from "../test-utils";
@@ -15,7 +15,9 @@ vi.mock("@/infrastructure/auth", () => ({
 // Import after mock so vi.mocked() works correctly
 import { authClient } from "@/infrastructure/auth";
 
-const mockSession = (overrides?: Partial<{ isPending: boolean; data: unknown }>) =>
+const mockSession = (
+  overrides?: Partial<{ isPending: boolean; data: unknown }>,
+) =>
   vi.mocked(authClient.useSession).mockReturnValue({
     data: null,
     isPending: false,

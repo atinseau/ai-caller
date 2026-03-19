@@ -1,8 +1,8 @@
-import { useEffect, useRef } from "react";
 import { Bot, User } from "lucide-react";
-import type { ITranscriptMessage } from "@/shared/types/session.types";
-import { ScrollArea } from "@/shared/components/ui/scroll-area";
+import { useEffect, useRef } from "react";
 import { EmptyState } from "@/shared/components/feedback/EmptyState";
+import { ScrollArea } from "@/shared/components/ui/scroll-area";
+import type { ITranscriptMessage } from "@/shared/types/session.types";
 import { cn } from "@/shared/utils";
 
 interface TranscriptFeedProps {
@@ -27,11 +27,7 @@ function TranscriptMessage({ message }: { message: ITranscriptMessage }) {
             : "bg-muted text-muted-foreground",
         )}
       >
-        {isUser ? (
-          <User className="size-3.5" />
-        ) : (
-          <Bot className="size-3.5" />
-        )}
+        {isUser ? <User className="size-3.5" /> : <Bot className="size-3.5" />}
       </div>
       <div
         className={cn(
@@ -65,7 +61,7 @@ export function TranscriptFeed({ messages }: TranscriptFeedProps) {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages.length]);
+  }, []);
 
   if (messages.length === 0) {
     return (

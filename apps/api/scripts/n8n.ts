@@ -1,9 +1,14 @@
 // env.ts handles dotenv loading automatically
+
+import { N8nService } from "../src/application/services/n8n.service";
+import { N8nSanitizeService } from "../src/application/services/n8n-sanitize.service";
+import { env } from "../src/infrastructure/config/env";
 import { N8nClientAdapter } from "../src/infrastructure/n8n/n8n-client.adapter";
 import { N8nWorkflowFileStorageAdapter } from "../src/infrastructure/n8n/n8n-workflow-file-storage.adapter";
 import { InfisicalSecretAdapter } from "../src/infrastructure/secret/infisical-secret.adapter";
-import { N8nSanitizeService } from "../src/application/services/n8n-sanitize.service";
-import { N8nService } from "../src/application/services/n8n.service";
+
+// Fetch secrets from Infisical before parsing env (so all secrets are available)
+await env.init();
 
 // Initialize Infisical adapter
 const secretAdapter = new InfisicalSecretAdapter();
@@ -73,9 +78,13 @@ try {
       }
       const result = await service.push(args[0], args[1]);
       if (result.created) {
-        console.log(`Created workflow "${result.name}" on ${args[0]} (ID: ${result.id})`);
+        console.log(
+          `Created workflow "${result.name}" on ${args[0]} (ID: ${result.id})`,
+        );
       } else {
-        console.log(`Updated workflow "${result.name}" on ${args[0]} (ID: ${result.id})`);
+        console.log(
+          `Updated workflow "${result.name}" on ${args[0]} (ID: ${result.id})`,
+        );
       }
       console.log(`\nThe client must assign their credentials in the n8n UI.`);
       break;
@@ -97,7 +106,9 @@ try {
     case N8nCommand.COMPANIES: {
       const companies = await service.listCompanies();
       if (companies.length === 0) {
-        console.log("No companies registered. Use `bun n8n add` to register one.");
+        console.log(
+          "No companies registered. Use `bun n8n add` to register one.",
+        );
       } else {
         console.log("Companies with n8n API keys:\n");
         for (const name of companies) {

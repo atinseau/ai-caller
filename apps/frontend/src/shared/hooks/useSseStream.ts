@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-export type SseStatus = "idle" | "connecting" | "connected" | "error" | "closed";
+export type SseStatus =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "error"
+  | "closed";
 
 export function useSseStream<T>(url: string | null) {
   const [events, setEvents] = useState<T[]>([]);

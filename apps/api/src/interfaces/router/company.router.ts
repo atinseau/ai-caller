@@ -1,10 +1,12 @@
-import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
+import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { CompanyUseCase } from "@/application/use-cases/company.use-case";
+import { UserRole } from "@/generated/prisma/client";
 import { container } from "@/infrastructure/di/container";
 import { CreateCompanyRequestDto } from "../dtos/company/create-company-request.dto";
 import { CreateCompanyResponseDto } from "../dtos/company/create-company-response.dto";
 import { GetAllCompanyResponseDto } from "../dtos/company/get-all-company-response.dto";
+import { GetCompanyResponseDto } from "../dtos/company/get-company-response.dto";
 
 export const companyRouter = new OpenAPIHono();
 
@@ -39,10 +41,13 @@ companyRouter.openapi(createCompanyRoute, async (ctx) => {
 
   const company = await companyUseCase.create(dto);
 
-  return ctx.json({
-    message: "Create a new company",
-    companyId: company.id,
-  });
+  return ctx.json(
+    {
+      message: "Create a new company",
+      companyId: company.id,
+    },
+    201,
+  );
 });
 
 const getAllCompaniesRoute = createRoute({
@@ -66,4 +71,91 @@ companyRouter.openapi(getAllCompaniesRoute, async (ctx) => {
     message: "Get all companies",
     companies: await companyUseCase.list(),
   });
+});
+
+const getCompanyRoute = createRoute({
+  method: "get",
+  path: "/:id",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    200: {
+      description: "Company found",
+      content: {
+        "application/json": {
+          schema: GetCompanyResponseDto,
+        },
+      },
+    },
+    404: {
+      description: "Company not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+companyRouter.openapi(getCompanyRoute, async (ctx) => {
+  const companyUseCase = container.get(CompanyUseCase);
+  const { id } = ctx.req.valid("param");
+
+  const company = await companyUseCase.getById(id);
+  if (!company) {
+    return ctx.json({ message: "Company not found" }, 404);
+  }
+
+  return ctx.json({ company }, 200);
+});
+
+const deleteCompanyRoute = createRoute({
+  method: "delete",
+  path: "/:id",
+  request: {
+    params: z.object({ id: z.string() }),
+  },
+  responses: {
+    204: {
+      description: "Company deleted successfully",
+    },
+    403: {
+      description: "Forbidden",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+    404: {
+      description: "Company not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+companyRouter.openapi(deleteCompanyRoute, async (ctx) => {
+  // biome-ignore lint/suspicious/noExplicitAny: better-auth user injected by middleware
+  const user = (ctx as any).get("user") as { role: string };
+  if (user.role !== UserRole.ROOT) {
+    return ctx.json({ message: "Forbidden" }, 403);
+  }
+
+  const companyUseCase = container.get(CompanyUseCase);
+  const { id } = ctx.req.valid("param");
+
+  const company = await companyUseCase.getById(id);
+  if (!company) {
+    return ctx.json({ message: "Company not found" }, 404);
+  }
+
+  await companyUseCase.delete(id);
+
+  return new Response(null, { status: 204 });
 });

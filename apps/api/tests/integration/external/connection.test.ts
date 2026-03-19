@@ -69,8 +69,8 @@ describe("Connection Tests", () => {
         };
         const tools = data.result.tools;
         expect(tools).toHaveLength(2);
-        expect(tools[0]!.name).toBe("search_customer");
-        expect(tools[1]!.name).toBe("get_weather");
+        expect(tools[0]?.name).toBe("search_customer");
+        expect(tools[1]?.name).toBe("get_weather");
       } finally {
         server.stop();
       }
@@ -99,7 +99,7 @@ describe("Connection Tests", () => {
         const data = (await res.json()) as {
           result: { content: { type: string; text: string }[] };
         };
-        const parsed = JSON.parse(data.result.content[0]!.text);
+        const parsed = JSON.parse(data.result.content[0]?.text);
         expect(parsed.name).toBe("John Doe");
         expect(parsed.email).toBe("john@example.com");
       } finally {
@@ -123,8 +123,8 @@ describe("Connection Tests", () => {
         await client.disconnect();
 
         expect(tools).toHaveLength(2);
-        expect(tools[0]!.name).toBe("search_customer");
-        expect(tools[1]!.name).toBe("get_weather");
+        expect(tools[0]?.name).toBe("search_customer");
+        expect(tools[1]?.name).toBe("get_weather");
       } finally {
         server.stop();
       }

@@ -1,14 +1,17 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 
 function createFakes() {
   const publishedEvents: { roomId: string; event: TextStreamEvent }[] = [];
-  const persistedEvents: { roomId: string; type: string; payload: unknown }[] = [];
+  const persistedEvents: { roomId: string; type: string; payload: unknown }[] =
+    [];
 
   const callService = {
-    createCall: mock(() => Promise.resolve({ token: "t", expiresAt: new Date() })),
+    createCall: mock(() =>
+      Promise.resolve({ token: "t", expiresAt: new Date() }),
+    ),
     terminateCall: mock(() => Promise.resolve()),
   };
 
@@ -38,7 +41,9 @@ function createFakes() {
     close: () => {},
   };
 
-  const subAgent = { execute: mock(() => Promise.resolve({ summary: "done" })) };
+  const subAgent = {
+    execute: mock(() => Promise.resolve({ summary: "done" })),
+  };
 
   const roomEventRepository = {
     create: mock((roomId: string, type: string, payload: unknown) => {
@@ -93,7 +98,7 @@ describe("RealtimeSessionService — audio transcript events", () => {
       );
 
       expect(fakes.publishedEvents).toHaveLength(1);
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "agent_transcript_delta",
         text: "Bon",
       });
@@ -123,7 +128,7 @@ describe("RealtimeSessionService — audio transcript events", () => {
         ROOM,
       );
 
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "agent_transcript_delta",
         text: "",
       });
@@ -133,12 +138,15 @@ describe("RealtimeSessionService — audio transcript events", () => {
   describe("response.audio_transcript.done", () => {
     it("publishes agent_transcript_done to textStream", async () => {
       await fakes.service.processMessage(
-        { type: "response.audio_transcript.done", transcript: "Bonjour!" } as never,
+        {
+          type: "response.audio_transcript.done",
+          transcript: "Bonjour!",
+        } as never,
         ROOM,
       );
 
       expect(fakes.publishedEvents).toHaveLength(1);
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "agent_transcript_done",
         text: "Bonjour!",
       });
@@ -146,7 +154,10 @@ describe("RealtimeSessionService — audio transcript events", () => {
 
     it("persists AGENT_TRANSCRIPT event to DB", async () => {
       await fakes.service.processMessage(
-        { type: "response.audio_transcript.done", transcript: "Au revoir!" } as never,
+        {
+          type: "response.audio_transcript.done",
+          transcript: "Au revoir!",
+        } as never,
         ROOM,
       );
 
@@ -164,7 +175,7 @@ describe("RealtimeSessionService — audio transcript events", () => {
         ROOM,
       );
 
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "agent_transcript_done",
         text: "",
       });
@@ -182,7 +193,7 @@ describe("RealtimeSessionService — audio transcript events", () => {
       );
 
       expect(fakes.publishedEvents).toHaveLength(1);
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "user_transcript",
         text: "Allô, c'est moi",
       });
@@ -207,11 +218,13 @@ describe("RealtimeSessionService — audio transcript events", () => {
 
     it("handles missing transcript field gracefully", async () => {
       await fakes.service.processMessage(
-        { type: "conversation.item.input_audio_transcription.completed" } as never,
+        {
+          type: "conversation.item.input_audio_transcription.completed",
+        } as never,
         ROOM,
       );
 
-      expect(fakes.publishedEvents[0]!.event).toEqual({
+      expect(fakes.publishedEvents[0]?.event).toEqual({
         type: "user_transcript",
         text: "",
       });

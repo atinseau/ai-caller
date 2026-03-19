@@ -1,13 +1,13 @@
 import {
+  afterAll,
+  beforeAll,
   describe,
   expect,
   it,
-  beforeAll,
-  afterAll,
   setDefaultTimeout,
 } from "bun:test";
-import { N8nClientAdapter } from "@/infrastructure/n8n/n8n-client.adapter";
 import type { N8nClient } from "@/domain/models/n8n.model";
+import { N8nClientAdapter } from "@/infrastructure/n8n/n8n-client.adapter";
 
 const hasN8n = !!process.env.N8N_URL && !!process.env.N8N_API_KEY;
 
@@ -75,7 +75,7 @@ describe.skipIf(!hasN8n)("N8nClientAdapter", () => {
     const found = workflows.find((w) => w.id === createdWorkflowId);
 
     expect(found).toBeDefined();
-    expect(found!.name).toBe(testWorkflow.name);
+    expect(found?.name).toBe(testWorkflow.name);
   });
 
   it("updates the workflow", async () => {
@@ -96,9 +96,9 @@ describe.skipIf(!hasN8n)("N8nClientAdapter", () => {
     await client.deleteWorkflow(createdWorkflowId);
 
     // Verify it's gone
-    await expect(
-      client.getWorkflow(createdWorkflowId),
-    ).rejects.toThrow("Resource not found");
+    await expect(client.getWorkflow(createdWorkflowId)).rejects.toThrow(
+      "Resource not found",
+    );
 
     // Prevent afterAll from trying to delete again
     createdWorkflowId = "";
@@ -112,8 +112,8 @@ describe.skipIf(!hasN8n)("N8nClientAdapter", () => {
   });
 
   it("throws on non-existent workflow", async () => {
-    await expect(
-      client.getWorkflow("non-existent-id"),
-    ).rejects.toThrow("Resource not found");
+    await expect(client.getWorkflow("non-existent-id")).rejects.toThrow(
+      "Resource not found",
+    );
   });
 });

@@ -45,8 +45,7 @@ function NavItem({
 
 export function AppSidebar() {
   const userState = useCurrentUser();
-  const user =
-    userState.status === "authenticated" ? userState.user : null;
+  const user = userState.status === "authenticated" ? userState.user : null;
 
   const initials = user?.name
     .split(" ")
@@ -68,7 +67,9 @@ export function AppSidebar() {
             <Phone className="size-4" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm font-semibold leading-none">AI Caller</span>
+            <span className="text-sm font-semibold leading-none">
+              AI Caller
+            </span>
             <span className="text-[10px] text-muted-foreground">Platform</span>
           </div>
         </div>
@@ -82,13 +83,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {user?.role === UserRoleEnum.ROOT ? (
-                <>
-                  <NavItem
-                    to="/dashboard/root"
-                    icon={Building2}
-                    label="Companies"
-                  />
-                </>
+                <NavItem
+                  to="/dashboard/root"
+                  icon={Building2}
+                  label="Companies"
+                />
               ) : (
                 <NavItem
                   to="/dashboard"

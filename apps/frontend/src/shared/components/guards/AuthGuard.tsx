@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Navigate } from "react-router";
 import { LoadingSpinner } from "@/shared/components/feedback/LoadingSpinner";
+import type { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
-import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 
 interface AuthGuardProps {
   children: ReactNode;

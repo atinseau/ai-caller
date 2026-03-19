@@ -1,8 +1,8 @@
 import { Navigate } from "react-router";
+import { DebugSessionPage } from "@/modules/debug-session/ui/pages/DebugSessionPage";
 import { AuthGuard } from "@/shared/components/guards/AuthGuard";
 import { AppShell } from "@/shared/components/layout/AppShell";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
-import { DebugSessionPage } from "@/modules/debug-session/ui/pages/DebugSessionPage";
 
 function UserSessionInner() {
   const state = useCurrentUser();

@@ -11,15 +11,9 @@ import { N8nWorkflowFileStorageAdapter } from "@/infrastructure/n8n/n8n-workflow
 import { InfisicalSecretAdapter } from "@/infrastructure/secret/infisical-secret.adapter";
 
 export const gatewayModule = new ContainerModule((module) => {
-  module
-    .bind(RealtimeGatewayPort)
-    .to(OpenAIRealtimeGateway)
-    .inSingletonScope();
+  module.bind(RealtimeGatewayPort).to(OpenAIRealtimeGateway).inSingletonScope();
   module.bind(McpClientPort).to(McpClientAdapter).inSingletonScope();
-  module
-    .bind(SecretManagerPort)
-    .to(InfisicalSecretAdapter)
-    .inSingletonScope();
+  module.bind(SecretManagerPort).to(InfisicalSecretAdapter).inSingletonScope();
   module.bind(N8nClientPort).to(N8nClientAdapter).inSingletonScope();
   module
     .bind(N8nWorkflowStoragePort)

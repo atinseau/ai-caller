@@ -1,10 +1,10 @@
 import { Activity, Wrench } from "lucide-react";
-import type { IToolInvoke } from "@/shared/types/session.types";
 import { JsonViewer } from "@/shared/components/data/JsonViewer";
 import { EmptyState } from "@/shared/components/feedback/EmptyState";
 import { StatusBadge } from "@/shared/components/feedback/StatusBadge";
 import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import { Separator } from "@/shared/components/ui/separator";
+import type { IToolInvoke } from "@/shared/types/session.types";
 
 interface LogsSidebarProps {
   toolInvokes: IToolInvoke[];
@@ -72,9 +72,7 @@ export function LogsSidebar({ toolInvokes }: LogsSidebarProps) {
                 ))}
               </>
             )}
-            {runningTools.length > 0 && doneTools.length > 0 && (
-              <Separator />
-            )}
+            {runningTools.length > 0 && doneTools.length > 0 && <Separator />}
             {doneTools.length > 0 && (
               <>
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">

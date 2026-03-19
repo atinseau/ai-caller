@@ -1,6 +1,6 @@
 import type { Container } from "inversify";
-import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import type { ICompanyModel } from "@/domain/models/company.model";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
 import { MockMcpServer } from "./mock-mcp-server";
 
 export const mockMcpServer = new MockMcpServer();

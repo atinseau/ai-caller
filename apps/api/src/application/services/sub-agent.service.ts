@@ -2,10 +2,10 @@ import { inject, injectable } from "inversify";
 import { LoggerPort } from "@/domain/ports/logger.port";
 import { McpClientPort } from "@/domain/ports/mcp-client.port";
 import { PromptPort } from "@/domain/ports/prompt.port";
-import {
+import type {
+  SubAgentConfig,
   SubAgentPort,
-  type SubAgentConfig,
-  type SubAgentResult,
+  SubAgentResult,
 } from "@/domain/ports/sub-agent.port";
 import { TextStreamPort } from "@/domain/ports/text-stream.port";
 import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
@@ -94,21 +94,18 @@ export class SubAgentService implements SubAgentPort {
       result: JSON.stringify(result, null, 2),
     });
 
-    const response = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${env.get("OPENAI_API_KEY")}`,
-        },
-        body: JSON.stringify({
-          model,
-          messages: [{ role: "user", content: userPrompt }],
-          max_tokens: 300,
-        }),
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${env.get("OPENAI_API_KEY")}`,
       },
-    );
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: userPrompt }],
+        max_tokens: 300,
+      }),
+    });
 
     const data = (await response.json()) as {
       choices?: { message?: { content?: string } }[];

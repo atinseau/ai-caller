@@ -20,4 +20,9 @@ export abstract class CompanyRepositoryPort {
    * Retrieve all companies
    */
   abstract getAllCompanies(): Promise<ICompanyModel[]>;
+
+  /**
+   * Delete a company by id
+   */
+  abstract deleteCompany(id: string): Promise<void>;
 }

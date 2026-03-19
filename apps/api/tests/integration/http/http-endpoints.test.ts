@@ -1,23 +1,17 @@
-import {
-  describe,
-  expect,
-  it,
-  beforeAll,
-  afterAll,
-} from "bun:test";
-import { app } from "@/interfaces/application";
-import { container } from "@/infrastructure/di/container";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { CompanyUseCase } from "@/application/use-cases/company.use-case";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
+import { container } from "@/infrastructure/di/container";
+import { app } from "@/interfaces/application";
+import {
+  cleanupTestSession,
+  createTestSession,
+} from "@/tests/helpers/auth-session";
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
-import {
-  createTestSession,
-  cleanupTestSession,
-} from "@/tests/helpers/auth-session";
 
 /**
  * HTTP endpoint tests use the PRODUCTION container because the Hono app
@@ -94,7 +88,9 @@ describe("HTTP Endpoints", () => {
 
       // Cleanup
       const { prisma } = await import("@/infrastructure/database/prisma");
-      await prisma.company.delete({ where: { id: data.companyId } }).catch(() => {});
+      await prisma.company
+        .delete({ where: { id: data.companyId } })
+        .catch(() => {});
     });
   });
 
@@ -119,7 +115,9 @@ describe("HTTP Endpoints", () => {
       });
 
       expect(res.ok).toBe(true);
-      const data = (await res.json()) as { data: { id: string; modality: string } };
+      const data = (await res.json()) as {
+        data: { id: string; modality: string };
+      };
       expect(data.data.modality).toBe("TEXT");
       createdRoomIds.push(data.data.id);
     });
@@ -132,7 +130,9 @@ describe("HTTP Endpoints", () => {
       });
 
       expect(res.ok).toBe(true);
-      const data = (await res.json()) as { data: { modality: string; id: string } };
+      const data = (await res.json()) as {
+        data: { modality: string; id: string };
+      };
       expect(data.data.modality).toBe("AUDIO");
       createdRoomIds.push(data.data.id);
     });
@@ -164,7 +164,9 @@ describe("HTTP Endpoints", () => {
         headers: jsonAuthHeaders(),
         body: JSON.stringify({ companyId: testCompanyId, modality: "AUDIO" }),
       });
-      const { data: room } = (await createRes.json()) as { data: { id: string } };
+      const { data: room } = (await createRes.json()) as {
+        data: { id: string };
+      };
       createdRoomIds.push(room.id);
 
       const res = await app.request(
@@ -185,7 +187,9 @@ describe("HTTP Endpoints", () => {
         headers: jsonAuthHeaders(),
         body: JSON.stringify({ companyId: testCompanyId, modality: "TEXT" }),
       });
-      const { data: room } = (await createRes.json()) as { data: { id: string } };
+      const { data: room } = (await createRes.json()) as {
+        data: { id: string };
+      };
       createdRoomIds.push(room.id);
 
       const res = await app.request(`/api/v1/room/${room.id}/messages`, {

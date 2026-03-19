@@ -12,13 +12,13 @@ class OtherEvent {
 describe("InMemoryEventBus", () => {
   it("should publish and receive events", async () => {
     const bus = new InMemoryEventBus();
-    const handler = mock((event: TestEvent) => {});
+    const handler = mock((_event: TestEvent) => {});
 
     bus.subscribe(TestEvent, handler);
     await bus.publish(new TestEvent("hello"));
 
     expect(handler).toHaveBeenCalledTimes(1);
-    expect(handler.mock.calls[0]![0].payload).toBe("hello");
+    expect(handler.mock.calls[0]?.[0].payload).toBe("hello");
   });
 
   it("should support multiple subscribers", async () => {

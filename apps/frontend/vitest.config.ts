@@ -1,6 +1,6 @@
 import react from "@vitejs/plugin-react";
-import { defineConfig } from "vitest/config";
 import tsconfigPaths from "vite-tsconfig-paths";
+import { defineConfig } from "vitest/config";
 
 /**
  * Separate vitest config — does NOT import vite.config.ts to avoid
@@ -20,11 +20,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       include: ["src/**/*.{ts,tsx}"],
-      exclude: [
-        "tests/**",
-        "src/app/routes.ts",
-        "src/**/*.d.ts",
-      ],
+      exclude: ["tests/**", "src/app/routes.ts", "src/**/*.d.ts"],
     },
   },
 });

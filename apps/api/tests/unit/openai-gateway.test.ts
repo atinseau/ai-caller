@@ -1,4 +1,4 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it } from "bun:test";
 
 describe("OpenAI Realtime Gateway — edge cases", () => {
   it("openRoomChannel should return early when audio room has no callId", async () => {
@@ -37,9 +37,9 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
   });
 
   it("closeRoomChannel should not crash on nonexistent room", () => {
-    const { OpenAIRealtimeGateway } = require(
-      "@/infrastructure/gateway/openai-realtime.gateway",
-    );
+    const {
+      OpenAIRealtimeGateway,
+    } = require("@/infrastructure/gateway/openai-realtime.gateway");
 
     const sessionService = {
       initSession: () => {},
@@ -53,9 +53,9 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
   });
 
   it("sendToRoom should not crash on nonexistent room", () => {
-    const { OpenAIRealtimeGateway } = require(
-      "@/infrastructure/gateway/openai-realtime.gateway",
-    );
+    const {
+      OpenAIRealtimeGateway,
+    } = require("@/infrastructure/gateway/openai-realtime.gateway");
 
     const sessionService = {
       initSession: () => {},

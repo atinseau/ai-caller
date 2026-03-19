@@ -1,7 +1,9 @@
-import { Building2, ExternalLink, Play } from "lucide-react";
+import { Building2, ExternalLink, Plus, Settings } from "lucide-react";
+import { useState } from "react";
 import { useNavigate } from "react-router";
 import { EmptyState } from "@/shared/components/feedback/EmptyState";
 import { LoadingSpinner } from "@/shared/components/feedback/LoadingSpinner";
+import { StatusBadge } from "@/shared/components/feedback/StatusBadge";
 import { PageContainer } from "@/shared/components/layout/PageContainer";
 import { PageHeader } from "@/shared/components/layout/PageHeader";
 import { Button } from "@/shared/components/ui/button";
@@ -14,16 +16,24 @@ import {
   TableRow,
 } from "@/shared/components/ui/table";
 import { useCompanies } from "@/shared/hooks/useCompanies";
+import { CreateCompanyDialog } from "../components/CreateCompanyDialog";
 
 export function RootDashboardPage() {
   const { companies, isLoading } = useCompanies();
   const navigate = useNavigate();
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <PageContainer>
       <PageHeader
         title="Companies"
         description="Manage onboarded companies and start debug sessions."
+        actions={
+          <Button className="gap-2" onClick={() => setDialogOpen(true)}>
+            <Plus className="size-4" />
+            Add company
+          </Button>
+        }
       />
 
       {isLoading ? (
@@ -41,6 +51,7 @@ export function RootDashboardPage() {
               <TableRow>
                 <TableHead>Name</TableHead>
                 <TableHead>MCP URL</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="w-[120px]" />
               </TableRow>
@@ -57,6 +68,9 @@ export function RootDashboardPage() {
                       </span>
                     </span>
                   </TableCell>
+                  <TableCell>
+                    <StatusBadge status={company.status} />
+                  </TableCell>
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(company.createdAt).toLocaleDateString()}
                   </TableCell>
@@ -66,11 +80,11 @@ export function RootDashboardPage() {
                       variant="outline"
                       className="gap-1.5"
                       onClick={() =>
-                        navigate(`/dashboard/root/session/${company.id}`)
+                        navigate(`/dashboard/company/${company.id}`)
                       }
                     >
-                      <Play className="size-3" />
-                      Debug
+                      <Settings className="size-3" />
+                      Configure
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -79,6 +93,8 @@ export function RootDashboardPage() {
           </Table>
         </div>
       )}
+
+      <CreateCompanyDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </PageContainer>
   );
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
-import { RoomReadyHandler } from "@/application/handlers/room-ready.handler";
 import { RoomReadyEvent } from "@/application/events/room-ready.event";
+import { RoomReadyHandler } from "@/application/handlers/room-ready.handler";
 
 describe("RoomReadyHandler", () => {
   it("should fetch room and open gateway channel on RoomReadyEvent", async () => {

@@ -11,7 +11,9 @@ interface UseSessionStreamOptions {
   roomId: string | null;
 }
 
-function buildTranscriptFromEvent(event: IRoomEvent): ITranscriptMessage | null {
+function buildTranscriptFromEvent(
+  event: IRoomEvent,
+): ITranscriptMessage | null {
   if (event.type === "USER_TRANSCRIPT") {
     return {
       id: event.id,
@@ -42,7 +44,9 @@ function buildTranscriptFromEvent(event: IRoomEvent): ITranscriptMessage | null 
 export function useSessionStream({ roomId }: UseSessionStreamOptions) {
   const [transcripts, setTranscripts] = useState<ITranscriptMessage[]>([]);
   const [toolInvokes, setToolInvokes] = useState<IToolInvoke[]>([]);
-  const [sseStatus, setSseStatus] = useState<"idle" | "connecting" | "connected" | "error">("idle");
+  const [sseStatus, setSseStatus] = useState<
+    "idle" | "connecting" | "connected" | "error"
+  >("idle");
   const esRef = useRef<EventSource | null>(null);
   const agentDeltaBuffer = useRef<Map<string, string>>(new Map());
 

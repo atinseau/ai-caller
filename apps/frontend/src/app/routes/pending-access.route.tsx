@@ -1,7 +1,7 @@
 import { Clock, LogOut } from "lucide-react";
 import { authClient } from "@/infrastructure/auth";
-import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { Button } from "@/shared/components/ui/button";
+import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 
 export default function PendingAccessRoute() {
   const state = useCurrentUser();

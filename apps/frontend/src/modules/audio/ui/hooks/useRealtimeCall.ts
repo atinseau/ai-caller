@@ -16,7 +16,12 @@ type CallState = {
 type CallAction =
   | { type: "START" }
   | { type: "AUDIO_READY"; audioStream: MediaStream }
-  | { type: "CONNECTED"; pc: RTCPeerConnection; dc: RTCDataChannel; roomId: string }
+  | {
+      type: "CONNECTED";
+      pc: RTCPeerConnection;
+      dc: RTCDataChannel;
+      roomId: string;
+    }
   | { type: "STOP" }
   | { type: "ERROR" }
   | { type: "MUTE_TOGGLE" };

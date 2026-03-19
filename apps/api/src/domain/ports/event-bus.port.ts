@@ -5,7 +5,9 @@ export type EventHandler<TEvent extends Class> = (
 ) => void | Promise<void>;
 
 export abstract class EventBusPort {
-  abstract publish<TEvent extends InstanceType<Class>>(event: TEvent): Promise<void>;
+  abstract publish<TEvent extends InstanceType<Class>>(
+    event: TEvent,
+  ): Promise<void>;
   abstract subscribe<TEvent extends Class>(
     event: TEvent,
     handler: EventHandler<TEvent>,

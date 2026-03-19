@@ -7,9 +7,7 @@ import { PRISMA_TOKEN } from "../prisma";
 
 @injectable()
 export class RoomRepositoryPrisma implements RoomRepositoryPort {
-  constructor(
-    @inject(PRISMA_TOKEN) private readonly prisma: PrismaClient,
-  ) {}
+  constructor(@inject(PRISMA_TOKEN) private readonly prisma: PrismaClient) {}
 
   async createRoom(
     companyId: string,

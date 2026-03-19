@@ -1,19 +1,19 @@
-import { describe, expect, it, beforeAll, afterAll } from "bun:test";
-import { app } from "@/interfaces/application";
-import { container } from "@/infrastructure/di/container";
+import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { CompanyUseCase } from "@/application/use-cases/company.use-case";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
+import { container } from "@/infrastructure/di/container";
+import { app } from "@/interfaces/application";
 import {
+  cleanupTestSession,
+  createTestSession,
+} from "@/tests/helpers/auth-session";
+import {
+  mockMcpServer,
   setupTestEnvironment,
   teardownTestEnvironment,
-  mockMcpServer,
 } from "@/tests/helpers/setup";
-import {
-  createTestSession,
-  cleanupTestSession,
-} from "@/tests/helpers/auth-session";
 
 let authCookie: string;
 let authUserId: string;
@@ -44,7 +44,12 @@ beforeAll(async () => {
 
   // Create a room for our event tests
   const roomRepo = container.get(RoomRepositoryPort);
-  const room = await roomRepo.createRoom(testCompanyId, `token-events-${Date.now()}`, undefined, "TEXT");
+  const room = await roomRepo.createRoom(
+    testCompanyId,
+    `token-events-${Date.now()}`,
+    undefined,
+    "TEXT",
+  );
   testRoomId = room.id;
 });
 

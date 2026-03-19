@@ -1,12 +1,11 @@
 import { randomUUID } from "node:crypto";
-import { setSignedCookie } from "hono/cookie";
 import { Hono } from "hono";
+import { setSignedCookie } from "hono/cookie";
 import { prisma } from "@/infrastructure/database/prisma";
 
 // better-auth uses DEFAULT_SECRET when no BETTER_AUTH_SECRET env var is set
 const AUTH_SECRET =
-  process.env.BETTER_AUTH_SECRET ??
-  "better-auth-secret-12345678901234567890";
+  process.env.BETTER_AUTH_SECRET ?? "better-auth-secret-12345678901234567890";
 
 /**
  * Creates a real user + session in the DB and returns a properly signed
@@ -72,12 +71,7 @@ async function buildSignedCookie(token: string): Promise<string> {
   let cookieValue = "";
 
   app.get("/", async (c) => {
-    await setSignedCookie(
-      c,
-      "better-auth.session_token",
-      token,
-      AUTH_SECRET,
-    );
+    await setSignedCookie(c, "better-auth.session_token", token, AUTH_SECRET);
     return c.text("ok");
   });
 

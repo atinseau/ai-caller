@@ -1,5 +1,5 @@
-import { cn } from "@/shared/utils";
 import { Loader2 } from "lucide-react";
+import { cn } from "@/shared/utils";
 
 type StatusVariant =
   | "RUNNING"
@@ -9,7 +9,9 @@ type StatusVariant =
   | "CONNECTING"
   | "IDLE"
   | "ERROR"
-  | "TEST";
+  | "TEST"
+  | "ACTIVE"
+  | "INACTIVE";
 
 const variantStyles: Record<StatusVariant, string> = {
   RUNNING: "bg-yellow-500/15 text-yellow-600 border-yellow-500/30",
@@ -20,6 +22,8 @@ const variantStyles: Record<StatusVariant, string> = {
   IDLE: "bg-muted text-muted-foreground border-border",
   ERROR: "bg-red-500/15 text-red-600 border-red-500/30",
   TEST: "bg-orange-500/15 text-orange-600 border-orange-500/30",
+  ACTIVE: "bg-green-500/15 text-green-600 border-green-500/30",
+  INACTIVE: "bg-muted text-muted-foreground border-border",
 };
 
 const variantLabels: Record<StatusVariant, string> = {
@@ -31,6 +35,8 @@ const variantLabels: Record<StatusVariant, string> = {
   IDLE: "Idle",
   ERROR: "Error",
   TEST: "Test",
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
 };
 
 interface StatusBadgeProps {

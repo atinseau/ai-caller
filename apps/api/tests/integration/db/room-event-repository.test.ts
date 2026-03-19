@@ -1,14 +1,14 @@
-import { describe, expect, it, beforeEach, afterEach } from "bun:test";
+import { afterEach, beforeEach, describe, expect, it } from "bun:test";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { PRISMA_TOKEN } from "@/infrastructure/database/prisma";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { createTestContext } from "@/tests/helpers/test-context";
 import {
-  mockMcpServer,
   createTestCompany,
+  mockMcpServer,
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
+import { createTestContext } from "@/tests/helpers/test-context";
 
 const ctx = createTestContext();
 
@@ -67,14 +67,16 @@ describe("RoomEventRepositoryPrisma", () => {
     const events = await repo.findByRoomId(room.id);
 
     expect(events).toHaveLength(3);
-    expect(events[0]!.type).toBe("USER_TRANSCRIPT");
-    expect(events[1]!.type).toBe("AGENT_TRANSCRIPT");
-    expect(events[2]!.type).toBe("TOOL_INVOKE_CREATED");
+    expect(events[0]?.type).toBe("USER_TRANSCRIPT");
+    expect(events[1]?.type).toBe("AGENT_TRANSCRIPT");
+    expect(events[2]?.type).toBe("TOOL_INVOKE_CREATED");
   });
 
   it("findByRoomId returns empty array for unknown roomId", async () => {
     const repo = ctx.container.get(RoomEventRepositoryPort);
-    const events = await repo.findByRoomId("00000000-0000-0000-0000-000000000000");
+    const events = await repo.findByRoomId(
+      "00000000-0000-0000-0000-000000000000",
+    );
     expect(events).toEqual([]);
   });
 
@@ -93,7 +95,7 @@ describe("RoomEventRepositoryPrisma", () => {
     await repo.create(room.id, "TOOL_INVOKE_CREATED", payload);
     const [event] = await repo.findByRoomId(room.id);
 
-    expect(event!.payload).toMatchObject(payload);
+    expect(event?.payload).toMatchObject(payload);
   });
 
   it("scopes results to the given roomId only", async () => {
@@ -110,7 +112,7 @@ describe("RoomEventRepositoryPrisma", () => {
 
     expect(room1Events).toHaveLength(1);
     expect(room2Events).toHaveLength(1);
-    expect(room1Events[0]!.payload).toMatchObject({ delta: "a" });
-    expect(room2Events[0]!.payload).toMatchObject({ delta: "b" });
+    expect(room1Events[0]?.payload).toMatchObject({ delta: "a" });
+    expect(room2Events[0]?.payload).toMatchObject({ delta: "b" });
   });
 });

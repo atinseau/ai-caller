@@ -1,5 +1,5 @@
-import type { ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import type { ReactNode } from "react";
 
 /**
  * Creates a fresh QueryClient + wrapper component for each test.
@@ -13,9 +13,9 @@ export function createWrapper() {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        retry: false,        // don't retry on failure in tests
-        staleTime: 0,        // always refetch
-        gcTime: 0,           // don't cache between tests
+        retry: false, // don't retry on failure in tests
+        staleTime: 0, // always refetch
+        gcTime: 0, // don't cache between tests
       },
     },
   });

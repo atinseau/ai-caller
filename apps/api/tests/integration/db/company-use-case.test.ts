@@ -1,10 +1,18 @@
-import { describe, expect, it, beforeAll, beforeEach, afterAll, afterEach } from "bun:test";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "bun:test";
 import { CompanyUseCase } from "@/application/use-cases/company.use-case";
-import { createTestContext } from "@/tests/helpers/test-context";
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
+import { createTestContext } from "@/tests/helpers/test-context";
 
 beforeAll(async () => {
   await setupTestEnvironment();

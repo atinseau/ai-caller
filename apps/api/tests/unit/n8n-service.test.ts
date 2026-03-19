@@ -59,7 +59,7 @@ describe("N8nService", () => {
 
       const workflows = await service.listWorkflows();
       expect(workflows).toHaveLength(1);
-      expect(workflows[0]!.name).toBe("WF1");
+      expect(workflows[0]?.name).toBe("WF1");
     });
 
     it("lists workflows from a named company", async () => {

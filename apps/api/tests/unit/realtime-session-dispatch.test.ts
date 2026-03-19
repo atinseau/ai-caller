@@ -1,8 +1,8 @@
-import { describe, expect, it, beforeEach, mock } from "bun:test";
+import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 import type { IRoomModel } from "@/domain/models/room.model";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
 
 function createFakes() {
   const publishedEvents: TextStreamEvent[] = [];
@@ -205,7 +205,7 @@ describe("RealtimeSessionService — sub-agent dispatch", () => {
     );
 
     expect(fakes.toolRepository.createToolInvoke).toHaveBeenCalled();
-    expect(fakes.createdInvokes[0]![2]).toBe("search_customer");
+    expect(fakes.createdInvokes[0]?.[2]).toBe("search_customer");
   });
 
   it("should call subAgent.execute for MCP-backed function calls", async () => {

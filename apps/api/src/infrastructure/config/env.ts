@@ -3,12 +3,15 @@ import { Environment } from "@/domain/enums/environment.enum";
 
 // Load .env only in non-production environments
 // Uses require() to avoid ESM module graph issues with circular imports
-const environment = (process.env.ENVIRONMENT as Environment) ?? Environment.LOCAL;
+const environment =
+  (process.env.ENVIRONMENT as Environment) ?? Environment.LOCAL;
 if (environment !== Environment.PROD) {
   const { resolve } = require("node:path");
   const { config } = require("dotenv");
   const { expand } = require("dotenv-expand");
-  expand(config({ path: resolve(import.meta.dir, "../../../.env"), quiet: true }));
+  expand(
+    config({ path: resolve(import.meta.dir, "../../../.env"), quiet: true }),
+  );
 }
 
 const envDto = z.object({

@@ -1,30 +1,30 @@
 import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
   describe,
   expect,
   it,
-  beforeAll,
-  beforeEach,
-  afterAll,
-  afterEach,
   setDefaultTimeout,
 } from "bun:test";
 
 setDefaultTimeout(30_000);
 
-import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
 import { SubAgentService } from "@/application/services/sub-agent.service";
+import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
+import { CallServicePort } from "@/domain/services/call-service.port";
 import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
-import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream";
 import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter";
-import { createTestContext } from "@/tests/helpers/test-context";
+import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream";
 import {
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
-import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
+import { createTestContext } from "@/tests/helpers/test-context";
 
 let mcpUrl: string;
 
@@ -109,12 +109,14 @@ describe("SubAgentService (real OpenAI chat + mock MCP)", () => {
 
     expect(
       events.some(
-        (e) => e.type === "tool_status" && "status" in e && e.status === "RUNNING",
+        (e) =>
+          e.type === "tool_status" && "status" in e && e.status === "RUNNING",
       ),
     ).toBe(true);
     expect(
       events.some(
-        (e) => e.type === "tool_status" && "status" in e && e.status === "COMPLETED",
+        (e) =>
+          e.type === "tool_status" && "status" in e && e.status === "COMPLETED",
       ),
     ).toBe(true);
   });

@@ -11,6 +11,7 @@ describe("CompanyMapper", () => {
       mcpUrl: "http://mcp.test",
       createdAt: new Date("2025-01-01"),
       updatedAt: new Date("2025-01-02"),
+      status: "INACTIVE" as const,
     };
 
     const model = CompanyMapper.toModel(prismaCompany);

@@ -1,5 +1,5 @@
 import { Container } from "inversify";
-import { prisma, PRISMA_TOKEN } from "@/infrastructure/database/prisma";
+import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma";
 import {
   eventsModule,
   HANDLERS,

@@ -19,5 +19,5 @@ try {
   process.exit(1);
 }
 
-export { prisma };
 export type { PrismaClient };
+export { prisma };

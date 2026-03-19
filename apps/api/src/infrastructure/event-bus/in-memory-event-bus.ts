@@ -1,8 +1,5 @@
 import { injectable } from "inversify";
-import type {
-  EventBusPort,
-  EventHandler,
-} from "@/domain/ports/event-bus.port";
+import type { EventBusPort, EventHandler } from "@/domain/ports/event-bus.port";
 import type { Class } from "@/types";
 
 @injectable()
@@ -10,7 +7,9 @@ export class InMemoryEventBus implements EventBusPort {
   // biome-ignore lint/suspicious/noExplicitAny: Handling generic event types
   private readonly handlers: Map<Class, Set<EventHandler<any>>> = new Map();
 
-  async publish<TEvent extends InstanceType<Class>>(event: TEvent): Promise<void> {
+  async publish<TEvent extends InstanceType<Class>>(
+    event: TEvent,
+  ): Promise<void> {
     const handlers = this.handlers.get(
       Object.getPrototypeOf(event).constructor,
     );

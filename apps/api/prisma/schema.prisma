@@ -89,13 +89,19 @@ model Verification {
 // ----------------------------------
 //
 
+enum CompanyStatus {
+  ACTIVE
+  INACTIVE
+}
+
 model Company {
-  id        String   @id @default(uuid())
-  name      String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String        @id @default(uuid())
+  name      String        @unique
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
 
   mcpUrl String
+  status CompanyStatus @default(INACTIVE)
 
   rooms     Room[]
   users     User[]

@@ -1,7 +1,7 @@
-import { describe, expect, it, mock, spyOn, afterEach } from "bun:test";
+import { afterEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { Hono } from "hono";
-import { authMiddleware } from "@/infrastructure/middleware/auth.middleware";
 import * as authModule from "@/infrastructure/auth";
+import { authMiddleware } from "@/infrastructure/middleware/auth.middleware";
 
 /**
  * Unit tests for authMiddleware.
@@ -41,7 +41,12 @@ describe("authMiddleware", () => {
   });
 
   it("calls next() and returns 200 when session is valid", async () => {
-    const fakeUser = { id: "user-1", name: "Test User", email: "test@test.com", role: "ROOT" };
+    const fakeUser = {
+      id: "user-1",
+      name: "Test User",
+      email: "test@test.com",
+      role: "ROOT",
+    };
     const fakeSession = { id: "session-1", userId: "user-1" };
 
     spyOn(authModule.auth.api, "getSession").mockResolvedValue({
@@ -58,7 +63,12 @@ describe("authMiddleware", () => {
   });
 
   it("sets user on context so downstream handlers can read it", async () => {
-    const fakeUser = { id: "user-abc", name: "Arthur", email: "arthur@test.com", role: "ROOT" };
+    const fakeUser = {
+      id: "user-abc",
+      name: "Arthur",
+      email: "arthur@test.com",
+      role: "ROOT",
+    };
 
     spyOn(authModule.auth.api, "getSession").mockResolvedValue({
       user: fakeUser,

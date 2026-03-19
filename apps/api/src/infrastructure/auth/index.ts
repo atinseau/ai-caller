@@ -34,8 +34,7 @@ export const auth = betterAuth({
     user: {
       create: {
         before: async (user) => {
-          const role =
-            user.email === env.get("ROOT_EMAIL") ? "ROOT" : "USER";
+          const role = user.email === env.get("ROOT_EMAIL") ? "ROOT" : "USER";
           return { data: { ...user, role } };
         },
       },

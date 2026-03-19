@@ -1,9 +1,9 @@
 import {
+  afterAll,
+  beforeAll,
   describe,
   expect,
   it,
-  beforeAll,
-  afterAll,
   setDefaultTimeout,
 } from "bun:test";
 import { InfisicalSecretAdapter } from "@/infrastructure/secret/infisical-secret.adapter";

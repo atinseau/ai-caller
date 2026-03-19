@@ -5,6 +5,7 @@ export const CreateCompanyRequestDto = CompanyModel.omit({
   id: true,
   createdAt: true,
   updatedAt: true,
+  status: true,
 }).openapi("CreateCompanyRequestDto", {
   description: "Data Transfer Object for creating a new company",
 });

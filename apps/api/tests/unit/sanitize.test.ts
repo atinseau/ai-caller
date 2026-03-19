@@ -32,7 +32,9 @@ const makeWorkflow = (overrides: Partial<N8nWorkflow> = {}): N8nWorkflow => ({
       parameters: {},
     },
   ],
-  connections: { Start: { main: [[{ node: "Google Sheets", type: "main", index: 0 }]] } },
+  connections: {
+    Start: { main: [[{ node: "Google Sheets", type: "main", index: 0 }]] },
+  },
   settings: { executionOrder: "v1" },
   tags: [
     { id: "tag1", name: "production" },
@@ -79,7 +81,7 @@ describe("sanitizeWorkflow", () => {
 
     expect(result.nodes[0]!).not.toHaveProperty("id");
     expect(result.nodes[0]!).not.toHaveProperty("webhookId");
-    expect(result.nodes[0]!.name).toBe("Trigger");
+    expect(result.nodes[0]?.name).toBe("Trigger");
   });
 
   it("preserves node parameters and structure", () => {
@@ -87,9 +89,12 @@ describe("sanitizeWorkflow", () => {
     const sheetsNode = result.nodes.find((n) => n.name === "Google Sheets");
 
     expect(sheetsNode).toBeDefined();
-    expect(sheetsNode!.type).toBe("n8n-nodes-base.googleSheets");
-    expect(sheetsNode!.parameters).toEqual({ operation: "read", sheetId: "abc" });
-    expect(sheetsNode!.position).toEqual([250, 300]);
+    expect(sheetsNode?.type).toBe("n8n-nodes-base.googleSheets");
+    expect(sheetsNode?.parameters).toEqual({
+      operation: "read",
+      sheetId: "abc",
+    });
+    expect(sheetsNode?.position).toEqual([250, 300]);
   });
 
   it("preserves connections", () => {
@@ -104,7 +109,9 @@ describe("sanitizeWorkflow", () => {
 
     expect(result.name).toBe("Test Workflow");
     expect(result.settings).toEqual({ executionOrder: "v1" });
-    expect(result.pinData).toEqual({ "Google Sheets": [{ json: { test: true } }] });
+    expect(result.pinData).toEqual({
+      "Google Sheets": [{ json: { test: true } }],
+    });
   });
 
   it("strips tag IDs but keeps names", () => {

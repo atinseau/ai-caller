@@ -1,5 +1,5 @@
 import { beforeAll, mock } from "bun:test";
-import { env } from "../src/infrastructure/config/env"
+import { env } from "../src/infrastructure/config/env";
 
 await env.init();
 

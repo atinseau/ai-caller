@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
 import { McpToolDiscoveryService } from "@/application/services/mcp-tool-discovery.service";
+import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
 import { MockMcpServer } from "@/tests/helpers/mock-mcp-server";
 
 const mockLogger = {
@@ -22,8 +22,9 @@ describe("Tool Invocation", () => {
           mockLogger as never,
         );
 
-        const functions =
-          await discovery.discoverAsRealtimeFunctions(server.url);
+        const functions = await discovery.discoverAsRealtimeFunctions(
+          server.url,
+        );
 
         expect(functions).toHaveLength(2);
 
@@ -73,9 +74,9 @@ describe("Tool Invocation", () => {
 
         expect(result).toBeDefined();
         const content = result as { type: string; text: string }[];
-        expect(content[0]!.type).toBe("text");
+        expect(content[0]?.type).toBe("text");
 
-        const parsed = JSON.parse(content[0]!.text);
+        const parsed = JSON.parse(content[0]?.text);
         expect(parsed.id).toBe(1);
         expect(parsed.name).toBe("John Doe");
       } finally {
@@ -96,7 +97,7 @@ describe("Tool Invocation", () => {
         await client.disconnect();
 
         const content = result as { type: string; text: string }[];
-        const parsed = JSON.parse(content[0]!.text);
+        const parsed = JSON.parse(content[0]?.text);
         expect(parsed.city).toBe("Paris");
         expect(parsed.temperature).toBe(22);
         expect(parsed.condition).toBe("sunny");
@@ -117,7 +118,7 @@ describe("Tool Invocation", () => {
 
         expect(result).toBeDefined();
         const content = result as { type: string; text: string }[];
-        expect(content[0]!.text).toBe("Unknown tool");
+        expect(content[0]?.text).toBe("Unknown tool");
       } finally {
         server.stop();
       }

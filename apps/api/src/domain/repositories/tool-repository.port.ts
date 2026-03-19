@@ -15,11 +15,7 @@ export abstract class ToolRepositoryPort {
 
   abstract failToolInvoke(toolInvokeId: string): Promise<IToolInvokeModel>;
 
-  abstract findByEntityId(
-    entityId: string,
-  ): Promise<IToolInvokeModel | null>;
+  abstract findByEntityId(entityId: string): Promise<IToolInvokeModel | null>;
 
-  abstract findActiveByRoomId(
-    roomId: string,
-  ): Promise<IToolInvokeModel[]>;
+  abstract findActiveByRoomId(roomId: string): Promise<IToolInvokeModel[]>;
 }

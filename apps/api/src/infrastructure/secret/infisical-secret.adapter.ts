@@ -1,5 +1,5 @@
-import { injectable } from "inversify";
 import { InfisicalSDK } from "@infisical/sdk";
+import { injectable } from "inversify";
 import { SecretManagerPort } from "@/domain/ports/secret-manager.port";
 import { env } from "@/infrastructure/config/env";
 
