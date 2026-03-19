@@ -137,6 +137,14 @@ const updateCompanyRoute = createRoute({
         },
       },
     },
+    400: {
+      description: "Validation error",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
     404: {
       description: "Company not found",
       content: {
@@ -152,11 +160,6 @@ companyRouter.openapi(updateCompanyRoute, async (ctx) => {
   const companyUseCase = container.get(CompanyUseCase);
   const { id } = ctx.req.valid("param");
   const dto = ctx.req.valid("json");
-
-  const existing = await companyUseCase.getById(id);
-  if (!existing) {
-    return ctx.json({ message: "Company not found" }, 404);
-  }
 
   const company = await companyUseCase.update(id, dto);
   const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);

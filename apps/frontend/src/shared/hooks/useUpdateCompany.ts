@@ -18,6 +18,12 @@ export function useUpdateCompany(companyId: string) {
         params: { path: { id: companyId } },
         body: dto,
       });
+      if (res.error) {
+        const message =
+          (res.error as { message?: string }).message ??
+          "Failed to update company";
+        throw new Error(message);
+      }
       if (!res.data) throw new Error("Failed to update company");
       return res.data.company;
     },

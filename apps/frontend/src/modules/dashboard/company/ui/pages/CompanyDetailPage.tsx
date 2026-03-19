@@ -103,8 +103,10 @@ export function CompanyDetailPage() {
       await updateCompany({ systemPrompt: systemPrompt || null });
       setPromptDirty(false);
       toast.success("System prompt saved");
-    } catch {
-      toast.error("Failed to save system prompt");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Failed to save system prompt",
+      );
     }
   }
 
@@ -135,8 +137,12 @@ export function CompanyDetailPage() {
       toast.success(
         `Company ${newStatus === "ACTIVE" ? "activated" : "deactivated"}`,
       );
-    } catch {
-      toast.error("Failed to update company status");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update company status",
+      );
     }
   }
 
@@ -419,8 +425,7 @@ export function CompanyDetailPage() {
                     <div className="rounded-lg border border-destructive/30 p-3 space-y-2">
                       <p className="text-sm font-medium">Delete company</p>
                       <p className="text-xs text-muted-foreground">
-                        Permanently delete this company and all associated
-                        data.
+                        Permanently delete this company and all associated data.
                       </p>
                       <Button
                         variant="destructive"
