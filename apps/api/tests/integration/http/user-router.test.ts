@@ -3,7 +3,7 @@ import { app } from "@/interfaces/application";
 import {
   createTestSession,
   cleanupTestSession,
-} from "../helpers/auth-session";
+} from "@/tests/helpers/auth-session";
 
 let rootCookie: string;
 let rootUserId: string;

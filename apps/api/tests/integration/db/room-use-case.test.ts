@@ -2,12 +2,12 @@ import { describe, expect, it, beforeAll, beforeEach, afterAll, afterEach } from
 import { RoomUseCase } from "@/application/use-cases/room.use-case";
 import { CallServicePort } from "@/domain/services/call-service.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { createTestContext } from "../helpers/test-context";
+import { createTestContext } from "@/tests/helpers/test-context";
 import {
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 
 let mcpUrl: string;
 

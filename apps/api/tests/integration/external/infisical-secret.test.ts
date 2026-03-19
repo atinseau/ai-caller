@@ -6,7 +6,7 @@ import {
   afterAll,
   setDefaultTimeout,
 } from "bun:test";
-import { InfisicalSecretAdapter } from "../../src/infrastructure/secret/infisical-secret.adapter";
+import { InfisicalSecretAdapter } from "@/infrastructure/secret/infisical-secret.adapter";
 
 const hasInfisical =
   !!process.env.INFISICAL_CLIENT_ID &&

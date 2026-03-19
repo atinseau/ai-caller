@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { MockMcpServer } from "../helpers/mock-mcp-server";
+import { MockMcpServer } from "@/tests/helpers/mock-mcp-server";
 
 describe("Connection Tests", () => {
   describe("Mock MCP Server", () => {

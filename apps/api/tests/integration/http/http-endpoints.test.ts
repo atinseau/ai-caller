@@ -13,11 +13,11 @@ import { CallServicePort } from "@/domain/services/call-service.port";
 import {
   setupTestEnvironment,
   teardownTestEnvironment,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 import {
   createTestSession,
   cleanupTestSession,
-} from "../helpers/auth-session";
+} from "@/tests/helpers/auth-session";
 
 /**
  * HTTP endpoint tests use the PRODUCTION container because the Hono app

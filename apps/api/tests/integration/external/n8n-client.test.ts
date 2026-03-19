@@ -6,8 +6,8 @@ import {
   afterAll,
   setDefaultTimeout,
 } from "bun:test";
-import { N8nClientAdapter } from "../../src/infrastructure/n8n/n8n-client.adapter";
-import type { N8nClient } from "../../src/domain/models/n8n.model";
+import { N8nClientAdapter } from "@/infrastructure/n8n/n8n-client.adapter";
+import type { N8nClient } from "@/domain/models/n8n.model";
 
 const hasN8n = !!process.env.N8N_URL && !!process.env.N8N_API_KEY;
 

@@ -11,12 +11,12 @@ import {
 import { OpenAICallService } from "@/application/services/openai-call.service";
 import { CallServicePort } from "@/domain/services/call-service.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { createTestContext } from "../helpers/test-context";
+import { createTestContext } from "@/tests/helpers/test-context";
 import {
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 
 setDefaultTimeout(30_000);
 

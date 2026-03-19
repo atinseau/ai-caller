@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
 import { McpToolDiscoveryService } from "@/application/services/mcp-tool-discovery.service";
-import { MockMcpServer } from "../helpers/mock-mcp-server";
+import { MockMcpServer } from "@/tests/helpers/mock-mcp-server";
 
 const mockLogger = {
   info: () => {},

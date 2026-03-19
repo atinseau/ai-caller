@@ -9,11 +9,11 @@ import {
   setupTestEnvironment,
   teardownTestEnvironment,
   mockMcpServer,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 import {
   createTestSession,
   cleanupTestSession,
-} from "../helpers/auth-session";
+} from "@/tests/helpers/auth-session";
 
 let authCookie: string;
 let authUserId: string;

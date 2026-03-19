@@ -25,7 +25,8 @@
     "paths": {
       "@/*": ["./src/*"],
       "@/domain/*": ["./src/domain/*"],
-      "@/generated/prisma/*": ["./generated/prisma/*"]
+      "@/generated/prisma/*": ["./generated/prisma/*"],
+      "@/tests/*": ["./tests/*"]
     },
     // Some stricter flags (disabled by default)
     "noUnusedLocals": false,

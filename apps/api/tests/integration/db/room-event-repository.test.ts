@@ -2,13 +2,13 @@ import { describe, expect, it, beforeEach, afterEach } from "bun:test";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { PRISMA_TOKEN } from "@/infrastructure/database/prisma";
 import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { createTestContext } from "../helpers/test-context";
+import { createTestContext } from "@/tests/helpers/test-context";
 import {
   mockMcpServer,
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 
 const ctx = createTestContext();
 

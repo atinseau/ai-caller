@@ -8,23 +8,22 @@ import {
   afterEach,
   setDefaultTimeout,
 } from "bun:test";
-
-setDefaultTimeout(30_000);
-
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
 import { SubAgentService } from "@/application/services/sub-agent.service";
 import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
 import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream";
 import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter";
-import { createTestContext } from "../helpers/test-context";
+import { createTestContext } from "@/tests/helpers/test-context";
 import {
   createTestCompany,
   setupTestEnvironment,
   teardownTestEnvironment,
-} from "../helpers/setup";
+} from "@/tests/helpers/setup";
 import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
 import { CallServicePort } from "@/domain/services/call-service.port";
+
+setDefaultTimeout(15_000);
 
 let mcpUrl: string;
 
@@ -45,11 +44,11 @@ const noopLogger = {
   warn: () => {},
 } as never;
 
-describe("SubAgentService (real OpenAI chat + mock MCP)", () => {
-  it("should execute full pipeline: MCP call → summarize via gpt-4o-mini → complete tool invoke", async () => {
+describe("SubAgentService — error paths", () => {
+  async function createTestRoom() {
     ctx.container.rebind(CallServicePort).toConstantValue({
       createCall: async () => ({
-        token: `sub-agent-test-${Date.now()}`,
+        token: `err-test-${Date.now()}`,
         expiresAt: new Date(Date.now() + 60_000),
       }),
       terminateCall: async () => {},
@@ -57,28 +56,68 @@ describe("SubAgentService (real OpenAI chat + mock MCP)", () => {
 
     const company = await createTestCompany(ctx.container, mcpUrl);
     const roomRepo = ctx.container.get(RoomRepositoryPort);
-    const room = await roomRepo.createRoom(
+    return roomRepo.createRoom(
       company.id,
-      `sub-agent-token-${Date.now()}`,
+      `err-token-${Date.now()}`,
       new Date(Date.now() + 60_000),
       "TEXT",
     );
+  }
 
+  it("should mark ToolInvoke as FAILED when MCP server is unreachable", async () => {
+    const room = await createTestRoom();
     const toolRepo = ctx.container.get(ToolRepositoryPort);
     const toolInvoke = await toolRepo.createToolInvoke(
       room.id,
-      "test-entity-1",
+      "fail-entity-1",
       "search_customer",
     );
 
-    // Collect text stream events
+    const textStream = new InMemoryTextStream();
+    const subAgent = new SubAgentService(
+      new McpClientAdapter(),
+      toolRepo,
+      textStream,
+      noopLogger,
+      new HandlebarsPromptAdapter(),
+    );
+
+    let thrown = false;
+    try {
+      await subAgent.execute({
+        model: "gpt-4o-mini",
+        roomId: room.id,
+        toolInvokeId: toolInvoke.entityId,
+        functionName: "search_customer",
+        functionArgs: { name: "John" },
+        mcpServerUrl: "http://localhost:1/unreachable",
+      });
+    } catch {
+      thrown = true;
+    }
+
+    expect(thrown).toBe(true);
+
+    const updated = await toolRepo.findByEntityId("fail-entity-1");
+    expect(updated?.status).toBe("FAILED");
+  });
+
+  it("should publish RUNNING then FAILED to TextStream on error", async () => {
+    const room = await createTestRoom();
+    const toolRepo = ctx.container.get(ToolRepositoryPort);
+    const toolInvoke = await toolRepo.createToolInvoke(
+      room.id,
+      "fail-entity-2",
+      "get_weather",
+    );
+
     const textStream = new InMemoryTextStream();
     const events: TextStreamEvent[] = [];
     const iter = textStream.subscribe(room.id);
     const collector = (async () => {
       for await (const e of iter) {
         events.push(e);
-        if ("status" in e && e.status === "COMPLETED") break;
+        if ("status" in e && e.status === "FAILED") break;
       }
     })();
 
@@ -90,32 +129,24 @@ describe("SubAgentService (real OpenAI chat + mock MCP)", () => {
       new HandlebarsPromptAdapter(),
     );
 
-    const result = await subAgent.execute({
-      model: "gpt-4o-mini",
-      roomId: room.id,
-      toolInvokeId: toolInvoke.entityId,
-      functionName: "search_customer",
-      functionArgs: { name: "John" },
-      mcpServerUrl: mcpUrl,
-    });
+    try {
+      await subAgent.execute({
+        model: "gpt-4o-mini",
+        roomId: room.id,
+        toolInvokeId: toolInvoke.entityId,
+        functionName: "get_weather",
+        functionArgs: { city: "Paris" },
+        mcpServerUrl: "http://localhost:1/unreachable",
+      });
+    } catch {
+      // expected
+    }
 
     await collector;
 
-    expect(result.summary.length).toBeGreaterThan(0);
-    expect(result.rawResult).toBeDefined();
-
-    const completed = await toolRepo.findByEntityId("test-entity-1");
-    expect(completed?.status).toBe("COMPLETED");
-
-    expect(
-      events.some(
-        (e) => e.type === "tool_status" && "status" in e && e.status === "RUNNING",
-      ),
-    ).toBe(true);
-    expect(
-      events.some(
-        (e) => e.type === "tool_status" && "status" in e && e.status === "COMPLETED",
-      ),
-    ).toBe(true);
+    const statusEvents = events.filter((e) => e.type === "tool_status");
+    expect(statusEvents).toHaveLength(2);
+    expect((statusEvents[0] as { status: string }).status).toBe("RUNNING");
+    expect((statusEvents[1] as { status: string }).status).toBe("FAILED");
   });
 });
