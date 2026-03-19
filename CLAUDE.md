@@ -165,4 +165,27 @@ Structure:
 7. **Interface** — add HTTP routes, DTOs, or event handlers if the feature is user-facing.
 8. **Prompts** — if the feature involves AI, create a `.md` prompt and use `PromptPort.render()`.
 9. **Tests** — write unit + integration tests before considering the feature done.
-10. **Verify** — `bun run check-types` + `bun test` from `apps/api/` must both pass.
+10. **Verify** — `bun run check-types` + `bun check` + `bun test` from `apps/api/` must all pass.
+
+### Biome Lint Rules (enforced as errors)
+
+The `suspicious` rule group is set to `"error"` globally. Respect these rules when writing new code:
+
+- **`noEmptyBlockStatements`** — never write `() => {}`. Always add a comment: `() => { /* noop */ }` or `() => { /* intentionally ignored */ }`.
+- **`useAwait`** — never mark a function `async` unless it contains an `await`. Return `Promise.resolve(value)` directly if needed.
+- **`noNonNullAssertion`** — never use `!` to assert non-null. Use a null guard (`if (!x) return`), a fallback (`?? default`), or a definite assignment assertion (`let x!: T`) for DI-injected fields.
+- **`noExplicitAny`** — never use `any`. Use the proper domain type, a generic, or `unknown` with a type guard.
+- **`noConsole`** — `console.*` is forbidden everywhere except `**/scripts/**` (excluded via biome override).
+- **`noAlert`** — `alert/confirm/prompt` must be suppressed with a `biome-ignore` comment explaining why the native dialog is intentional.
+- **`noDocumentCookie`** — direct `document.cookie` writes must be suppressed with a `biome-ignore` comment (frontend override sets this to `"warn"`, but prefer the Cookie Store API for new code).
+- **`noReactSpecificProps`** — disabled for `apps/frontend/**`. Use `className` (not `class`) in all JSX/TSX.
+
+**When a biome-ignore comment is needed**, always include the reason:
+```ts
+// biome-ignore lint/suspicious/useAwait: required async signature by better-auth hook interface
+```
+
+**Scope of overrides** (defined in `biome.json`):
+- `apps/frontend/**` — `noReactSpecificProps: off`, `noDocumentCookie: warn`
+- `**/scripts/**` — `noConsole: off`
+- `**/openapi-openai.types.ts` — excluded from checks (file exceeds 1 MiB size limit)
