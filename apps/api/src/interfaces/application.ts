@@ -1,14 +1,14 @@
 import { OpenAPIHono } from "@hono/zod-openapi";
 import { cors } from "hono/cors";
-import { auth } from "@/infrastructure/auth";
-import { env } from "@/infrastructure/config/env";
-import { globalErrorHandler } from "@/infrastructure/error/global-error-handler";
-import { authMiddleware } from "@/infrastructure/middleware/auth.middleware";
-import { loggerMiddleware } from "@/infrastructure/middleware/logger.middleware";
-import { companyRouter } from "./router/company.router";
-import { messageRouter } from "./router/message.router";
-import { roomRouter } from "./router/room.router";
-import { userRouter } from "./router/user.router";
+import { auth } from "@/infrastructure/auth/index.ts";
+import { env } from "@/infrastructure/config/env.ts";
+import { globalErrorHandler } from "@/infrastructure/error/global-error-handler.ts";
+import { authMiddleware } from "@/infrastructure/middleware/auth.middleware.ts";
+import { loggerMiddleware } from "@/infrastructure/middleware/logger.middleware.ts";
+import { companyRouter } from "./router/company.router.ts";
+import { messageRouter } from "./router/message.router.ts";
+import { roomRouter } from "./router/room.router.ts";
+import { userRouter } from "./router/user.router.ts";
 
 const app = new OpenAPIHono();
 

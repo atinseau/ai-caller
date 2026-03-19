@@ -1,8 +1,8 @@
 import { inject, injectable } from "inversify";
-import type { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
+import type { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
-import { CompanyMapper } from "../mappers/company.mapper";
-import { PRISMA_TOKEN } from "../prisma";
+import { CompanyMapper } from "../mappers/company.mapper.ts";
+import { PRISMA_TOKEN } from "../prisma.ts";
 
 @injectable()
 export class CompanyRepositoryPrisma implements CompanyRepositoryPort {

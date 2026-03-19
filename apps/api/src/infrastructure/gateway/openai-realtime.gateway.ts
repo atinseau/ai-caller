@@ -1,10 +1,10 @@
 import type { Schema } from "@ai-caller/shared";
 import { inject, injectable } from "inversify";
-import type { IRoomModel } from "@/domain/models/room.model";
-import type { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port";
-import { RealtimeSessionPort } from "@/domain/ports/realtime-session.port";
-import { env } from "../config/env";
-import { logger } from "../logger";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port.ts";
+import { RealtimeSessionPort } from "@/domain/ports/realtime-session.port.ts";
+import { env } from "../config/env.ts";
+import { logger } from "../logger/index.ts";
 
 @injectable()
 export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
@@ -15,7 +15,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     private readonly sessionService: RealtimeSessionPort,
   ) {}
 
-  public async openRoomChannel(room: IRoomModel, companyMcpUrl?: string) {
+  public openRoomChannel(room: IRoomModel, companyMcpUrl?: string) {
     if (room.modality === "TEXT") {
       return this.openTextChannel(room, companyMcpUrl);
     }
@@ -44,7 +44,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     }
   }
 
-  private async openAudioChannel(room: IRoomModel, companyMcpUrl?: string) {
+  private openAudioChannel(room: IRoomModel, companyMcpUrl?: string) {
     if (!room.callId) {
       logger.error(`Room ${room.id} does not have a call ID.`);
       return;
@@ -58,7 +58,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     this.setupChannel(ws, room, undefined, companyMcpUrl);
   }
 
-  private async openTextChannel(room: IRoomModel, companyMcpUrl?: string) {
+  private openTextChannel(room: IRoomModel, companyMcpUrl?: string) {
     const ws = this.connectWebSocket(
       "wss://api.openai.com/v1/realtime?model=gpt-realtime-1.5",
       env.get("OPENAI_API_KEY"),

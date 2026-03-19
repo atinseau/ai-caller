@@ -8,8 +8,8 @@ import {
   it,
   setDefaultTimeout,
 } from "bun:test";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
 import {
   createTestCompany,
   setupTestEnvironment,
@@ -106,7 +106,8 @@ describe("OpenAICallService (real API)", () => {
 
       // hangups with fake callId is silently accepted by OpenAI
       // then deleteRoom is called
-      await callService.terminateCall(updatedRoom!);
+      if (!updatedRoom) throw new Error("Expected updatedRoom to be defined");
+      await callService.terminateCall(updatedRoom);
 
       // Room should be deleted
       expect(roomRepo.findById(room.id)).rejects.toThrow();

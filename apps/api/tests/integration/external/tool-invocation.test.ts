@@ -1,12 +1,18 @@
 import { describe, expect, it } from "bun:test";
-import { McpToolDiscoveryService } from "@/application/services/mcp-tool-discovery.service";
-import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
+import { McpToolDiscoveryService } from "@/application/services/mcp-tool-discovery.service.ts";
+import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter.ts";
 import { MockMcpServer } from "@/tests/helpers/mock-mcp-server";
 
 const mockLogger = {
-  info: () => {},
-  error: () => {},
-  warn: () => {},
+  info: () => {
+    /* noop */
+  },
+  error: () => {
+    /* noop */
+  },
+  warn: () => {
+    /* noop */
+  },
 };
 
 describe("Tool Invocation", () => {
@@ -28,7 +34,7 @@ describe("Tool Invocation", () => {
 
         expect(functions).toHaveLength(2);
 
-        expect(functions[0]!).toEqual({
+        expect(functions[0]).toEqual({
           type: "function",
           name: "search_customer",
           description: "Search for a customer by name",
@@ -41,7 +47,7 @@ describe("Tool Invocation", () => {
           },
         });
 
-        expect(functions[1]!).toEqual({
+        expect(functions[1]).toEqual({
           type: "function",
           name: "get_weather",
           description: "Get the current weather for a location",
@@ -76,7 +82,7 @@ describe("Tool Invocation", () => {
         const content = result as { type: string; text: string }[];
         expect(content[0]?.type).toBe("text");
 
-        const parsed = JSON.parse(content[0]?.text);
+        const parsed = JSON.parse(content[0]?.text ?? "{}");
         expect(parsed.id).toBe(1);
         expect(parsed.name).toBe("John Doe");
       } finally {
@@ -97,7 +103,7 @@ describe("Tool Invocation", () => {
         await client.disconnect();
 
         const content = result as { type: string; text: string }[];
-        const parsed = JSON.parse(content[0]?.text);
+        const parsed = JSON.parse(content[0]?.text ?? "{}");
         expect(parsed.city).toBe("Paris");
         expect(parsed.temperature).toBe(22);
         expect(parsed.condition).toBe("sunny");

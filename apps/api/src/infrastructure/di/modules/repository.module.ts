@@ -1,13 +1,13 @@
 import { ContainerModule } from "inversify";
-import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma";
-import { CompanyRepositoryPrisma } from "@/infrastructure/database/repositories/company-repository.prisma";
-import { RoomEventRepositoryPrisma } from "@/infrastructure/database/repositories/room-event-repository.prisma";
-import { RoomRepositoryPrisma } from "@/infrastructure/database/repositories/room-repository.prisma";
-import { ToolRepositoryPrisma } from "@/infrastructure/database/repositories/tool-repository.prisma";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port.ts";
+import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma.ts";
+import { CompanyRepositoryPrisma } from "@/infrastructure/database/repositories/company-repository.prisma.ts";
+import { RoomEventRepositoryPrisma } from "@/infrastructure/database/repositories/room-event-repository.prisma.ts";
+import { RoomRepositoryPrisma } from "@/infrastructure/database/repositories/room-repository.prisma.ts";
+import { ToolRepositoryPrisma } from "@/infrastructure/database/repositories/tool-repository.prisma.ts";
 
 export const repositoryModule = new ContainerModule((module) => {
   module.bind(PRISMA_TOKEN).toConstantValue(prisma);

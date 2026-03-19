@@ -32,6 +32,7 @@ export function CompanyDetailPage() {
 
   async function handleDelete() {
     if (!company) return;
+    // biome-ignore lint/suspicious/noAlert: confirmation dialog is intentional UX
     if (!confirm(`Delete "${company.name}"? This action cannot be undone.`))
       return;
     try {

@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
-import { LoggerPort } from "@/domain/ports/logger.port";
-import { McpClientPort } from "@/domain/ports/mcp-client.port";
+import { LoggerPort } from "@/domain/ports/logger.port.ts";
+import { McpClientPort } from "@/domain/ports/mcp-client.port.ts";
 
 export type RealtimeFunctionTool = {
   type: "function";

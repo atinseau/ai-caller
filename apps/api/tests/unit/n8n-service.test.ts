@@ -1,20 +1,25 @@
 import { describe, expect, it, mock } from "bun:test";
-import { N8nService } from "../../src/application/services/n8n.service";
-import { N8nSanitizeService } from "../../src/application/services/n8n-sanitize.service";
-import type { N8nClient } from "../../src/domain/models/n8n.model";
-import type { N8nClientPort } from "../../src/domain/ports/n8n-client.port";
-import type { N8nWorkflowStoragePort } from "../../src/domain/ports/n8n-workflow-storage.port";
-import type { SecretManagerPort } from "../../src/domain/ports/secret-manager.port";
+import { N8nService } from "../../src/application/services/n8n.service.ts";
+import { N8nSanitizeService } from "../../src/application/services/n8n-sanitize.service.ts";
+import type {
+  N8nClient,
+  N8nWorkflow,
+} from "../../src/domain/models/n8n.model.ts";
+import type { N8nClientPort } from "../../src/domain/ports/n8n-client.port.ts";
+import type { N8nWorkflowStoragePort } from "../../src/domain/ports/n8n-workflow-storage.port.ts";
+import type { SecretManagerPort } from "../../src/domain/ports/secret-manager.port.ts";
+
+const emptyWorkflow = {} as N8nWorkflow;
 
 function createMockClient(): N8nClient {
   return {
-    getWorkflow: mock(() => Promise.resolve({} as any)),
+    getWorkflow: mock(() => Promise.resolve(emptyWorkflow)),
     listWorkflows: mock(() => Promise.resolve([])),
-    createWorkflow: mock(() => Promise.resolve({} as any)),
-    updateWorkflow: mock(() => Promise.resolve({} as any)),
+    createWorkflow: mock(() => Promise.resolve(emptyWorkflow)),
+    updateWorkflow: mock(() => Promise.resolve(emptyWorkflow)),
     deleteWorkflow: mock(() => Promise.resolve()),
-    activateWorkflow: mock(() => Promise.resolve({} as any)),
-    deactivateWorkflow: mock(() => Promise.resolve({} as any)),
+    activateWorkflow: mock(() => Promise.resolve(emptyWorkflow)),
+    deactivateWorkflow: mock(() => Promise.resolve(emptyWorkflow)),
   };
 }
 
@@ -48,10 +53,20 @@ describe("N8nService", () => {
 
   describe("listWorkflows", () => {
     it("lists workflows from root when no company specified", async () => {
-      const mockClient = createMockClient();
-      (mockClient.listWorkflows as any).mockImplementation(() =>
-        Promise.resolve([{ id: "1", name: "WF1", active: true }]),
-      );
+      const mockClient = {
+        ...createMockClient(),
+        listWorkflows: mock(() =>
+          Promise.resolve([
+            {
+              id: "1",
+              name: "WF1",
+              active: true,
+              nodes: [],
+              connections: {},
+            } as N8nWorkflow,
+          ]),
+        ),
+      };
 
       const service = createService({
         clientPort: { createClient: mock(() => mockClient) },
@@ -63,10 +78,20 @@ describe("N8nService", () => {
     });
 
     it("lists workflows from a named company", async () => {
-      const mockClient = createMockClient();
-      (mockClient.listWorkflows as any).mockImplementation(() =>
-        Promise.resolve([{ id: "2", name: "WF2", active: false }]),
-      );
+      const mockClient = {
+        ...createMockClient(),
+        listWorkflows: mock(() =>
+          Promise.resolve([
+            {
+              id: "2",
+              name: "WF2",
+              active: false,
+              nodes: [],
+              connections: {},
+            } as N8nWorkflow,
+          ]),
+        ),
+      };
 
       const service = createService({
         clientPort: { createClient: mock(() => mockClient) },
@@ -116,10 +141,18 @@ describe("N8nService", () => {
 
   describe("deleteWorkflow", () => {
     it("deletes and returns the workflow name", async () => {
-      const mockClient = createMockClient();
-      (mockClient.getWorkflow as any).mockImplementation(() =>
-        Promise.resolve({ id: "42", name: "My WF" }),
-      );
+      const mockClient = {
+        ...createMockClient(),
+        getWorkflow: mock(() =>
+          Promise.resolve({
+            id: "42",
+            name: "My WF",
+            active: true,
+            nodes: [],
+            connections: {},
+          } as N8nWorkflow),
+        ),
+      };
 
       const service = createService({
         clientPort: { createClient: mock(() => mockClient) },

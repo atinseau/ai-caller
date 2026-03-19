@@ -110,6 +110,7 @@ export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
       </div>
 
       {/* Hidden audio element for WebRTC playback */}
+      {/* biome-ignore lint/a11y/useMediaCaption: audio is for WebRTC playback, captions not applicable */}
       <audio ref={audioRef} autoPlay className="hidden" />
     </div>
   );

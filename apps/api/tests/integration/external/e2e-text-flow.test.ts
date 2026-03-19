@@ -3,7 +3,7 @@ import { describe, expect, it, setDefaultTimeout } from "bun:test";
 setDefaultTimeout(60_000);
 
 import type { Schema } from "@ai-caller/shared";
-import { env } from "@/infrastructure/config/env";
+import { env } from "@/infrastructure/config/env.ts";
 
 /**
  * End-to-end text flow test.
@@ -178,6 +178,6 @@ describe("E2E Text Flow (real OpenAI)", () => {
 
     expect(responses).toHaveLength(2);
     // Second response should contain the name from context
-    expect(responses[1]!).toContain("TestUser42");
+    expect(responses[1]).toContain("TestUser42");
   });
 });

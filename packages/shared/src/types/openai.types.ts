@@ -1,4 +1,4 @@
-import type { components, paths } from "./openapi-openai.types";
+import type { components, paths } from "./openapi-openai.types.ts";
 
 // UTILS
 export type JsonRouteBody<

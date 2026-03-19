@@ -1,5 +1,5 @@
 import type { z } from "@hono/zod-openapi";
-import { CompanyModel } from "@/domain/models/company.model";
+import { CompanyModel } from "@/domain/models/company.model.ts";
 
 export const CreateCompanyRequestDto = CompanyModel.omit({
   id: true,

@@ -99,7 +99,7 @@ describe("Connection Tests", () => {
         const data = (await res.json()) as {
           result: { content: { type: string; text: string }[] };
         };
-        const parsed = JSON.parse(data.result.content[0]?.text);
+        const parsed = JSON.parse(data.result.content[0]?.text ?? "{}");
         expect(parsed.name).toBe("John Doe");
         expect(parsed.email).toBe("john@example.com");
       } finally {
@@ -111,7 +111,7 @@ describe("Connection Tests", () => {
   describe("MCP Client Adapter", () => {
     it("should connect to mock MCP server and list tools", async () => {
       const { McpClientAdapter } = await import(
-        "@/infrastructure/mcp/mcp-client.adapter"
+        "@/infrastructure/mcp/mcp-client.adapter.ts"
       );
       const server = new MockMcpServer();
       await server.start();
@@ -132,7 +132,7 @@ describe("Connection Tests", () => {
 
     it("should call tools and return results", async () => {
       const { McpClientAdapter } = await import(
-        "@/infrastructure/mcp/mcp-client.adapter"
+        "@/infrastructure/mcp/mcp-client.adapter.ts"
       );
       const server = new MockMcpServer();
       await server.start();

@@ -1,2 +1,2 @@
-export * from "./classes/openai";
-export * from "./types/openai.types";
+export * from "./classes/openai/index.ts";
+export * from "./types/openai.types.ts";

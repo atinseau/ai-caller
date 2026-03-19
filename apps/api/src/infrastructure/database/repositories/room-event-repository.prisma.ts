@@ -4,9 +4,9 @@ import type {
   RoomEventPayload,
   RoomEventRepositoryPort,
   RoomEventType,
-} from "@/domain/repositories/room-event-repository.port";
+} from "@/domain/repositories/room-event-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
-import { PRISMA_TOKEN } from "../prisma";
+import { PRISMA_TOKEN } from "../prisma.ts";
 
 @injectable()
 export class RoomEventRepositoryPrisma implements RoomEventRepositoryPort {

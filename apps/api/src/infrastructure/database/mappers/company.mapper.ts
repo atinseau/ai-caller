@@ -1,6 +1,6 @@
 import { randomUUIDv7 } from "bun";
-import { CompanyStatus } from "@/domain/enums/company-status.enum";
-import type { ICompanyModel } from "@/domain/models/company.model";
+import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
+import type { ICompanyModel } from "@/domain/models/company.model.ts";
 import type { Company } from "@/generated/prisma/client";
 
 export abstract class CompanyMapper {

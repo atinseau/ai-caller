@@ -4,7 +4,7 @@ import { injectable } from "inversify";
 import type {
   McpClientPort,
   McpToolDefinition,
-} from "@/domain/ports/mcp-client.port";
+} from "@/domain/ports/mcp-client.port.ts";
 
 @injectable()
 export class McpClientAdapter implements McpClientPort {

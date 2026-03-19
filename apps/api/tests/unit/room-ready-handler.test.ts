@@ -1,6 +1,6 @@
 import { describe, expect, it, mock } from "bun:test";
-import { RoomReadyEvent } from "@/application/events/room-ready.event";
-import { RoomReadyHandler } from "@/application/handlers/room-ready.handler";
+import { RoomReadyEvent } from "@/application/events/room-ready.event.ts";
+import { RoomReadyHandler } from "@/application/handlers/room-ready.handler.ts";
 
 describe("RoomReadyHandler", () => {
   it("should fetch room and open gateway channel on RoomReadyEvent", async () => {
@@ -21,23 +21,35 @@ describe("RoomReadyHandler", () => {
       createRoom: mock(async () => mockRoom),
       updateRoomCallId: mock(async () => mockRoom),
       findExpiredRooms: mock(async () => []),
-      deleteRoom: mock(async () => {}),
+      deleteRoom: mock(async () => {
+        /* noop */
+      }),
     };
 
-    const openRoomChannel = mock(async () => {});
+    const openRoomChannel = mock(async () => {
+      /* noop */
+    });
     const realtimeGateway = {
       openRoomChannel,
-      sendToRoom: mock(() => {}),
-      closeRoomChannel: mock(() => {}),
+      sendToRoom: mock(() => {
+        /* noop */
+      }),
+      closeRoomChannel: mock(() => {
+        /* noop */
+      }),
     };
 
     const subscribeHandler = { fn: null as unknown };
     const eventBus = {
-      publish: mock(async () => {}),
+      publish: mock(async () => {
+        /* noop */
+      }),
       subscribe: mock((_event: unknown, handler: unknown) => {
         subscribeHandler.fn = handler;
       }),
-      unsubscribe: mock(() => {}),
+      unsubscribe: mock(() => {
+        /* noop */
+      }),
     };
 
     const companyRepository = {

@@ -1,5 +1,6 @@
+import process from "node:process";
 import z from "zod";
-import { Environment } from "@/domain/enums/environment.enum";
+import { Environment } from "@/domain/enums/environment.enum.ts";
 
 // Load .env only in non-production environments
 // Uses require() to avoid ESM module graph issues with circular imports
@@ -21,7 +22,7 @@ const envDto = z.object({
   CLIENT_URL: z.url(),
 
   // DATABASE
-  DATABASE_URL: z.url({ protocol: /^postgres$/ }),
+  DATABASE_URL: z.url({ protocol: /^postgres$/u }),
 
   // OPENAI
   OPENAI_API_KEY: z.string(),

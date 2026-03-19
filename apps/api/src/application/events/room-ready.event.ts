@@ -1,4 +1,4 @@
-import type { IRoomModel } from "@/domain/models/room.model";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
 
 export class RoomReadyEvent {
   public readonly roomId: string;

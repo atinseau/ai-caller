@@ -3,8 +3,8 @@ import type {
   N8nClient,
   N8nWorkflow,
   N8nWorkflowPayload,
-} from "@/domain/models/n8n.model";
-import { N8nClientPort } from "@/domain/ports/n8n-client.port";
+} from "@/domain/models/n8n.model.ts";
+import { N8nClientPort } from "@/domain/ports/n8n-client.port.ts";
 
 interface N8nListResponse<T> {
   data: T[];
@@ -41,7 +41,7 @@ export class N8nClientAdapter extends N8nClientPort {
     }
 
     return {
-      async getWorkflow(id: string) {
+      getWorkflow(id: string) {
         return request<N8nWorkflow>(`/workflows/${id}`);
       },
 
@@ -51,7 +51,7 @@ export class N8nClientAdapter extends N8nClientPort {
         return result.data;
       },
 
-      async createWorkflow(data: N8nWorkflowPayload) {
+      createWorkflow(data: N8nWorkflowPayload) {
         return request<N8nWorkflow>("/workflows", {
           method: "POST",
           body: JSON.stringify(data),
@@ -62,20 +62,20 @@ export class N8nClientAdapter extends N8nClientPort {
         await request<void>(`/workflows/${id}`, { method: "DELETE" });
       },
 
-      async updateWorkflow(id: string, data: N8nWorkflowPayload) {
+      updateWorkflow(id: string, data: N8nWorkflowPayload) {
         return request<N8nWorkflow>(`/workflows/${id}`, {
           method: "PUT",
           body: JSON.stringify(data),
         });
       },
 
-      async activateWorkflow(id: string) {
+      activateWorkflow(id: string) {
         return request<N8nWorkflow>(`/workflows/${id}/activate`, {
           method: "POST",
         });
       },
 
-      async deactivateWorkflow(id: string) {
+      deactivateWorkflow(id: string) {
         return request<N8nWorkflow>(`/workflows/${id}/deactivate`, {
           method: "POST",
         });

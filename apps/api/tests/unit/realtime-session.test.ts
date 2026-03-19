@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
-import type { IRoomModel } from "@/domain/models/room.model";
-import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 // Lightweight fakes for ports (no mocking framework needed)
 function createFakes() {
@@ -38,9 +38,15 @@ function createFakes() {
   };
 
   const logger = {
-    info: () => {},
-    error: () => {},
-    warn: () => {},
+    info: () => {
+      /* noop */
+    },
+    error: () => {
+      /* noop */
+    },
+    warn: () => {
+      /* noop */
+    },
   };
 
   const textStream = {
@@ -48,7 +54,9 @@ function createFakes() {
     publish: (roomId: string, event: TextStreamEvent) => {
       publishedEvents.push({ roomId, event });
     },
-    close: () => {},
+    close: () => {
+      /* noop */
+    },
   };
 
   const subAgent = { execute: mock(() => Promise.resolve({})) };

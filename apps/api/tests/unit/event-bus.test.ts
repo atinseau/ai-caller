@@ -1,5 +1,5 @@
 import { describe, expect, it, mock } from "bun:test";
-import { InMemoryEventBus } from "@/infrastructure/event-bus/in-memory-event-bus";
+import { InMemoryEventBus } from "@/infrastructure/event-bus/in-memory-event-bus.ts";
 
 class TestEvent {
   constructor(public readonly payload: string) {}
@@ -12,7 +12,9 @@ class OtherEvent {
 describe("InMemoryEventBus", () => {
   it("should publish and receive events", async () => {
     const bus = new InMemoryEventBus();
-    const handler = mock((_event: TestEvent) => {});
+    const handler = mock((_event: TestEvent) => {
+      /* noop */
+    });
 
     bus.subscribe(TestEvent, handler);
     await bus.publish(new TestEvent("hello"));
@@ -23,8 +25,12 @@ describe("InMemoryEventBus", () => {
 
   it("should support multiple subscribers", async () => {
     const bus = new InMemoryEventBus();
-    const handler1 = mock(() => {});
-    const handler2 = mock(() => {});
+    const handler1 = mock(() => {
+      /* noop */
+    });
+    const handler2 = mock(() => {
+      /* noop */
+    });
 
     bus.subscribe(TestEvent, handler1);
     bus.subscribe(TestEvent, handler2);
@@ -36,7 +42,9 @@ describe("InMemoryEventBus", () => {
 
   it("should not deliver events to unsubscribed handlers", async () => {
     const bus = new InMemoryEventBus();
-    const handler = mock(() => {});
+    const handler = mock(() => {
+      /* noop */
+    });
 
     bus.subscribe(TestEvent, handler);
     bus.unsubscribe(TestEvent, handler);
@@ -47,8 +55,12 @@ describe("InMemoryEventBus", () => {
 
   it("should isolate event types", async () => {
     const bus = new InMemoryEventBus();
-    const testHandler = mock(() => {});
-    const otherHandler = mock(() => {});
+    const testHandler = mock(() => {
+      /* noop */
+    });
+    const otherHandler = mock(() => {
+      /* noop */
+    });
 
     bus.subscribe(TestEvent, testHandler);
     bus.subscribe(OtherEvent, otherHandler);
@@ -67,7 +79,7 @@ describe("InMemoryEventBus", () => {
       await new Promise((r) => setTimeout(r, 10));
       order.push(1);
     });
-    bus.subscribe(TestEvent, async () => {
+    bus.subscribe(TestEvent, () => {
       order.push(2);
     });
 
@@ -85,14 +97,18 @@ describe("InMemoryEventBus", () => {
 
   it("should cleanup handler set when last handler unsubscribes", () => {
     const bus = new InMemoryEventBus();
-    const handler = mock(() => {});
+    const handler = mock(() => {
+      /* noop */
+    });
 
     bus.subscribe(TestEvent, handler);
     bus.unsubscribe(TestEvent, handler);
 
     // Internally the map entry should be removed
     // Verify by subscribing again and publishing
-    const handler2 = mock(() => {});
+    const handler2 = mock(() => {
+      /* noop */
+    });
     bus.subscribe(TestEvent, handler2);
     bus.publish(new TestEvent("after-cleanup"));
 

@@ -6,8 +6,9 @@ import {
   it,
   setDefaultTimeout,
 } from "bun:test";
-import type { N8nClient } from "@/domain/models/n8n.model";
-import { N8nClientAdapter } from "@/infrastructure/n8n/n8n-client.adapter";
+import process from "node:process";
+import type { N8nClient } from "@/domain/models/n8n.model.ts";
+import { N8nClientAdapter } from "@/infrastructure/n8n/n8n-client.adapter.ts";
 
 const hasN8n = !!process.env.N8N_URL && !!process.env.N8N_API_KEY;
 
@@ -36,8 +37,8 @@ describe.skipIf(!hasN8n)("N8nClientAdapter", () => {
   beforeAll(() => {
     const adapter = new N8nClientAdapter();
     client = adapter.createClient(
-      process.env.N8N_URL!,
-      process.env.N8N_API_KEY!,
+      process.env.N8N_URL as string,
+      process.env.N8N_API_KEY as string,
     );
   });
 
@@ -106,7 +107,10 @@ describe.skipIf(!hasN8n)("N8nClientAdapter", () => {
 
   it("throws on invalid API key", async () => {
     const adapter = new N8nClientAdapter();
-    const badClient = adapter.createClient(process.env.N8N_URL!, "bad-key");
+    const badClient = adapter.createClient(
+      process.env.N8N_URL as string,
+      "bad-key",
+    );
 
     await expect(badClient.listWorkflows()).rejects.toThrow("Invalid API key");
   });

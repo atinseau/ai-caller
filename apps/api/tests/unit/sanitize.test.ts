@@ -1,6 +1,6 @@
 import { describe, expect, it } from "bun:test";
-import { N8nSanitizeService } from "../../src/application/services/n8n-sanitize.service";
-import type { N8nWorkflow } from "../../src/domain/models/n8n.model";
+import { N8nSanitizeService } from "../../src/application/services/n8n-sanitize.service.ts";
+import type { N8nWorkflow } from "../../src/domain/models/n8n.model.ts";
 
 const svc = new N8nSanitizeService();
 const sanitizeWorkflow = svc.sanitize.bind(svc);
@@ -79,8 +79,8 @@ describe("sanitizeWorkflow", () => {
     });
     const result = sanitizeWorkflow(workflow);
 
-    expect(result.nodes[0]!).not.toHaveProperty("id");
-    expect(result.nodes[0]!).not.toHaveProperty("webhookId");
+    expect(result.nodes[0]).not.toHaveProperty("id");
+    expect(result.nodes[0]).not.toHaveProperty("webhookId");
     expect(result.nodes[0]?.name).toBe("Trigger");
   });
 

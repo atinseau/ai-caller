@@ -1,10 +1,10 @@
 import { createRoute, OpenAPIHono } from "@hono/zod-openapi";
-import { RoomUseCase } from "@/application/use-cases/room.use-case";
-import { container } from "@/infrastructure/di/container";
-import { AttachCallToRoomRequestDto } from "../dtos/room/attach-call-to-room-request.dto";
-import { AttachCallToRoomResponseDto } from "../dtos/room/attach-call-to-room-response.dto";
-import { CreateRoomParamsRequestDto } from "../dtos/room/create-room-params-request.dto";
-import { CreateRoomResponseDto } from "../dtos/room/create-room-response.dto";
+import { RoomUseCase } from "@/application/use-cases/room.use-case.ts";
+import { container } from "@/infrastructure/di/container.ts";
+import { AttachCallToRoomRequestDto } from "../dtos/room/attach-call-to-room-request.dto.ts";
+import { AttachCallToRoomResponseDto } from "../dtos/room/attach-call-to-room-response.dto.ts";
+import { CreateRoomParamsRequestDto } from "../dtos/room/create-room-params-request.dto.ts";
+import { CreateRoomResponseDto } from "../dtos/room/create-room-response.dto.ts";
 
 export const roomRouter = new OpenAPIHono();
 

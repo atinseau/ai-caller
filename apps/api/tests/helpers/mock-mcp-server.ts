@@ -63,7 +63,7 @@ export class MockMcpServer {
     return `http://localhost:${this.port}/mcp`;
   }
 
-  async start(): Promise<void> {
+  start(): void {
     this.server = Bun.serve({
       port: 0, // auto-assign
       fetch: async (req) => {

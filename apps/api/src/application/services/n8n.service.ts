@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import type { N8nClient, N8nWorkflow } from "@/domain/models/n8n.model";
-import { N8nClientPort } from "@/domain/ports/n8n-client.port";
-import { N8nWorkflowStoragePort } from "@/domain/ports/n8n-workflow-storage.port";
-import { SecretManagerPort } from "@/domain/ports/secret-manager.port";
-import { env } from "@/infrastructure/config/env";
-import { N8nSanitizeService } from "./n8n-sanitize.service";
+import type { N8nClient, N8nWorkflow } from "@/domain/models/n8n.model.ts";
+import { N8nClientPort } from "@/domain/ports/n8n-client.port.ts";
+import { N8nWorkflowStoragePort } from "@/domain/ports/n8n-workflow-storage.port.ts";
+import { SecretManagerPort } from "@/domain/ports/secret-manager.port.ts";
+import { env } from "@/infrastructure/config/env.ts";
+import { N8nSanitizeService } from "./n8n-sanitize.service.ts";
 
 export interface PullResult {
   name: string;
@@ -44,7 +44,7 @@ export class N8nService {
     );
   }
 
-  async listCompanies(): Promise<string[]> {
+  listCompanies(): Promise<string[]> {
     return this.secrets.listFolders("/companies");
   }
 
@@ -99,7 +99,7 @@ export class N8nService {
 
   // --- API usage (for application services) ---
 
-  async getClientForCompany(companyName: string): Promise<N8nClient> {
+  getClientForCompany(companyName: string): Promise<N8nClient> {
     return this.resolveClient(companyName);
   }
 

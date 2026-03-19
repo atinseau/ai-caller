@@ -1,4 +1,4 @@
-import type { IRoomModel } from "../models/room.model";
+import type { IRoomModel } from "../models/room.model.ts";
 
 export abstract class RoomRepositoryPort {
   abstract createRoom(

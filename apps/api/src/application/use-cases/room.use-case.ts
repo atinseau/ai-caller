@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
-import { LoggerPort } from "@/domain/ports/logger.port";
-import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
-import type { IAttachCallToRoomRequestDto } from "@/interfaces/dtos/room/attach-call-to-room-request.dto";
-import type { ICreateRoomParamsRequestDto } from "@/interfaces/dtos/room/create-room-params-request.dto";
-import { EventBusPort } from "../../domain/ports/event-bus.port";
-import { RoomReadyEvent } from "../events/room-ready.event";
+import { LoggerPort } from "@/domain/ports/logger.port.ts";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
+import type { IAttachCallToRoomRequestDto } from "@/interfaces/dtos/room/attach-call-to-room-request.dto.ts";
+import type { ICreateRoomParamsRequestDto } from "@/interfaces/dtos/room/create-room-params-request.dto.ts";
+import { EventBusPort } from "../../domain/ports/event-bus.port.ts";
+import { RoomReadyEvent } from "../events/room-ready.event.ts";
 
 @injectable()
 export class RoomUseCase {

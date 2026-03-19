@@ -80,7 +80,9 @@ export function useSessionStream({ roomId }: UseSessionStreamOptions) {
         setTranscripts(msgs);
         setToolInvokes(tools);
       })
-      .catch(() => {});
+      .catch(() => {
+        /* intentionally ignored */
+      });
   }, [roomId]);
 
   const handleEvent = useCallback((event: SessionStreamEvent) => {

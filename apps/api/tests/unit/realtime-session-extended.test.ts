@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
-import { RealtimeSessionService } from "@/application/services/realtime-session.service";
-import type { IRoomModel } from "@/domain/models/room.model";
-import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
+import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 function createFakes() {
   const publishedEvents: TextStreamEvent[] = [];
@@ -32,14 +32,26 @@ function createFakes() {
     findActiveByRoomId: mock(() => Promise.resolve([])),
   };
 
-  const logger = { info: () => {}, error: () => {}, warn: () => {} };
+  const logger = {
+    info: () => {
+      /* noop */
+    },
+    error: () => {
+      /* noop */
+    },
+    warn: () => {
+      /* noop */
+    },
+  };
 
   const textStream = {
     subscribe: () => ({}),
     publish: (_roomId: string, event: TextStreamEvent) => {
       publishedEvents.push(event);
     },
-    close: mock(() => {}),
+    close: mock(() => {
+      /* noop */
+    }),
   };
 
   const subAgent = { execute: mock(() => Promise.resolve({})) };

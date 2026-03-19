@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, mock, spyOn } from "bun:test";
 import { Hono } from "hono";
-import * as authModule from "@/infrastructure/auth";
-import { authMiddleware } from "@/infrastructure/middleware/auth.middleware";
+import * as authModule from "@/infrastructure/auth/index.ts";
+import { authMiddleware } from "@/infrastructure/middleware/auth.middleware.ts";
 
 /**
  * Unit tests for authMiddleware.

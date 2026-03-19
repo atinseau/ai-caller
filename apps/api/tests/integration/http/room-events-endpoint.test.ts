@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { CompanyUseCase } from "@/application/use-cases/company.use-case";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
-import { container } from "@/infrastructure/di/container";
-import { app } from "@/interfaces/application";
+import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
+import { container } from "@/infrastructure/di/container.ts";
+import { app } from "@/interfaces/application.ts";
 import {
   cleanupTestSession,
   createTestSession,
@@ -32,7 +32,9 @@ beforeAll(async () => {
       token: `events-test-${Date.now()}`,
       expiresAt: new Date(Date.now() + 60_000),
     }),
-    terminateCall: async () => {},
+    terminateCall: async () => {
+      /* noop */
+    },
   });
 
   const companyUseCase = container.get(CompanyUseCase);
@@ -54,9 +56,13 @@ beforeAll(async () => {
 });
 
 afterAll(async () => {
-  const { prisma } = await import("@/infrastructure/database/prisma");
-  await prisma.room.delete({ where: { id: testRoomId } }).catch(() => {});
-  await prisma.company.delete({ where: { id: testCompanyId } }).catch(() => {});
+  const { prisma } = await import("@/infrastructure/database/prisma.ts");
+  await prisma.room.delete({ where: { id: testRoomId } }).catch(() => {
+    /* intentionally ignored */
+  });
+  await prisma.company.delete({ where: { id: testCompanyId } }).catch(() => {
+    /* intentionally ignored */
+  });
   await cleanupTestSession(authUserId);
   teardownTestEnvironment();
 });

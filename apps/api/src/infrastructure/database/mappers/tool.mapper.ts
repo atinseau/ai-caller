@@ -1,6 +1,6 @@
 import type { JsonValue } from "@prisma/client/runtime/client";
 import { randomUUIDv7 } from "bun";
-import type { IToolInvokeModel } from "@/domain/models/tool.model";
+import type { IToolInvokeModel } from "@/domain/models/tool.model.ts";
 import type { ToolInvoke } from "@/generated/prisma/client";
 import { ToolInvokeStatus } from "@/generated/prisma/enums";
 

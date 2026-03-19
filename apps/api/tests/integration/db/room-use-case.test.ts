@@ -7,9 +7,9 @@ import {
   expect,
   it,
 } from "bun:test";
-import { RoomUseCase } from "@/application/use-cases/room.use-case";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
+import { RoomUseCase } from "@/application/use-cases/room.use-case.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
 import {
   createTestCompany,
   setupTestEnvironment,
@@ -37,7 +37,9 @@ function stubCallService() {
       token: `test-token-${Date.now()}`,
       expiresAt: new Date(Date.now() + 60_000),
     }),
-    terminateCall: async () => {},
+    terminateCall: async () => {
+      /* noop */
+    },
   });
 }
 
@@ -77,7 +79,7 @@ describe("RoomUseCase", () => {
     stubCallService();
     const useCase = ctx.container.get(RoomUseCase);
 
-    expect(
+    await expect(
       useCase.createRoom({
         companyId: "00000000-0000-0000-0000-000000000000",
       }),

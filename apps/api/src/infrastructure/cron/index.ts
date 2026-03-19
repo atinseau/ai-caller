@@ -1,8 +1,8 @@
 import { CronJob, type CronJobParams } from "cron";
-import { RoomUseCase } from "@/application/use-cases/room.use-case";
-import { CronEnum } from "@/interfaces/enums/cron.enum";
-import { container } from "../di/container";
-import { logger } from "../logger";
+import { RoomUseCase } from "@/application/use-cases/room.use-case.ts";
+import { CronEnum } from "@/interfaces/enums/cron.enum.ts";
+import { container } from "../di/container.ts";
+import { logger } from "../logger/index.ts";
 
 const registeredCronJobs: CronJob[] = [];
 

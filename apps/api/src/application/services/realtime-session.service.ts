@@ -1,15 +1,15 @@
 import type { Schema } from "@ai-caller/shared";
 import { inject, injectable } from "inversify";
-import type { IRoomModel } from "@/domain/models/room.model";
-import { LoggerPort } from "@/domain/ports/logger.port";
-import type { RealtimeSessionPort } from "@/domain/ports/realtime-session.port";
-import { SubAgentPort } from "@/domain/ports/sub-agent.port";
-import { TextStreamPort } from "@/domain/ports/text-stream.port";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
-import { env } from "@/infrastructure/config/env";
-import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import { LoggerPort } from "@/domain/ports/logger.port.ts";
+import type { RealtimeSessionPort } from "@/domain/ports/realtime-session.port.ts";
+import { SubAgentPort } from "@/domain/ports/sub-agent.port.ts";
+import { TextStreamPort } from "@/domain/ports/text-stream.port.ts";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port.ts";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
+import { env } from "@/infrastructure/config/env.ts";
+import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum.ts";
 
 type SendToRoomFn = (event: Schema["RealtimeClientEvent"]) => void;
 
@@ -159,7 +159,7 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     return this.buildUnblockMessages();
   }
 
-  private async handleFunctionCall(
+  private handleFunctionCall(
     item: Schema["RealtimeConversationItemFunctionCall"],
     room: IRoomModel,
   ): Promise<Schema["RealtimeClientEvent"][]> {
@@ -167,7 +167,7 @@ export class RealtimeSessionService implements RealtimeSessionPort {
       this.logger.warn(
         `Function call item with ID ${item.id} has unhandled status: ${item.status}`,
       );
-      return [];
+      return Promise.resolve([]);
     }
 
     if (item.name === AiToolEnum.CALL_CLOSE) {
@@ -222,13 +222,15 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     room: IRoomModel,
   ): Promise<Schema["RealtimeClientEvent"][]> {
     const state = this.sessionState.get(room.id);
+    if (!item.id || !item.name) return [];
+
     const args = item.arguments
       ? (JSON.parse(item.arguments) as Record<string, unknown>)
       : {};
 
     const toolInvoke = await this.toolRepository.createToolInvoke(
       room.id,
-      item.id!,
+      item.id,
       item.name,
       args,
     );
@@ -248,7 +250,7 @@ export class RealtimeSessionService implements RealtimeSessionPort {
           model: env.get("SUB_AGENT_MODEL"),
           roomId: room.id,
           toolInvokeId: toolInvoke.entityId,
-          functionName: item.name!,
+          functionName: item.name,
           functionArgs: args,
           mcpServerUrl: state.companyMcpUrl,
         })

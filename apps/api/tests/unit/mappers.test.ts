@@ -1,7 +1,7 @@
 import { describe, expect, it } from "bun:test";
-import { CompanyMapper } from "@/infrastructure/database/mappers/company.mapper";
-import { RoomMapper } from "@/infrastructure/database/mappers/room.mapper";
-import { ToolInvokeMapper } from "@/infrastructure/database/mappers/tool.mapper";
+import { CompanyMapper } from "@/infrastructure/database/mappers/company.mapper.ts";
+import { RoomMapper } from "@/infrastructure/database/mappers/room.mapper.ts";
+import { ToolInvokeMapper } from "@/infrastructure/database/mappers/tool.mapper.ts";
 
 describe("CompanyMapper", () => {
   it("toModel should map all Prisma fields to domain model", () => {

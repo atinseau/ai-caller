@@ -1,6 +1,6 @@
 import type { Hono } from "hono";
-import type { IRoomModel } from "@/domain/models/room.model";
-import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 /**
  * Programmatic client for testing text-mode conversations.
@@ -91,7 +91,9 @@ export class TestConversationClient {
     })();
 
     await Promise.race([readPromise, timeoutPromise]);
-    reader.cancel().catch(() => {});
+    reader.cancel().catch(() => {
+      /* intentionally ignored */
+    });
 
     return events;
   }

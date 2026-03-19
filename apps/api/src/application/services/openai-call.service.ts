@@ -1,15 +1,15 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
 import { inject, injectable } from "inversify";
-import type { ICompanyModel } from "@/domain/models/company.model";
-import type { IRoomModel } from "@/domain/models/room.model";
-import { LoggerPort } from "@/domain/ports/logger.port";
-import { PromptPort } from "@/domain/ports/prompt.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import type { CallServicePort } from "@/domain/services/call-service.port";
-import { env } from "@/infrastructure/config/env";
-import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum";
-import { McpToolDiscoveryService } from "./mcp-tool-discovery.service";
+import type { ICompanyModel } from "@/domain/models/company.model.ts";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import { LoggerPort } from "@/domain/ports/logger.port.ts";
+import { PromptPort } from "@/domain/ports/prompt.port.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import type { CallServicePort } from "@/domain/services/call-service.port.ts";
+import { env } from "@/infrastructure/config/env.ts";
+import { AiToolEnum } from "@/interfaces/enums/ai-tool.enum.ts";
+import { McpToolDiscoveryService } from "./mcp-tool-discovery.service.ts";
 
 @injectable()
 export class OpenAICallService implements CallServicePort {

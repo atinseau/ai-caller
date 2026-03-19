@@ -1,5 +1,5 @@
-import type { ICompanyModel } from "../models/company.model";
-import type { IRoomModel } from "../models/room.model";
+import type { ICompanyModel } from "../models/company.model.ts";
+import type { IRoomModel } from "../models/room.model.ts";
 
 export abstract class CallServicePort {
   /**

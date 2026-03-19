@@ -2,8 +2,8 @@ import type {
   JsonRouteBody,
   JsonRouteResponse,
   OpenAIConfig,
-} from "../../types/openai.types";
-import { openAiClient } from "./openai-client";
+} from "../../types/openai.types.ts";
+import { openAiClient } from "./openai-client.ts";
 
 export class OpenAIRealtime {
   constructor(private readonly config: OpenAIConfig) {}
@@ -41,10 +41,6 @@ export class OpenAIRealtime {
         "Location header is missing in the response from OpenAI Realtime API",
       );
     }
-    console.log(
-      "Received SDP answer from OpenAI Realtime API:",
-      sdpResponse.data,
-    );
     return {
       answer: {
         type: "answer",

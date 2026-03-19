@@ -1,8 +1,8 @@
 import { randomUUIDv7 } from "bun";
 import dayjs from "dayjs";
-import type { IRoomModel } from "@/domain/models/room.model";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
 import type { Room } from "@/generated/prisma/client";
-import { env } from "@/infrastructure/config/env";
+import { env } from "@/infrastructure/config/env.ts";
 
 export abstract class RoomMapper {
   static toModel(prismaRoom: Room): IRoomModel {

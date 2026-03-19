@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { app } from "@/interfaces/application";
+import { app } from "@/interfaces/application.ts";
 import {
   cleanupTestSession,
   createTestSession,

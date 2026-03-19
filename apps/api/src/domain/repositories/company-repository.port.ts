@@ -1,5 +1,5 @@
-import type { ICompanyModel } from "@/domain/models/company.model";
-import type { CompanyMapper } from "@/infrastructure/database/mappers/company.mapper";
+import type { ICompanyModel } from "@/domain/models/company.model.ts";
+import type { CompanyMapper } from "@/infrastructure/database/mappers/company.mapper.ts";
 
 export abstract class CompanyRepositoryPort {
   /**

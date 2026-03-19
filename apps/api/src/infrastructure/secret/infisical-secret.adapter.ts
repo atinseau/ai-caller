@@ -1,7 +1,7 @@
 import { InfisicalSDK } from "@infisical/sdk";
 import { injectable } from "inversify";
-import { SecretManagerPort } from "@/domain/ports/secret-manager.port";
-import { env } from "@/infrastructure/config/env";
+import { SecretManagerPort } from "@/domain/ports/secret-manager.port.ts";
+import { env } from "@/infrastructure/config/env.ts";
 
 @injectable()
 export class InfisicalSecretAdapter extends SecretManagerPort {
@@ -14,15 +14,20 @@ export class InfisicalSecretAdapter extends SecretManagerPort {
     this.client = new InfisicalSDK({
       siteUrl: env.get("INFISICAL_SITE_URL"),
     });
-    this.projectId = env.get("INFISICAL_PROJECT_ID")!;
+    const projectId = env.get("INFISICAL_PROJECT_ID");
+    if (!projectId) throw new Error("INFISICAL_PROJECT_ID is required");
+    this.projectId = projectId;
     this.environment = env.get("INFISICAL_ENVIRONMENT");
   }
 
   async login(): Promise<void> {
-    await this.client.auth().universalAuth.login({
-      clientId: env.get("INFISICAL_CLIENT_ID")!,
-      clientSecret: env.get("INFISICAL_CLIENT_SECRET")!,
-    });
+    const clientId = env.get("INFISICAL_CLIENT_ID");
+    const clientSecret = env.get("INFISICAL_CLIENT_SECRET");
+    if (!clientId || !clientSecret)
+      throw new Error(
+        "INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET are required",
+      );
+    await this.client.auth().universalAuth.login({ clientId, clientSecret });
   }
 
   async getSecret(name: string, path = "/"): Promise<string> {

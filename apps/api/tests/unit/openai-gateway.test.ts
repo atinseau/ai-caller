@@ -4,12 +4,16 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
   it("openRoomChannel should return early when audio room has no callId", async () => {
     // Import the real gateway via DI — no circular dep since we test it standalone
     const { OpenAIRealtimeGateway } = await import(
-      "@/infrastructure/gateway/openai-realtime.gateway"
+      "@/infrastructure/gateway/openai-realtime.gateway.ts"
     );
 
     const sessionService = {
-      initSession: () => {},
-      destroySession: () => {},
+      initSession: () => {
+        /* noop */
+      },
+      destroySession: () => {
+        /* noop */
+      },
       processMessage: async () => [],
     };
 
@@ -39,11 +43,15 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
   it("closeRoomChannel should not crash on nonexistent room", () => {
     const {
       OpenAIRealtimeGateway,
-    } = require("@/infrastructure/gateway/openai-realtime.gateway");
+    } = require("@/infrastructure/gateway/openai-realtime.gateway.ts");
 
     const sessionService = {
-      initSession: () => {},
-      destroySession: () => {},
+      initSession: () => {
+        /* noop */
+      },
+      destroySession: () => {
+        /* noop */
+      },
       processMessage: async () => [],
     };
 
@@ -55,11 +63,15 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
   it("sendToRoom should not crash on nonexistent room", () => {
     const {
       OpenAIRealtimeGateway,
-    } = require("@/infrastructure/gateway/openai-realtime.gateway");
+    } = require("@/infrastructure/gateway/openai-realtime.gateway.ts");
 
     const sessionService = {
-      initSession: () => {},
-      destroySession: () => {},
+      initSession: () => {
+        /* noop */
+      },
+      destroySession: () => {
+        /* noop */
+      },
       processMessage: async () => [],
     };
 

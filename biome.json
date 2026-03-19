@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "includes": ["**", "!**/vite-env.d.ts"]
+    "includes": ["**", "!**/vite-env.d.ts", "!**/openapi-openai.types.ts"]
   },
   "formatter": {
     "enabled": true,
@@ -18,6 +18,7 @@
     "enabled": true,
     "rules": {
       "recommended": true,
+      "suspicious": "error",
       "complexity": {
         "noStaticOnlyClass": "off"
       }
@@ -36,6 +37,29 @@
       "quoteStyle": "double"
     }
   },
+  "overrides": [
+    {
+      "includes": ["apps/frontend/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noReactSpecificProps": "off",
+            "noDocumentCookie": "warn"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/scripts/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ],
   "assist": {
     "enabled": true,
     "actions": {

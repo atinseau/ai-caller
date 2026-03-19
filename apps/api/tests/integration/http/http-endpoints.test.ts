@@ -1,9 +1,9 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import { CompanyUseCase } from "@/application/use-cases/company.use-case";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
-import { container } from "@/infrastructure/di/container";
-import { app } from "@/interfaces/application";
+import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
+import { container } from "@/infrastructure/di/container.ts";
+import { app } from "@/interfaces/application.ts";
 import {
   cleanupTestSession,
   createTestSession,
@@ -39,7 +39,7 @@ beforeAll(async () => {
       token: `http-test-${Date.now()}-${Math.random()}`,
       expiresAt: new Date(Date.now() + 60_000),
     }),
-    terminateCall: async () => {},
+    terminateCall: () => Promise.resolve(),
   });
 
   // Create a test company via the production container
@@ -55,11 +55,15 @@ afterAll(async () => {
   // Cleanup: delete rooms then company
   const roomRepo = container.get(RoomRepositoryPort);
   for (const id of createdRoomIds) {
-    await roomRepo.deleteRoom(id).catch(() => {});
+    await roomRepo.deleteRoom(id).catch(() => {
+      /* intentionally ignored */
+    });
   }
   // Delete company via raw prisma
-  const { prisma } = await import("@/infrastructure/database/prisma");
-  await prisma.company.delete({ where: { id: testCompanyId } }).catch(() => {});
+  const { prisma } = await import("@/infrastructure/database/prisma.ts");
+  await prisma.company.delete({ where: { id: testCompanyId } }).catch(() => {
+    /* intentionally ignored */
+  });
   await cleanupTestSession(authUserId);
   teardownTestEnvironment();
 });
@@ -87,10 +91,12 @@ describe("HTTP Endpoints", () => {
       expect(data.companyId).toBeDefined();
 
       // Cleanup
-      const { prisma } = await import("@/infrastructure/database/prisma");
+      const { prisma } = await import("@/infrastructure/database/prisma.ts");
       await prisma.company
         .delete({ where: { id: data.companyId } })
-        .catch(() => {});
+        .catch(() => {
+          /* intentionally ignored */
+        });
     });
   });
 

@@ -1,6 +1,6 @@
 import { compile, type TemplateDelegate } from "handlebars";
 import { injectable } from "inversify";
-import type { PromptPort } from "@/domain/ports/prompt.port";
+import type { PromptPort } from "@/domain/ports/prompt.port.ts";
 
 const PROMPTS_DIR = new URL("../../prompts/", import.meta.url);
 

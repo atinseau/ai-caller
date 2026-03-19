@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it } from "bun:test";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
-import { PRISMA_TOKEN } from "@/infrastructure/database/prisma";
+import { PRISMA_TOKEN } from "@/infrastructure/database/prisma.ts";
 import {
   createTestCompany,
   mockMcpServer,
@@ -26,7 +26,7 @@ function getTxPrisma() {
   return ctx.container.get<PrismaClient>(PRISMA_TOKEN as never);
 }
 
-async function createTestRoom(companyId: string) {
+function createTestRoom(companyId: string) {
   return getTxPrisma().room.create({
     data: {
       token: `token-${Date.now()}-${Math.random()}`,

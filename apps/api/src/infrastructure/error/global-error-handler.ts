@@ -2,7 +2,7 @@ import type { ErrorHandler } from "hono";
 import { HTTPException } from "hono/http-exception";
 import z, { ZodError } from "zod";
 import { PrismaClientKnownRequestError } from "@/generated/prisma/internal/prismaNamespace";
-import { logger } from "../logger";
+import { logger } from "../logger/index.ts";
 
 export const globalErrorHandler: ErrorHandler = (error, ctx) => {
   logger.error(error);

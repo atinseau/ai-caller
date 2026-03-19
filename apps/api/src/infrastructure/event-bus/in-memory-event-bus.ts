@@ -1,6 +1,9 @@
 import { injectable } from "inversify";
-import type { EventBusPort, EventHandler } from "@/domain/ports/event-bus.port";
-import type { Class } from "@/types";
+import type {
+  EventBusPort,
+  EventHandler,
+} from "@/domain/ports/event-bus.port.ts";
+import type { Class } from "@/types.ts";
 
 @injectable()
 export class InMemoryEventBus implements EventBusPort {

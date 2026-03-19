@@ -1,4 +1,4 @@
-import type { GenericWorkflow } from "@/domain/models/n8n.model";
+import type { GenericWorkflow } from "@/domain/models/n8n.model.ts";
 
 export abstract class N8nWorkflowStoragePort {
   abstract save(filename: string, workflow: GenericWorkflow): Promise<void>;

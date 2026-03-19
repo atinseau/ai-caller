@@ -1,7 +1,8 @@
 import { randomUUID } from "node:crypto";
+import process from "node:process";
 import { Hono } from "hono";
 import { setSignedCookie } from "hono/cookie";
-import { prisma } from "@/infrastructure/database/prisma";
+import { prisma } from "@/infrastructure/database/prisma.ts";
 
 // better-auth uses DEFAULT_SECRET when no BETTER_AUTH_SECRET env var is set
 const AUTH_SECRET =
@@ -58,7 +59,9 @@ export async function createTestSession(
 
 export async function cleanupTestSession(userId: string): Promise<void> {
   // Cascade deletes session rows too (onDelete: Cascade on Session → User)
-  await prisma.user.delete({ where: { id: userId } }).catch(() => {});
+  await prisma.user.delete({ where: { id: userId } }).catch(() => {
+    /* already deleted */
+  });
 }
 
 /**

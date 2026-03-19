@@ -2,7 +2,7 @@ import { describe, expect, it } from "bun:test";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
-import { globalErrorHandler } from "@/infrastructure/error/global-error-handler";
+import { globalErrorHandler } from "@/infrastructure/error/global-error-handler.ts";
 
 /**
  * Unit tests for globalErrorHandler.

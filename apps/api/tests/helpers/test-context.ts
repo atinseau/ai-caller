@@ -1,13 +1,13 @@
 import { Container } from "inversify";
-import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma";
+import { PRISMA_TOKEN, prisma } from "@/infrastructure/database/prisma.ts";
 import {
   eventsModule,
   HANDLERS,
-} from "@/infrastructure/di/modules/events.module";
-import { gatewayModule } from "@/infrastructure/di/modules/gateway.module";
-import { repositoryModule } from "@/infrastructure/di/modules/repository.module";
-import { serviceModule } from "@/infrastructure/di/modules/service.module";
-import { useCaseModule } from "@/infrastructure/di/modules/use-case.module";
+} from "@/infrastructure/di/modules/events.module.ts";
+import { gatewayModule } from "@/infrastructure/di/modules/gateway.module.ts";
+import { repositoryModule } from "@/infrastructure/di/modules/repository.module.ts";
+import { serviceModule } from "@/infrastructure/di/modules/service.module.ts";
+import { useCaseModule } from "@/infrastructure/di/modules/use-case.module.ts";
 
 class RollbackError extends Error {
   constructor() {
@@ -30,7 +30,7 @@ class RollbackError extends Error {
  * ```
  */
 export function createTestContext() {
-  let _container: Container = null!;
+  let _container!: Container;
   let _signalRollback: (() => void) | null = null;
   let _transactionDone: Promise<void> | null = null;
 

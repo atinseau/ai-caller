@@ -1,6 +1,6 @@
 import { inject, injectable } from "inversify";
-import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port";
-import type { ICreateCompanyRequestDto } from "@/interfaces/dtos/company/create-company-request.dto";
+import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
+import type { ICreateCompanyRequestDto } from "@/interfaces/dtos/company/create-company-request.dto.ts";
 
 @injectable()
 export class CompanyUseCase {
@@ -9,22 +9,22 @@ export class CompanyUseCase {
     private companyRepository: CompanyRepositoryPort,
   ) {}
 
-  async create(dto: ICreateCompanyRequestDto) {
+  create(dto: ICreateCompanyRequestDto) {
     return this.companyRepository.createCompany({
       name: dto.name,
       mcpUrl: dto.mcpUrl,
     });
   }
 
-  async list() {
+  list() {
     return this.companyRepository.getAllCompanies();
   }
 
-  async getById(id: string) {
+  getById(id: string) {
     return this.companyRepository.findById(id);
   }
 
-  async delete(id: string) {
+  delete(id: string) {
     return this.companyRepository.deleteCompany(id);
   }
 }

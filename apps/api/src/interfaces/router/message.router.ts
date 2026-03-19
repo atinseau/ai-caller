@@ -1,11 +1,11 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 import { streamSSE } from "hono/streaming";
-import { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port";
-import { TextStreamPort } from "@/domain/ports/text-stream.port";
-import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port";
-import { container } from "@/infrastructure/di/container";
-import { SendMessageRequestDto } from "../dtos/room/send-message-request.dto";
-import { SendMessageResponseDto } from "../dtos/room/send-message-response.dto";
+import { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port.ts";
+import { TextStreamPort } from "@/domain/ports/text-stream.port.ts";
+import { RoomEventRepositoryPort } from "@/domain/repositories/room-event-repository.port.ts";
+import { container } from "@/infrastructure/di/container.ts";
+import { SendMessageRequestDto } from "../dtos/room/send-message-request.dto.ts";
+import { SendMessageResponseDto } from "../dtos/room/send-message-response.dto.ts";
 
 export const messageRouter = new OpenAPIHono();
 
@@ -35,7 +35,7 @@ const sendMessageRoute = createRoute({
   },
 });
 
-messageRouter.openapi(sendMessageRoute, async (ctx) => {
+messageRouter.openapi(sendMessageRoute, (ctx) => {
   const { roomId } = ctx.req.valid("param");
   const { text } = ctx.req.valid("json");
 
@@ -58,7 +58,7 @@ messageRouter.openapi(sendMessageRoute, async (ctx) => {
 });
 
 // GET /api/v1/room/:roomId/stream — SSE stream of real-time session events
-messageRouter.get("/:roomId/stream", async (ctx) => {
+messageRouter.get("/:roomId/stream", (ctx) => {
   const roomId = ctx.req.param("roomId");
   const textStream = container.get(TextStreamPort);
 

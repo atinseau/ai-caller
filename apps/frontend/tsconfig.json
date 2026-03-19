@@ -25,6 +25,7 @@
       "@/domain/*": ["./src/domain/*"],
       "@/shared/lib/*": ["./src/shared/lib/*"]
     },
+    "allowImportingTsExtensions": true,
     "esModuleInterop": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,

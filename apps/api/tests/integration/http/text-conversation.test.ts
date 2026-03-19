@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream";
+import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream.ts";
 
 describe("Text Conversation", () => {
   describe("InMemoryTextStream", () => {

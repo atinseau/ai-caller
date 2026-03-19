@@ -1,5 +1,5 @@
 import type { MiddlewareHandler } from "hono";
-import { auth } from "../auth";
+import { auth } from "../auth/index.ts";
 
 export const authMiddleware: MiddlewareHandler = async (ctx, next) => {
   const session = await auth.api.getSession({ headers: ctx.req.raw.headers });

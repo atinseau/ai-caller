@@ -1,11 +1,13 @@
 import { beforeAll, mock } from "bun:test";
-import { env } from "../src/infrastructure/config/env";
+import { env } from "../src/infrastructure/config/env.ts";
 
 await env.init();
 
 // Silence pino logger in tests
 mock.module("pino", () => {
-  const noop = () => {};
+  const noop = () => {
+    /* noop */
+  };
   const noopLogger = {
     info: noop,
     error: noop,

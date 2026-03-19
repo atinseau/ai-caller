@@ -1,8 +1,8 @@
 import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { injectable } from "inversify";
-import type { GenericWorkflow } from "@/domain/models/n8n.model";
-import { N8nWorkflowStoragePort } from "@/domain/ports/n8n-workflow-storage.port";
+import type { GenericWorkflow } from "@/domain/models/n8n.model.ts";
+import { N8nWorkflowStoragePort } from "@/domain/ports/n8n-workflow-storage.port.ts";
 
 const WORKFLOWS_DIR = join(import.meta.dir, "../../../workflows");
 

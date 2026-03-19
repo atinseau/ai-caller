@@ -1,9 +1,9 @@
 import { Container } from "inversify";
-import { eventsModule, HANDLERS } from "./modules/events.module";
-import { gatewayModule } from "./modules/gateway.module";
-import { repositoryModule } from "./modules/repository.module";
-import { serviceModule } from "./modules/service.module";
-import { useCaseModule } from "./modules/use-case.module";
+import { eventsModule, HANDLERS } from "./modules/events.module.ts";
+import { gatewayModule } from "./modules/gateway.module.ts";
+import { repositoryModule } from "./modules/repository.module.ts";
+import { serviceModule } from "./modules/service.module.ts";
+import { useCaseModule } from "./modules/use-case.module.ts";
 
 export const container = new Container();
 

@@ -3,7 +3,7 @@ import { describe, expect, it, setDefaultTimeout } from "bun:test";
 setDefaultTimeout(30_000);
 
 import type { Schema } from "@ai-caller/shared";
-import { env } from "@/infrastructure/config/env";
+import { env } from "@/infrastructure/config/env.ts";
 
 /**
  * These tests use the REAL OpenAI Realtime API.

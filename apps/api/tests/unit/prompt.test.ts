@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter";
+import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter.ts";
 
 describe("HandlebarsPromptAdapter", () => {
   const adapter = new HandlebarsPromptAdapter();
@@ -34,6 +34,6 @@ describe("HandlebarsPromptAdapter", () => {
   });
 
   it("should throw on nonexistent prompt", async () => {
-    expect(adapter.render("nonexistent-prompt-xyz")).rejects.toThrow();
+    await expect(adapter.render("nonexistent-prompt-xyz")).rejects.toThrow();
   });
 });

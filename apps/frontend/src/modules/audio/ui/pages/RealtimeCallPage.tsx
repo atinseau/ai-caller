@@ -30,7 +30,6 @@ export function RealtimeCallPage() {
     const companyId = input.value.trim();
 
     if (!companyId.length) {
-      console.warn("Company ID is required");
       return;
     }
 

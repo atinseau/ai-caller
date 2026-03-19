@@ -62,7 +62,6 @@ export class ApiWebSocket {
 
   close() {
     if (!this.isOpen() || !this.socket) {
-      console.warn("WebSocket is not open or already closed.");
       return;
     }
     this.socket.close();
@@ -73,9 +72,6 @@ export class ApiWebSocket {
     callback: ApiWebSocketEventCallback<T>,
   ) {
     if (!this.socket) {
-      console.warn(
-        "WebSocket is not initialized. Unable to attach event listener.",
-      );
       return;
     }
     if (!this.eventListeners.has(event)) {
@@ -88,9 +84,6 @@ export class ApiWebSocket {
 
   once(event: string, callback: (data: Event) => void) {
     if (!this.socket) {
-      console.warn(
-        "WebSocket is not initialized. Unable to attach event listener.",
-      );
       return;
     }
     if (!this.onceListeners.has(event)) {
@@ -101,9 +94,6 @@ export class ApiWebSocket {
 
   off(event: string, callback?: (data: Event) => void) {
     if (!this.socket) {
-      console.warn(
-        "WebSocket is not initialized. Unable to detach event listener.",
-      );
       return;
     }
     if (callback) {
@@ -132,7 +122,6 @@ export class ApiWebSocket {
 
   send(data: string | ArrayBufferLike | Blob | ArrayBufferView) {
     if (!this.isOpen() || !this.socket) {
-      console.warn("WebSocket is not open. Unable to send message.");
       return;
     }
     this.socket.send(data);

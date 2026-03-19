@@ -3,7 +3,7 @@ import { Subject } from "rxjs";
 import type {
   TextStreamEvent,
   TextStreamPort,
-} from "@/domain/ports/text-stream.port";
+} from "@/domain/ports/text-stream.port.ts";
 
 @injectable()
 export class InMemoryTextStream implements TextStreamPort {
@@ -70,7 +70,7 @@ export class InMemoryTextStream implements TextStreamPort {
           next() {
             if (buffer.length > 0) {
               return Promise.resolve({
-                value: buffer.shift()!,
+                value: buffer.shift() as TextStreamEvent,
                 done: false,
               });
             }

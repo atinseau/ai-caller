@@ -1,10 +1,10 @@
 import { inject, injectable } from "inversify";
-import type { IToolInvokeModel } from "@/domain/models/tool.model";
-import type { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
+import type { IToolInvokeModel } from "@/domain/models/tool.model.ts";
+import type { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
 import { ToolInvokeStatus } from "@/generated/prisma/enums";
-import { ToolInvokeMapper } from "../mappers/tool.mapper";
-import { PRISMA_TOKEN } from "../prisma";
+import { ToolInvokeMapper } from "../mappers/tool.mapper.ts";
+import { PRISMA_TOKEN } from "../prisma.ts";
 
 @injectable()
 export class ToolRepositoryPrisma implements ToolRepositoryPort {

@@ -1,5 +1,5 @@
 import type { Schema } from "@ai-caller/shared";
-import type { IRoomModel } from "../models/room.model";
+import type { IRoomModel } from "../models/room.model.ts";
 
 export abstract class RealtimeGatewayPort {
   abstract openRoomChannel(

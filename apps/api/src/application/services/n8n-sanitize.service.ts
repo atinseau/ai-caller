@@ -3,10 +3,10 @@ import type {
   GenericWorkflow,
   N8nWorkflow,
   N8nWorkflowPayload,
-} from "@/domain/models/n8n.model";
+} from "@/domain/models/n8n.model.ts";
 
 const UUID_RE =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/iu;
 
 function isUuid(value: string): boolean {
   return UUID_RE.test(value);
@@ -47,7 +47,7 @@ export class N8nSanitizeService {
   slugify(name: string): string {
     return name
       .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+      .replace(/[^a-z0-9]+/gu, "-")
+      .replace(/^-|-$/gu, "");
   }
 }

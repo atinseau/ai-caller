@@ -1,4 +1,4 @@
-import type { IToolInvokeModel } from "../models/tool.model";
+import type { IToolInvokeModel } from "../models/tool.model.ts";
 
 export type TextStreamEvent =
   | { type: "text_delta"; text: string }

@@ -1,4 +1,4 @@
-import type { Class } from "@/types";
+import type { Class } from "@/types.ts";
 
 export type EventHandler<TEvent extends Class> = (
   event: InstanceType<TEvent>,

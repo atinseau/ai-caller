@@ -1,15 +1,15 @@
 import { inject, injectable } from "inversify";
-import { LoggerPort } from "@/domain/ports/logger.port";
-import { McpClientPort } from "@/domain/ports/mcp-client.port";
-import { PromptPort } from "@/domain/ports/prompt.port";
+import { LoggerPort } from "@/domain/ports/logger.port.ts";
+import { McpClientPort } from "@/domain/ports/mcp-client.port.ts";
+import { PromptPort } from "@/domain/ports/prompt.port.ts";
 import type {
   SubAgentConfig,
   SubAgentPort,
   SubAgentResult,
-} from "@/domain/ports/sub-agent.port";
-import { TextStreamPort } from "@/domain/ports/text-stream.port";
-import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { env } from "@/infrastructure/config/env";
+} from "@/domain/ports/sub-agent.port.ts";
+import { TextStreamPort } from "@/domain/ports/text-stream.port.ts";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port.ts";
+import { env } from "@/infrastructure/config/env.ts";
 
 @injectable()
 export class SubAgentService implements SubAgentPort {
@@ -65,7 +65,9 @@ export class SubAgentService implements SubAgentPort {
         .findByEntityId(config.toolInvokeId)
         .catch(() => null);
       if (existing) {
-        await this.toolRepo.failToolInvoke(existing.id).catch(() => {});
+        await this.toolRepo.failToolInvoke(existing.id).catch(() => {
+          /* intentionally ignored */
+        });
       }
 
       this.textStream.publish(config.roomId, {

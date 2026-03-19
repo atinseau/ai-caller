@@ -1,5 +1,5 @@
 import { z } from "@hono/zod-openapi";
-import { RoomModel } from "@/domain/models/room.model";
+import { RoomModel } from "@/domain/models/room.model.ts";
 
 export const CreateRoomResponseDto = z
   .object({

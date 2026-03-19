@@ -1,7 +1,8 @@
+import process from "node:process";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@/generated/prisma/client";
-import { env } from "../config/env";
-import { logger } from "../logger";
+import { env } from "../config/env.ts";
+import { logger } from "../logger/index.ts";
 
 export const PRISMA_TOKEN = Symbol.for("PrismaClient");
 

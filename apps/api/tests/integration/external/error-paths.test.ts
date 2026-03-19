@@ -1,5 +1,5 @@
 import { describe, expect, it, setDefaultTimeout } from "bun:test";
-import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
+import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter.ts";
 
 setDefaultTimeout(15_000);
 

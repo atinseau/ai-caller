@@ -1,9 +1,9 @@
 import { inject, injectable } from "inversify";
-import type { IRoomModel } from "@/domain/models/room.model";
-import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
+import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
-import { RoomMapper } from "../mappers/room.mapper";
-import { PRISMA_TOKEN } from "../prisma";
+import { RoomMapper } from "../mappers/room.mapper.ts";
+import { PRISMA_TOKEN } from "../prisma.ts";
 
 @injectable()
 export class RoomRepositoryPrisma implements RoomRepositoryPort {

@@ -1,4 +1,4 @@
-import type { IToolInvokeModel } from "../models/tool.model";
+import type { IToolInvokeModel } from "../models/tool.model.ts";
 
 export abstract class ToolRepositoryPort {
   abstract createToolInvoke(

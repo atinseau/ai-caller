@@ -7,7 +7,7 @@ import {
   expect,
   it,
 } from "bun:test";
-import { CompanyUseCase } from "@/application/use-cases/company.use-case";
+import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
 import {
   setupTestEnvironment,
   teardownTestEnvironment,

@@ -100,8 +100,7 @@ export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement | null>) {
       });
 
       dispatch({ type: "CONNECTED", pc, dc, roomId });
-    } catch (error) {
-      console.error("Error during call setup:", error);
+    } catch (_error) {
       dispatch({ type: "ERROR" });
     }
   };

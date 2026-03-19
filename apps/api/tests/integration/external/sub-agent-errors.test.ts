@@ -8,14 +8,14 @@ import {
   it,
   setDefaultTimeout,
 } from "bun:test";
-import { SubAgentService } from "@/application/services/sub-agent.service";
-import type { TextStreamEvent } from "@/domain/ports/text-stream.port";
-import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port";
-import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port";
-import { CallServicePort } from "@/domain/services/call-service.port";
-import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter";
-import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter";
-import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream";
+import { SubAgentService } from "@/application/services/sub-agent.service.ts";
+import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
+import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
+import { ToolRepositoryPort } from "@/domain/repositories/tool-repository.port.ts";
+import { CallServicePort } from "@/domain/services/call-service.port.ts";
+import { McpClientAdapter } from "@/infrastructure/mcp/mcp-client.adapter.ts";
+import { HandlebarsPromptAdapter } from "@/infrastructure/prompt/handlebars-prompt.adapter.ts";
+import { InMemoryTextStream } from "@/infrastructure/stream/in-memory-text-stream.ts";
 import {
   createTestCompany,
   setupTestEnvironment,
@@ -39,9 +39,15 @@ beforeEach(ctx.setup);
 afterEach(ctx.teardown);
 
 const noopLogger = {
-  info: () => {},
-  error: () => {},
-  warn: () => {},
+  info: () => {
+    /* noop */
+  },
+  error: () => {
+    /* noop */
+  },
+  warn: () => {
+    /* noop */
+  },
 } as never;
 
 describe("SubAgentService — error paths", () => {
@@ -51,7 +57,9 @@ describe("SubAgentService — error paths", () => {
         token: `err-test-${Date.now()}`,
         expiresAt: new Date(Date.now() + 60_000),
       }),
-      terminateCall: async () => {},
+      terminateCall: async () => {
+        /* noop */
+      },
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);

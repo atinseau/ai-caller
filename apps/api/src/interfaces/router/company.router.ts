@@ -1,12 +1,12 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
-import { CompanyUseCase } from "@/application/use-cases/company.use-case";
+import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
 import { UserRole } from "@/generated/prisma/client";
-import { container } from "@/infrastructure/di/container";
-import { CreateCompanyRequestDto } from "../dtos/company/create-company-request.dto";
-import { CreateCompanyResponseDto } from "../dtos/company/create-company-response.dto";
-import { GetAllCompanyResponseDto } from "../dtos/company/get-all-company-response.dto";
-import { GetCompanyResponseDto } from "../dtos/company/get-company-response.dto";
+import { container } from "@/infrastructure/di/container.ts";
+import { CreateCompanyRequestDto } from "../dtos/company/create-company-request.dto.ts";
+import { CreateCompanyResponseDto } from "../dtos/company/create-company-response.dto.ts";
+import { GetAllCompanyResponseDto } from "../dtos/company/get-all-company-response.dto.ts";
+import { GetCompanyResponseDto } from "../dtos/company/get-company-response.dto.ts";
 
 export const companyRouter = new OpenAPIHono();
 

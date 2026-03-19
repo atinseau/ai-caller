@@ -1,5 +1,5 @@
 import { z } from "@hono/zod-openapi";
-import { CompanyStatus } from "@/domain/enums/company-status.enum";
+import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 
 export const CompanyModel = z
   .object({
@@ -11,7 +11,7 @@ export const CompanyModel = z
       description: "The MCP server URL of the company",
       example: "https://mcp.acme-corp.com",
     }),
-    status: z.nativeEnum(CompanyStatus).openapi({
+    status: z.enum(CompanyStatus).openapi({
       description: "The status of the company",
       example: CompanyStatus.INACTIVE,
     }),
