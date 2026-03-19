@@ -1,0 +1,5 @@
+export enum McpStatusEnum {
+  CONNECTED = "CONNECTED",
+  UNREACHABLE = "UNREACHABLE",
+  NOT_CONFIGURED = "NOT_CONFIGURED",
+}

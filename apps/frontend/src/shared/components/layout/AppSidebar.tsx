@@ -75,7 +75,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
 
-      <SidebarSeparator />
+      <SidebarSeparator className="w-auto!" />
 
       <SidebarContent>
         <SidebarGroup>

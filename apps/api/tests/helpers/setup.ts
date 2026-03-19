@@ -20,11 +20,11 @@ export function teardownTestEnvironment() {
  */
 export function createTestCompany(
   container: Container,
-  mcpUrl: string,
+  _mcpUrl: string,
 ): Promise<ICompanyModel> {
   const companyRepo = container.get(CompanyRepositoryPort);
   return companyRepo.createCompany({
     name: `test-company-${Date.now()}`,
-    mcpUrl,
+    description: null,
   });
 }

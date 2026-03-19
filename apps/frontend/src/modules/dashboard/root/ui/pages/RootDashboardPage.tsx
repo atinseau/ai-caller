@@ -1,4 +1,4 @@
-import { Building2, ExternalLink, Plus, Settings } from "lucide-react";
+import { Building2, Plus, Settings } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { EmptyState } from "@/shared/components/feedback/EmptyState";
@@ -50,7 +50,7 @@ export function RootDashboardPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
-                <TableHead>MCP URL</TableHead>
+                <TableHead>MCP</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead className="w-[120px]" />
@@ -61,12 +61,10 @@ export function RootDashboardPage() {
                 <TableRow key={company.id}>
                   <TableCell className="font-medium">{company.name}</TableCell>
                   <TableCell>
-                    <span className="flex items-center gap-1 text-xs text-muted-foreground">
-                      <ExternalLink className="size-3" />
-                      <span className="max-w-[200px] truncate">
-                        {company.mcpUrl}
-                      </span>
-                    </span>
+                    <StatusBadge
+                      status={company.mcpUrl ? "CONNECTED" : "IDLE"}
+                      label={company.mcpUrl ? "Configured" : "Not configured"}
+                    />
                   </TableCell>
                   <TableCell>
                     <StatusBadge status={company.status} />

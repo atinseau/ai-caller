@@ -112,7 +112,7 @@ export class OpenAICallService implements CallServicePort {
       },
     ];
 
-    if (modality === "TEXT") {
+    if (modality === "TEXT" && company.mcpUrl) {
       // Text mode: discover MCP tools and register as functions
       const mcpFunctions = await this.toolDiscovery.discoverAsRealtimeFunctions(
         company.mcpUrl,

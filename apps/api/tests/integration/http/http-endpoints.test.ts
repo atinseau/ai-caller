@@ -18,7 +18,7 @@ import {
  * routes call `container.get()` directly. Data is cleaned up in afterAll.
  */
 
-let mcpUrl: string;
+let _mcpUrl: string;
 const createdRoomIds: string[] = [];
 let testCompanyId: string;
 let authCookie: string;
@@ -26,7 +26,7 @@ let authUserId: string;
 
 beforeAll(async () => {
   const env = await setupTestEnvironment();
-  mcpUrl = env.mcpUrl;
+  _mcpUrl = env.mcpUrl;
 
   // Create a real session so requests pass authMiddleware
   const session = await createTestSession("ROOT");
@@ -46,7 +46,6 @@ beforeAll(async () => {
   const companyUseCase = container.get(CompanyUseCase);
   const company = await companyUseCase.create({
     name: `http-test-${Date.now()}`,
-    mcpUrl,
   });
   testCompanyId = company.id;
 });

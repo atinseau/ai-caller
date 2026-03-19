@@ -22,6 +22,9 @@ export class RoomReadyHandler {
   private async handle(event: RoomReadyEvent) {
     const room = await this.roomRepository.findById(event.roomId);
     const company = await this.companyRepository.findById(room.companyId);
-    await this.realtimeGateway.openRoomChannel(room, company?.mcpUrl);
+    await this.realtimeGateway.openRoomChannel(
+      room,
+      company?.mcpUrl ?? undefined,
+    );
   }
 }

@@ -10,7 +10,6 @@ import {
   createTestSession,
 } from "@/tests/helpers/auth-session";
 import {
-  mockMcpServer,
   setupTestEnvironment,
   teardownTestEnvironment,
 } from "@/tests/helpers/setup";
@@ -40,7 +39,6 @@ beforeAll(async () => {
   const companyUseCase = container.get(CompanyUseCase);
   const company = await companyUseCase.create({
     name: `events-test-${Date.now()}`,
-    mcpUrl: mockMcpServer.url,
   });
   testCompanyId = company.id;
 

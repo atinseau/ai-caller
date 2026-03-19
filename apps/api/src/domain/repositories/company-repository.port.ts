@@ -3,7 +3,6 @@ import type { CompanyMapper } from "@/infrastructure/database/mappers/company.ma
 
 export abstract class CompanyRepositoryPort {
   /**
-   *
    * @param companyEntity The company entity to create
    */
   abstract createCompany(
@@ -11,7 +10,6 @@ export abstract class CompanyRepositoryPort {
   ): Promise<ICompanyModel>;
 
   /**
-   *
    * @param id The id of the company to find
    */
   abstract findById(id: string): Promise<ICompanyModel | null>;
@@ -20,6 +18,19 @@ export abstract class CompanyRepositoryPort {
    * Retrieve all companies
    */
   abstract getAllCompanies(): Promise<ICompanyModel[]>;
+
+  /**
+   * Update a company by id
+   */
+  abstract updateCompany(
+    id: string,
+    data: Partial<
+      Pick<
+        ICompanyModel,
+        "name" | "mcpUrl" | "status" | "systemPrompt" | "description"
+      >
+    >,
+  ): Promise<ICompanyModel>;
 
   /**
    * Delete a company by id

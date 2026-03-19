@@ -12,22 +12,23 @@ export abstract class CompanyMapper {
       name: prismaCompany.name,
       updatedAt: prismaCompany.updatedAt,
       status: prismaCompany.status as CompanyStatus,
+      systemPrompt: prismaCompany.systemPrompt,
+      description: prismaCompany.description,
     };
   }
 
   static toEntity(
-    modelCompany: Omit<
-      ICompanyModel,
-      "id" | "createdAt" | "updatedAt" | "status"
-    >,
+    modelCompany: Pick<ICompanyModel, "name" | "description">,
   ): Company {
     return {
       id: randomUUIDv7(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      mcpUrl: modelCompany.mcpUrl,
+      mcpUrl: null,
       name: modelCompany.name,
       status: CompanyStatus.INACTIVE,
+      systemPrompt: null,
+      description: modelCompany.description ?? null,
     };
   }
 }

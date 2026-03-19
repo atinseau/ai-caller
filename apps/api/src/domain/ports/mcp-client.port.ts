@@ -12,4 +12,5 @@ export abstract class McpClientPort {
     name: string,
     args: Record<string, unknown>,
   ): Promise<unknown>;
+  abstract checkConnectivity(serverUrl: string): Promise<boolean>;
 }

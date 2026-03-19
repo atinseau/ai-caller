@@ -30,12 +30,10 @@ describe("CompanyUseCase", () => {
 
     const company = await useCase.create({
       name: `test-company-${Date.now()}`,
-      mcpUrl: "http://localhost:9999/mcp",
     });
 
     expect(company.id).toBeDefined();
     expect(company.name).toContain("test-company-");
-    expect(company.mcpUrl).toBe("http://localhost:9999/mcp");
     expect(company.createdAt).toBeInstanceOf(Date);
   });
 
@@ -44,11 +42,9 @@ describe("CompanyUseCase", () => {
 
     await useCase.create({
       name: `list-test-1-${Date.now()}`,
-      mcpUrl: "http://localhost:9999/mcp",
     });
     await useCase.create({
       name: `list-test-2-${Date.now()}`,
-      mcpUrl: "http://localhost:9999/mcp",
     });
 
     const companies = await useCase.list();

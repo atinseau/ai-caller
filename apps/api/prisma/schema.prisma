@@ -100,8 +100,10 @@ model Company {
   createdAt DateTime      @default(now())
   updatedAt DateTime      @updatedAt
 
-  mcpUrl String
-  status CompanyStatus @default(INACTIVE)
+  mcpUrl       String?
+  status       CompanyStatus @default(INACTIVE)
+  systemPrompt String?       @map("system_prompt")
+  description  String?
 
   rooms     Room[]
   users     User[]

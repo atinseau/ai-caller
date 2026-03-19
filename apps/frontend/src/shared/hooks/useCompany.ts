@@ -5,11 +5,11 @@ export function useCompany(id: string | null) {
   return useQuery({
     queryKey: ["company", id],
     queryFn: async () => {
-      const res = await api.GET("/api/v1/company/:id", {
+      const res = await api.GET("/api/v1/company/{id}", {
         params: { path: { id: id as string } },
       });
       if (!res.data) throw new Error("Company not found");
-      return res.data.company;
+      return res.data;
     },
     enabled: !!id,
   });

@@ -7,6 +7,7 @@ import { CreateCompanyRequestDto } from "../dtos/company/create-company-request.
 import { CreateCompanyResponseDto } from "../dtos/company/create-company-response.dto.ts";
 import { GetAllCompanyResponseDto } from "../dtos/company/get-all-company-response.dto.ts";
 import { GetCompanyResponseDto } from "../dtos/company/get-company-response.dto.ts";
+import { UpdateCompanyRequestDto } from "../dtos/company/update-company-request.dto.ts";
 
 export const companyRouter = new OpenAPIHono();
 
@@ -75,7 +76,7 @@ companyRouter.openapi(getAllCompaniesRoute, async (ctx) => {
 
 const getCompanyRoute = createRoute({
   method: "get",
-  path: "/:id",
+  path: "/{id}",
   request: {
     params: z.object({ id: z.string() }),
   },
@@ -108,12 +109,64 @@ companyRouter.openapi(getCompanyRoute, async (ctx) => {
     return ctx.json({ message: "Company not found" }, 404);
   }
 
-  return ctx.json({ company }, 200);
+  const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+
+  return ctx.json({ company, mcpStatus }, 200);
+});
+
+const updateCompanyRoute = createRoute({
+  method: "patch",
+  path: "/{id}",
+  request: {
+    params: z.object({ id: z.string() }),
+    body: {
+      required: true,
+      content: {
+        "application/json": {
+          schema: UpdateCompanyRequestDto,
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Company updated successfully",
+      content: {
+        "application/json": {
+          schema: GetCompanyResponseDto,
+        },
+      },
+    },
+    404: {
+      description: "Company not found",
+      content: {
+        "application/json": {
+          schema: z.object({ message: z.string() }),
+        },
+      },
+    },
+  },
+});
+
+companyRouter.openapi(updateCompanyRoute, async (ctx) => {
+  const companyUseCase = container.get(CompanyUseCase);
+  const { id } = ctx.req.valid("param");
+  const dto = ctx.req.valid("json");
+
+  const existing = await companyUseCase.getById(id);
+  if (!existing) {
+    return ctx.json({ message: "Company not found" }, 404);
+  }
+
+  const company = await companyUseCase.update(id, dto);
+  const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+
+  return ctx.json({ company, mcpStatus }, 200);
 });
 
 const deleteCompanyRoute = createRoute({
   method: "delete",
-  path: "/:id",
+  path: "/{id}",
   request: {
     params: z.object({ id: z.string() }),
   },

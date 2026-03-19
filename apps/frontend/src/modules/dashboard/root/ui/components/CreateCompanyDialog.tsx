@@ -23,16 +23,19 @@ export function CreateCompanyDialog({
   onOpenChange,
 }: CreateCompanyDialogProps) {
   const [name, setName] = useState("");
-  const [mcpUrl, setMcpUrl] = useState("");
+  const [description, setDescription] = useState("");
   const { mutateAsync, isPending } = useCreateCompany();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     try {
-      await mutateAsync({ name, mcpUrl });
+      await mutateAsync({
+        name,
+        description: description || undefined,
+      });
       toast.success(`Company "${name}" created`);
       setName("");
-      setMcpUrl("");
+      setDescription("");
       onOpenChange(false);
     } catch {
       toast.error("Failed to create company");
@@ -46,8 +49,8 @@ export function CreateCompanyDialog({
           <DialogTitle>Add company</DialogTitle>
           <DialogDescription>
             The company will be created with an{" "}
-            <span className="font-medium">Inactive</span> status until fully
-            configured.
+            <span className="font-medium">Inactive</span> status. MCP
+            configuration can be done later from the company detail page.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -62,14 +65,17 @@ export function CreateCompanyDialog({
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="mcpUrl">MCP URL</Label>
+            <Label htmlFor="description">
+              Description{" "}
+              <span className="text-muted-foreground font-normal">
+                (optional)
+              </span>
+            </Label>
             <Input
-              id="mcpUrl"
-              type="url"
-              placeholder="https://mcp.acme-corp.com"
-              value={mcpUrl}
-              onChange={(e) => setMcpUrl(e.target.value)}
-              required
+              id="description"
+              placeholder="Leading provider of innovative solutions"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <DialogFooter>
@@ -81,7 +87,7 @@ export function CreateCompanyDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending || !name || !mcpUrl}>
+            <Button type="submit" disabled={isPending || !name}>
               {isPending ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>

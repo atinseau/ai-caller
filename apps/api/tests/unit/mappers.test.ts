@@ -12,6 +12,8 @@ describe("CompanyMapper", () => {
       createdAt: new Date("2025-01-01"),
       updatedAt: new Date("2025-01-02"),
       status: "INACTIVE" as const,
+      description: "A test company",
+      systemPrompt: "You are a helpful assistant",
     };
 
     const model = CompanyMapper.toModel(prismaCompany);
@@ -26,13 +28,12 @@ describe("CompanyMapper", () => {
   it("toEntity should generate id and timestamps", () => {
     const entity = CompanyMapper.toEntity({
       name: "New Co",
-      mcpUrl: "http://mcp.new",
+      description: "A new company",
     });
 
     expect(entity.id).toBeDefined();
     expect(entity.id.length).toBeGreaterThan(0);
     expect(entity.name).toBe("New Co");
-    expect(entity.mcpUrl).toBe("http://mcp.new");
     expect(entity.createdAt).toBeInstanceOf(Date);
     expect(entity.updatedAt).toBeInstanceOf(Date);
   });

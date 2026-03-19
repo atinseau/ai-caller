@@ -6,7 +6,7 @@ export function useDeleteCompany() {
 
   return useMutation({
     mutationFn: async (id: string) => {
-      await api.DELETE("/api/v1/company/:id", {
+      await api.DELETE("/api/v1/company/{id}", {
         params: { path: { id } },
       });
     },

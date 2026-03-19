@@ -49,4 +49,30 @@ export class McpClientAdapter implements McpClientPort {
     const result = await this.client.callTool({ name, arguments: args });
     return result.content;
   }
+
+  async checkConnectivity(serverUrl: string): Promise<boolean> {
+    const localClient = new Client({
+      name: "ai-caller-health-check",
+      version: "1.0.0",
+    });
+    const transport = new StreamableHTTPClientTransport(new URL(serverUrl));
+
+    try {
+      const connectPromise = localClient.connect(transport);
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error("MCP connectivity timeout")), 3000);
+      });
+
+      await Promise.race([connectPromise, timeoutPromise]);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      try {
+        await transport.close();
+      } catch {
+        /* intentionally ignored */
+      }
+    }
+  }
 }
