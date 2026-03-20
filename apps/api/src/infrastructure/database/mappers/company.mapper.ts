@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 import type {
   ICompanyModel,
+  ISystemToolPrompts,
   IToolConfigs,
 } from "@/domain/models/company.model.ts";
 import { type Company, Prisma } from "@/generated/prisma/client";
@@ -18,6 +19,11 @@ export abstract class CompanyMapper {
       systemPrompt: prismaCompany.systemPrompt,
       description: prismaCompany.description,
       toolConfigs: (prismaCompany.toolConfigs as IToolConfigs) ?? null,
+      systemToolPrompts:
+        (prismaCompany.systemToolPrompts as ISystemToolPrompts) ?? null,
+      voice: prismaCompany.voice,
+      language: prismaCompany.language,
+      vadEagerness: prismaCompany.vadEagerness,
     };
   }
 
@@ -30,6 +36,10 @@ export abstract class CompanyMapper {
       status: CompanyStatus.INACTIVE,
       description: modelCompany.description ?? null,
       toolConfigs: Prisma.DbNull,
+      systemToolPrompts: Prisma.DbNull,
+      voice: null,
+      language: null,
+      vadEagerness: null,
     };
   }
 }

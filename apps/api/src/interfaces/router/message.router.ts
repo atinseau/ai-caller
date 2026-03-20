@@ -65,11 +65,24 @@ messageRouter.get("/:roomId/stream", (ctx) => {
   return streamSSE(ctx, async (stream) => {
     const events = textStream.subscribe(roomId);
 
-    for await (const event of events) {
-      await stream.writeSSE({
-        event: event.type,
-        data: JSON.stringify(event),
-      });
+    // Send keepalive comments every 15s to prevent proxy/browser timeouts
+    const keepalive = setInterval(async () => {
+      try {
+        await stream.writeSSE({ event: "keepalive", data: "" });
+      } catch {
+        clearInterval(keepalive);
+      }
+    }, 15_000);
+
+    try {
+      for await (const event of events) {
+        await stream.writeSSE({
+          event: event.type,
+          data: JSON.stringify(event),
+        });
+      }
+    } finally {
+      clearInterval(keepalive);
     }
   });
 });

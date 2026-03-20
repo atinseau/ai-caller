@@ -6,6 +6,7 @@ type ConnectWebRtcParams = {
   audioStream: MediaStream;
   audioRef: RefObject<HTMLAudioElement | null>;
   realtimeRoom: RealtimeRoomService;
+  isTest?: boolean;
 };
 
 export async function connectWebRtc({
@@ -13,13 +14,16 @@ export async function connectWebRtc({
   audioStream,
   audioRef,
   realtimeRoom,
+  isTest,
 }: ConnectWebRtcParams): Promise<{
   pc: RTCPeerConnection;
   dc: RTCDataChannel;
   roomId: string;
 }> {
-  const { pc, dc, roomId, roomToken } =
-    await realtimeRoom.createRoom(companyId);
+  const { pc, dc, roomId, roomToken } = await realtimeRoom.createRoom(
+    companyId,
+    isTest,
+  );
 
   pc.addTrack(audioStream.getTracks()[0]);
   pc.ontrack = (e) => {

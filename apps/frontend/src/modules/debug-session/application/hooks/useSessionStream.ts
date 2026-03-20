@@ -41,6 +41,28 @@ function buildTranscriptFromEvent(
   return null;
 }
 
+const WORD_REVEAL_MS = 80;
+
+function streamWordsIntoTranscript(
+  id: string,
+  fullText: string,
+  setTranscripts: React.Dispatch<React.SetStateAction<ITranscriptMessage[]>>,
+): NodeJS.Timeout {
+  const words = fullText.split(/(\s+)/);
+  let wordIndex = 0;
+
+  return setInterval(() => {
+    wordIndex++;
+    const revealed = words.slice(0, wordIndex).join("");
+    setTranscripts((prev) =>
+      prev.map((m) => (m.id === id ? { ...m, text: revealed } : m)),
+    );
+    if (wordIndex >= words.length) {
+      // Will be cleared by the caller via the returned interval id
+    }
+  }, WORD_REVEAL_MS);
+}
+
 export function useSessionStream({ roomId }: UseSessionStreamOptions) {
   const [transcripts, setTranscripts] = useState<ITranscriptMessage[]>([]);
   const [toolInvokes, setToolInvokes] = useState<IToolInvoke[]>([]);
@@ -49,6 +71,7 @@ export function useSessionStream({ roomId }: UseSessionStreamOptions) {
   >("idle");
   const esRef = useRef<EventSource | null>(null);
   const agentDeltaBuffer = useRef<Map<string, string>>(new Map());
+  const streamIntervalsRef = useRef<Map<string, NodeJS.Timeout>>(new Map());
 
   // Load historical events on mount
   useEffect(() => {
@@ -85,67 +108,97 @@ export function useSessionStream({ roomId }: UseSessionStreamOptions) {
       });
   }, [roomId]);
 
-  const handleEvent = useCallback((event: SessionStreamEvent) => {
-    switch (event.type) {
-      case SessionEventTypeEnum.USER_TRANSCRIPT:
-        setTranscripts((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            type: "user",
-            text: event.text,
-            createdAt: new Date(),
-          },
-        ]);
-        break;
+  const startAgentStreaming = useCallback((fullText: string) => {
+    const id = crypto.randomUUID();
+    const words = fullText.split(/(\s+)/);
+    const totalDuration = words.length * WORD_REVEAL_MS;
 
-      case SessionEventTypeEnum.AGENT_TRANSCRIPT_DELTA:
-        // Buffer deltas keyed by a running key
-        agentDeltaBuffer.current.set(
-          "current",
-          (agentDeltaBuffer.current.get("current") ?? "") + event.text,
-        );
-        break;
+    // Add message with first word visible
+    setTranscripts((prev) => [
+      ...prev,
+      {
+        id,
+        type: "agent" as const,
+        text: words[0] ?? "",
+        createdAt: new Date(),
+      },
+    ]);
 
-      case SessionEventTypeEnum.AGENT_TRANSCRIPT_DONE:
-        agentDeltaBuffer.current.delete("current");
-        setTranscripts((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            type: "agent",
-            text: event.text,
-            createdAt: new Date(),
-          },
-        ]);
-        break;
-
-      case SessionEventTypeEnum.TEXT_DONE:
-        // TEXT mode: agent text response
-        setTranscripts((prev) => [
-          ...prev,
-          {
-            id: crypto.randomUUID(),
-            type: "agent",
-            text: event.text,
-            createdAt: new Date(),
-          },
-        ]);
-        break;
-
-      case SessionEventTypeEnum.TOOL_INVOKE_CREATED:
-        setToolInvokes((prev) => [...prev, event.toolInvoke]);
-        break;
-
-      case SessionEventTypeEnum.TOOL_INVOKE_UPDATED:
-        setToolInvokes((prev) =>
-          prev.map((t) =>
-            t.id === event.toolInvoke.id ? event.toolInvoke : t,
-          ),
-        );
-        break;
+    // If short enough, show immediately
+    if (totalDuration <= WORD_REVEAL_MS * 2) {
+      setTranscripts((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, text: fullText } : m)),
+      );
+      return;
     }
+
+    const interval = streamWordsIntoTranscript(id, fullText, setTranscripts);
+    streamIntervalsRef.current.set(id, interval);
+
+    // Auto-clear when done
+    setTimeout(() => {
+      clearInterval(interval);
+      streamIntervalsRef.current.delete(id);
+      // Ensure final text is complete
+      setTranscripts((prev) =>
+        prev.map((m) => (m.id === id ? { ...m, text: fullText } : m)),
+      );
+    }, totalDuration + WORD_REVEAL_MS);
   }, []);
+
+  const handleEvent = useCallback(
+    (event: SessionStreamEvent) => {
+      switch (event.type) {
+        case SessionEventTypeEnum.USER_TRANSCRIPT:
+          if (event.text.trim()) {
+            setTranscripts((prev) => [
+              ...prev,
+              {
+                id: crypto.randomUUID(),
+                type: "user",
+                text: event.text,
+                createdAt: new Date(),
+              },
+            ]);
+          }
+          break;
+
+        case SessionEventTypeEnum.AGENT_TRANSCRIPT_DELTA:
+          // Buffer deltas keyed by a running key
+          agentDeltaBuffer.current.set(
+            "current",
+            (agentDeltaBuffer.current.get("current") ?? "") + event.text,
+          );
+          break;
+
+        case SessionEventTypeEnum.AGENT_TRANSCRIPT_DONE:
+          agentDeltaBuffer.current.delete("current");
+          if (event.text.trim()) {
+            startAgentStreaming(event.text);
+          }
+          break;
+
+        case SessionEventTypeEnum.TEXT_DONE:
+          if (event.text.trim()) {
+            startAgentStreaming(event.text);
+          }
+          break;
+
+        case SessionEventTypeEnum.TOOL_INVOKE_CREATED:
+          setToolInvokes((prev) => [...prev, event.toolInvoke]);
+          break;
+
+        case SessionEventTypeEnum.TOOL_INVOKE_UPDATED:
+          setToolInvokes((prev) =>
+            prev.map((t) =>
+              t.id === event.toolInvoke.id ? event.toolInvoke : t,
+            ),
+          );
+          break;
+      }
+    },
+    [startAgentStreaming],
+  );
 
   const connect = useCallback(
     (roomId: string) => {
@@ -158,9 +211,8 @@ export function useSessionStream({ roomId }: UseSessionStreamOptions) {
 
       es.onopen = () => setSseStatus("connected");
       es.onerror = () => {
-        setSseStatus("error");
-        es.close();
-        esRef.current = null;
+        // Don't close — let EventSource auto-reconnect
+        setSseStatus("connecting");
       };
 
       const listener = (e: MessageEvent) => {
@@ -187,6 +239,10 @@ export function useSessionStream({ roomId }: UseSessionStreamOptions) {
   useEffect(() => {
     return () => {
       esRef.current?.close();
+      for (const interval of streamIntervalsRef.current.values()) {
+        clearInterval(interval);
+      }
+      streamIntervalsRef.current.clear();
     };
   }, []);
 

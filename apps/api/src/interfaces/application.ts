@@ -9,6 +9,7 @@ import { companyRouter } from "./router/company.router.ts";
 import { messageRouter } from "./router/message.router.ts";
 import { roomRouter } from "./router/room.router.ts";
 import { userRouter } from "./router/user.router.ts";
+import { voiceRouter } from "./router/voice.router.ts";
 
 const app = new OpenAPIHono();
 
@@ -32,6 +33,7 @@ app.route("/api/v1/user", userRouter);
 app.route("/api/v1/room", roomRouter);
 app.route("/api/v1/room", messageRouter);
 app.route("/api/v1/company", companyRouter);
+app.route("/api/v1/voice", voiceRouter);
 
 app.get("/", (c) => c.json({ message: "API is running", docs: "/docs" }));
 

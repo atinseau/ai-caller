@@ -1,8 +1,10 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
 import { inject, injectable } from "inversify";
+import { VoiceEnum } from "@/domain/enums/voice.enum.ts";
 import type {
   ICompanyModel,
+  ISystemToolPrompts,
   IToolConfigs,
 } from "@/domain/models/company.model.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
@@ -36,49 +38,57 @@ export class OpenAICallService implements CallServicePort {
     });
 
     const [instructions, callClose, getToolStatus] = await Promise.all([
-      this.prompt.render("instructions-prompt", { env: "dev" }),
+      this.prompt.render("instructions-prompt", {
+        companyName: company.name,
+        companySystemPrompt: company.systemPrompt ?? "",
+      }),
       this.prompt.render("call-close-tool-prompt"),
       this.prompt.render("get-tool-status-prompt"),
     ]);
 
-    const tools = await this.buildTools(
-      company,
-      modality,
-      callClose,
-      getToolStatus,
-    );
+    const tools = await this.buildTools(company, callClose, getToolStatus);
 
     this.logger.info(
       { instructions, tools, company },
       "Compiled OpenAI prompt templates",
     );
 
+    const voice = (company.voice as VoiceEnum) ?? VoiceEnum.MARIN;
+
+    // biome-ignore lint/suspicious/noExplicitAny: session config includes fields (audio.output.format) not yet fully typed in shared OpenAPI schema
+    const sessionConfig: any = {
+      output_modalities: [modality === "TEXT" ? "text" : "audio"],
+      instructions,
+      audio: {
+        input: {
+          transcription: {
+            model: "gpt-4o-mini-transcribe",
+            ...(company.language ? { language: company.language } : {}),
+          },
+        },
+        output: {
+          voice,
+          speed: 1,
+        },
+      },
+      tools,
+      tool_choice: "auto",
+      type: "realtime",
+      model: "gpt-realtime-1.5",
+      tracing: {
+        workflow_name: "realtime-audio-call",
+        metadata: {
+          companyId: company.id,
+        },
+      },
+    };
+
     const data = await openai.realtime.clientSecrets({
       expires_after: {
         anchor: "created_at",
         seconds: env.get("ROOM_CALL_DURATION_MINUTE") * 60,
       },
-      session: {
-        output_modalities: [modality === "TEXT" ? "text" : "audio"],
-        instructions,
-        audio: {
-          output: {
-            voice: "alloy",
-            speed: 1,
-          },
-        },
-        // biome-ignore lint/suspicious/noExplicitAny: tools are dynamically built from MCP discovery
-        tools: tools as any,
-        tool_choice: "auto",
-        type: "realtime",
-        model: "gpt-realtime-1.5",
-        tracing: {
-          workflow_name: "realtime-audio-call",
-          metadata: {
-            companyId: company.id as never,
-          },
-        },
-      },
+      session: sessionConfig,
     });
 
     return {
@@ -103,20 +113,24 @@ export class OpenAICallService implements CallServicePort {
 
   private async buildTools(
     company: ICompanyModel,
-    modality: "AUDIO" | "TEXT",
     callCloseDescription: string,
     getToolStatusDescription: string,
   ) {
+    const systemToolPrompts = company.systemToolPrompts;
+
     const baseTools: unknown[] = [
       {
         type: "function",
         name: AiToolEnum.CALL_CLOSE,
-        description: callCloseDescription,
+        description: this.mergeSystemToolPrompt(
+          callCloseDescription,
+          AiToolEnum.CALL_CLOSE,
+          systemToolPrompts,
+        ),
       },
     ];
 
-    if (modality === "TEXT" && company.mcpUrl) {
-      // Text mode: discover MCP tools and register as functions
+    if (company.mcpUrl) {
       const mcpFunctions = await this.toolDiscovery.discoverAsRealtimeFunctions(
         company.mcpUrl,
       );
@@ -124,7 +138,11 @@ export class OpenAICallService implements CallServicePort {
       baseTools.push({
         type: "function",
         name: AiToolEnum.GET_TOOL_STATUS,
-        description: getToolStatusDescription,
+        description: this.mergeSystemToolPrompt(
+          getToolStatusDescription,
+          AiToolEnum.GET_TOOL_STATUS,
+          systemToolPrompts,
+        ),
         parameters: {
           type: "object",
           properties: {
@@ -139,17 +157,19 @@ export class OpenAICallService implements CallServicePort {
 
       this.applyToolConfigs(mcpFunctions, company.toolConfigs);
       baseTools.push(...mcpFunctions);
-    } else {
-      // Audio mode: use native MCP (OpenAI connects directly)
-      baseTools.push({
-        type: "mcp" as "MCPTool",
-        server_label: "mcp_server",
-        require_approval: "never",
-        server_url: company.mcpUrl,
-      });
     }
 
     return baseTools;
+  }
+
+  private mergeSystemToolPrompt(
+    baseDescription: string,
+    toolName: string,
+    systemToolPrompts: ISystemToolPrompts | undefined | null,
+  ): string {
+    const custom = systemToolPrompts?.[toolName];
+    if (!custom?.trim()) return baseDescription;
+    return `${baseDescription}\n\n${custom}`;
   }
 
   private applyToolConfigs(

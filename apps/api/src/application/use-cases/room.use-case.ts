@@ -38,6 +38,7 @@ export class RoomUseCase {
       token,
       expiresAt,
       modality,
+      createRoomParamsDto.isTest ?? false,
     );
     this.logger.info(
       `Room created with ID: ${room.id} (${modality}) for Company ID: ${createRoomParamsDto.companyId}`,

@@ -5,6 +5,9 @@ export abstract class RealtimeGatewayPort {
   abstract openRoomChannel(
     room: IRoomModel,
     companyMcpUrl?: string,
+    isTest?: boolean,
+    companyLanguage?: string,
+    companyVadEagerness?: string,
   ): void | Promise<void>;
   abstract sendToRoom(
     roomId: string,

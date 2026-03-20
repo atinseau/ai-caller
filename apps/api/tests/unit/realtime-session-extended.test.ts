@@ -125,69 +125,6 @@ describe("RealtimeSessionService — extended", () => {
     });
   });
 
-  describe("mcp_call with JSON string arguments", () => {
-    it("should parse string arguments", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "response.output_item.done",
-          item: {
-            type: "mcp_call",
-            id: "mcp-str",
-            name: "search",
-            arguments: '{"query":"test"}',
-            output: "ok",
-          },
-        } as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-
-      expect(fakes.toolRepository.createToolInvoke).toHaveBeenCalled();
-      const args = fakes.createdInvokes[0] as unknown[];
-      // args[3] should be the parsed arguments
-      expect(args[3]).toEqual({ query: "test" });
-    });
-  });
-
-  describe("mcp_call with object arguments", () => {
-    it("should pass object arguments directly", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "response.output_item.done",
-          item: {
-            type: "mcp_call",
-            id: "mcp-obj",
-            name: "search",
-            arguments: { query: "test" } as unknown as string,
-            output: "ok",
-          },
-        } as unknown as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-
-      const args = fakes.createdInvokes[0] as unknown[];
-      expect(args[3]).toEqual({ query: "test" });
-    });
-  });
-
-  describe("mcp_call without id", () => {
-    it("should not create tool invoke when item has no id", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "response.output_item.done",
-          item: {
-            type: "mcp_call",
-            name: "search",
-            arguments: "{}",
-            output: "ok",
-          },
-        } as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-
-      expect(fakes.toolRepository.createToolInvoke).not.toHaveBeenCalled();
-    });
-  });
-
   describe("audio_buffer.stopped without shouldCloseCall", () => {
     it("should NOT terminate when shouldCloseCall is false", async () => {
       await fakes.service.processMessage(

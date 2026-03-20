@@ -17,6 +17,7 @@ type SessionState = {
   shouldCloseCall: boolean;
   companyMcpUrl?: string;
   sendToRoom?: SendToRoomFn;
+  isTest?: boolean;
 };
 
 @injectable()
@@ -38,11 +39,13 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     roomId: string,
     companyMcpUrl?: string,
     sendToRoom?: SendToRoomFn,
+    isTest?: boolean,
   ): void {
     this.sessionState.set(roomId, {
       shouldCloseCall: false,
       companyMcpUrl,
       sendToRoom,
+      isTest,
     });
   }
 
@@ -102,18 +105,35 @@ export class RealtimeSessionService implements RealtimeSessionPort {
       return [];
     }
 
-    if (
-      message.type === "response.output_item.done" &&
-      message.item.type === "mcp_call"
-    ) {
-      return this.handleMcpCall(message.item, room);
-    }
+    if (message.type === "response.output_item.done") {
+      if (message.item.type === "function_call") {
+        return this.handleFunctionCall(message.item, room);
+      }
 
-    if (
-      message.type === "response.output_item.done" &&
-      message.item.type === "function_call"
-    ) {
-      return this.handleFunctionCall(message.item, room);
+      if (
+        message.item.type === "message" &&
+        message.item.role === "assistant"
+      ) {
+        // biome-ignore lint/suspicious/noExplicitAny: content type varies between output_text and output_audio
+        const content = (message.item as any).content as
+          | { type?: string; text?: string; transcript?: string }[]
+          | undefined;
+        const text =
+          content
+            ?.map((c) => c.transcript ?? c.text ?? "")
+            .filter(Boolean)
+            .join("") ?? "";
+        if (text) {
+          this.textStream.publish(room.id, {
+            type: "agent_transcript_done",
+            text,
+          });
+          await this.roomEventRepository.create(room.id, "AGENT_TRANSCRIPT", {
+            text,
+          });
+        }
+        return [];
+      }
     }
 
     const state = this.sessionState.get(room.id);
@@ -125,38 +145,6 @@ export class RealtimeSessionService implements RealtimeSessionPort {
     }
 
     return [];
-  }
-
-  private async handleMcpCall(
-    item: Schema["RealtimeMCPToolCall"],
-    room: IRoomModel,
-  ): Promise<Schema["RealtimeClientEvent"][]> {
-    this.logger.info(
-      item.output ?? {},
-      `MCP call done for room ${room.id}, item ID: ${item.id}`,
-    );
-
-    if (item.id) {
-      const args =
-        typeof item.arguments === "string"
-          ? (JSON.parse(item.arguments) as Record<string, unknown>)
-          : (item.arguments as Record<string, unknown>);
-      const toolInvoke = await this.toolRepository.createToolInvoke(
-        room.id,
-        item.id,
-        item.name,
-        args,
-      );
-      this.textStream.publish(room.id, {
-        type: "tool_invoke_created",
-        toolInvoke,
-      });
-      await this.roomEventRepository.create(room.id, "TOOL_INVOKE_CREATED", {
-        toolInvoke,
-      });
-    }
-
-    return this.buildUnblockMessages();
   }
 
   private handleFunctionCall(
@@ -243,6 +231,40 @@ export class RealtimeSessionService implements RealtimeSessionPort {
       toolInvoke,
     });
 
+    if (state?.sendToRoom && state.isTest) {
+      const mockSummary = `[TEST] ${item.name} executed successfully (mocked)`;
+      const completed = await this.toolRepository.completeToolInvokeByEntityId(
+        toolInvoke.entityId,
+        { summary: mockSummary },
+      );
+      this.textStream.publish(room.id, {
+        type: "tool_invoke_updated",
+        toolInvoke: completed,
+      });
+      await this.roomEventRepository.create(room.id, "TOOL_INVOKE_UPDATED", {
+        toolInvoke: completed,
+      });
+
+      this.logger.info(
+        `Test mock completed for ${item.name} in room ${room.id}`,
+      );
+
+      return [
+        {
+          type: "conversation.item.create",
+          item: {
+            type: "function_call_output",
+            call_id: item.call_id,
+            output: JSON.stringify({
+              status: "completed",
+              result: mockSummary,
+            }),
+          },
+        } as Schema["RealtimeClientEvent"],
+        { type: "response.create" } as Schema["RealtimeClientEvent"],
+      ];
+    }
+
     if (state?.companyMcpUrl && state.sendToRoom) {
       const { sendToRoom } = state;
       this.subAgent
@@ -255,20 +277,20 @@ export class RealtimeSessionService implements RealtimeSessionPort {
           mcpServerUrl: state.companyMcpUrl,
         })
         .then(async (result) => {
-          const completed =
-            await this.toolRepository.completeToolInvokeByEntityId(
-              toolInvoke.entityId,
-              { summary: result.summary },
-            );
-          this.textStream.publish(room.id, {
-            type: "tool_invoke_updated",
-            toolInvoke: completed,
-          });
-          await this.roomEventRepository.create(
-            room.id,
-            "TOOL_INVOKE_UPDATED",
-            { toolInvoke: completed },
+          const completed = await this.toolRepository.findByEntityId(
+            toolInvoke.entityId,
           );
+          if (completed) {
+            this.textStream.publish(room.id, {
+              type: "tool_invoke_updated",
+              toolInvoke: completed,
+            });
+            await this.roomEventRepository.create(
+              room.id,
+              "TOOL_INVOKE_UPDATED",
+              { toolInvoke: completed },
+            );
+          }
 
           sendToRoom({
             type: "conversation.item.create",
@@ -292,18 +314,23 @@ export class RealtimeSessionService implements RealtimeSessionPort {
             err,
             `Sub-agent failed for ${item.name} in room ${room.id}`,
           );
-          const failed = await this.toolRepository.failToolInvoke(
-            toolInvoke.id,
-          );
-          this.textStream.publish(room.id, {
-            type: "tool_invoke_updated",
-            toolInvoke: failed,
-          });
-          await this.roomEventRepository.create(
-            room.id,
-            "TOOL_INVOKE_UPDATED",
-            { toolInvoke: failed },
-          );
+          const existing = await this.toolRepository
+            .findByEntityId(toolInvoke.entityId)
+            .catch(() => null);
+          if (existing && existing.status === "RUNNING") {
+            const failed = await this.toolRepository.failToolInvoke(
+              toolInvoke.id,
+            );
+            this.textStream.publish(room.id, {
+              type: "tool_invoke_updated",
+              toolInvoke: failed,
+            });
+            await this.roomEventRepository.create(
+              room.id,
+              "TOOL_INVOKE_UPDATED",
+              { toolInvoke: failed },
+            );
+          }
         });
     }
 

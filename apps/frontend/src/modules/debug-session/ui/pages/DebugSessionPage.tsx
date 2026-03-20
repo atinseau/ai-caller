@@ -11,6 +11,7 @@ import { useSessionStream } from "../../application/hooks/useSessionStream";
 import { AudioControls } from "../components/AudioControls";
 import { LogsSidebar } from "../components/LogsSidebar";
 import { TranscriptFeed } from "../components/TranscriptFeed";
+import { WebRtcStats } from "../components/WebRtcStats";
 
 interface DebugSessionPageProps {
   companyId: string;
@@ -56,9 +57,9 @@ export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Header */}
-      <div className="flex items-center gap-3 border-b px-4 py-3">
+    <div className="flex h-[calc(100dvh-3rem)] flex-col overflow-hidden">
+      {/* Header — fixed */}
+      <div className="shrink-0 flex items-center gap-3 border-b px-4 py-3">
         <Button variant="ghost" size="sm" asChild className="-ml-1 gap-1.5">
           <Link to={`/dashboard/company/${companyId}`}>
             <ArrowLeft className="size-4" />
@@ -82,30 +83,35 @@ export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
         </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-hidden">
-        <div className="flex h-full">
-          {/* Left: Conversation (72%) */}
-          <div className="flex flex-1 flex-col overflow-hidden">
-            <div className="flex-1 overflow-hidden">
-              <TranscriptFeed messages={transcripts} />
-            </div>
+      {/* Content — fills remaining height */}
+      <div className="flex flex-1 min-h-0">
+        {/* Left panel */}
+        <div className="flex flex-1 min-w-0 flex-col">
+          {/* Transcript — ONLY scrollable zone */}
+          <div className="flex-1 min-h-0 overflow-y-auto px-4">
+            <TranscriptFeed messages={transcripts} />
+          </div>
+          {/* Audio controls — fixed at bottom */}
+          <div className="shrink-0">
             <AudioControls
               status={callState.status}
               muted={callState.muted}
-              onStart={() => start(companyId)}
+              onStart={() => start(companyId, true)}
               onStop={stop}
               onToggleMute={toggleMute}
             />
           </div>
+        </div>
 
-          {/* Divider */}
-          <div className="w-px bg-border" />
+        {/* Divider */}
+        <div className="w-px bg-border" />
 
-          {/* Right: Logs (28%) */}
-          <div className="w-72 shrink-0 overflow-hidden">
+        {/* Right: Logs + stats — fixed, own scroll if needed */}
+        <div className="w-72 shrink-0 flex flex-col">
+          <div className="flex-1 overflow-y-auto">
             <LogsSidebar toolInvokes={toolInvokes} />
           </div>
+          <WebRtcStats peerConnection={callState.peerConnection} />
         </div>
       </div>
 

@@ -187,27 +187,6 @@ describe("RealtimeSessionService", () => {
     });
   });
 
-  describe("mcp calls", () => {
-    it("should create tool invoke and return unblock messages", async () => {
-      const events = await fakes.service.processMessage(
-        {
-          type: "response.output_item.done",
-          item: {
-            type: "mcp_call",
-            id: "mcp-1",
-            name: "search_customer",
-            arguments: '{"name":"John"}',
-            output: "result",
-          },
-        } as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-
-      expect(fakes.toolRepository.createToolInvoke).toHaveBeenCalled();
-      expect(events.length).toBeGreaterThan(0);
-    });
-  });
-
   describe("lifecycle", () => {
     it("should init and destroy session state", () => {
       // Already init'd in beforeEach

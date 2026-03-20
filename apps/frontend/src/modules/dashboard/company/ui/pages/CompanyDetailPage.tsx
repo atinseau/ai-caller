@@ -4,14 +4,16 @@ import {
   CircleAlert,
   Loader2,
   Network,
+  Pause,
   Play,
   Plug,
   Save,
   Settings,
   Trash2,
+  Volume2,
   Wrench,
 } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import { WysiwygEditor } from "@/shared/components/data/WysiwygEditor";
@@ -29,9 +31,19 @@ import {
 } from "@/shared/components/ui/card";
 import { Input } from "@/shared/components/ui/input";
 import { Label } from "@/shared/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import { Separator } from "@/shared/components/ui/separator";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { LanguageEnum } from "@/shared/enums/language.enum";
 import { McpStatusEnum } from "@/shared/enums/mcp-status.enum";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
+import { VoiceEnum } from "@/shared/enums/voice.enum";
 import { useCompany } from "@/shared/hooks/useCompany";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { useDeleteCompany } from "@/shared/hooks/useDeleteCompany";
@@ -56,6 +68,38 @@ const mcpStatusConfig: Record<
     label: "MCP not configured",
   },
 };
+
+const LANGUAGE_LABELS: Record<string, string> = {
+  [LanguageEnum.FR]: "French",
+  [LanguageEnum.EN]: "English",
+  [LanguageEnum.ES]: "Spanish",
+  [LanguageEnum.DE]: "German",
+  [LanguageEnum.IT]: "Italian",
+  [LanguageEnum.PT]: "Portuguese",
+  [LanguageEnum.NL]: "Dutch",
+  [LanguageEnum.PL]: "Polish",
+  [LanguageEnum.RU]: "Russian",
+  [LanguageEnum.JA]: "Japanese",
+  [LanguageEnum.ZH]: "Chinese",
+  [LanguageEnum.KO]: "Korean",
+  [LanguageEnum.AR]: "Arabic",
+  [LanguageEnum.TR]: "Turkish",
+};
+
+const SYSTEM_TOOLS = [
+  {
+    name: "close_call",
+    label: "Close Call",
+    description:
+      "Custom instructions appended to the close call tool prompt. Use this to personalize the AI's behavior when ending a call.",
+  },
+  {
+    name: "get_tool_status",
+    label: "Get Tool Status",
+    description:
+      "Custom instructions appended to the tool status check prompt.",
+  },
+] as const;
 
 export function CompanyDetailPage() {
   const { companyId } = useParams<{ companyId: string }>();
@@ -87,6 +131,19 @@ export function CompanyDetailPage() {
   );
   const [selectedToolName, setSelectedToolName] = useState<string | null>(null);
 
+  const [systemToolPrompts, setSystemToolPrompts] = useState<
+    Record<string, string>
+  >({});
+  const [systemToolPromptsDirty, setSystemToolPromptsDirty] = useState(false);
+
+  const [voice, setVoice] = useState<string>(VoiceEnum.MARIN);
+  const [language, setLanguage] = useState<string>(LanguageEnum.FR);
+  const [voiceConfigDirty, setVoiceConfigDirty] = useState(false);
+
+  const [previewPlaying, setPreviewPlaying] = useState(false);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+
   useEffect(() => {
     if (company) {
       setSystemPrompt(company.systemPrompt ?? "");
@@ -94,6 +151,13 @@ export function CompanyDetailPage() {
       setToolConfigs(
         (company.toolConfigs as Record<string, ToolConfig> | null) ?? {},
       );
+      setSystemToolPrompts(
+        (company.systemToolPrompts as Record<string, string> | null) ?? {},
+      );
+      setSystemToolPromptsDirty(false);
+      setVoice(company.voice ?? VoiceEnum.MARIN);
+      setLanguage(company.language ?? LanguageEnum.FR);
+      setVoiceConfigDirty(false);
     }
   }, [company]);
 
@@ -141,6 +205,86 @@ export function CompanyDetailPage() {
     },
     [toolConfigs, updateCompany],
   );
+
+  const handleSystemToolPromptChange = useCallback(
+    (toolName: string, value: string) => {
+      setSystemToolPrompts((prev) => {
+        const next = { ...prev };
+        if (value.trim()) {
+          next[toolName] = value;
+        } else {
+          delete next[toolName];
+        }
+        return next;
+      });
+      setSystemToolPromptsDirty(true);
+    },
+    [],
+  );
+
+  async function handleSaveSystemToolPrompts() {
+    try {
+      const prompts =
+        Object.keys(systemToolPrompts).length > 0 ? systemToolPrompts : null;
+      await updateCompany({ systemToolPrompts: prompts });
+      setSystemToolPromptsDirty(false);
+      toast.success("System tool prompts saved");
+    } catch {
+      toast.error("Failed to save system tool prompts");
+    }
+  }
+
+  async function handleSaveVoiceConfig() {
+    try {
+      await updateCompany({
+        voice: voice as VoiceEnum,
+        language: language as LanguageEnum,
+      });
+      setVoiceConfigDirty(false);
+      toast.success("Voice configuration saved");
+    } catch {
+      toast.error("Failed to save voice configuration");
+    }
+  }
+
+  async function handlePreviewVoice() {
+    if (previewPlaying && previewAudioRef.current) {
+      previewAudioRef.current.pause();
+      previewAudioRef.current.currentTime = 0;
+      setPreviewPlaying(false);
+      return;
+    }
+
+    setPreviewLoading(true);
+    try {
+      const apiUrl = import.meta.env.VITE_API_URL;
+      const url = `${apiUrl}/api/v1/voice/preview?voice=${encodeURIComponent(voice)}&language=${encodeURIComponent(language)}`;
+      const res = await fetch(url, { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch preview");
+
+      const blob = await res.blob();
+      const objectUrl = URL.createObjectURL(blob);
+      const audio = new Audio(objectUrl);
+      previewAudioRef.current = audio;
+
+      audio.onended = () => {
+        setPreviewPlaying(false);
+        URL.revokeObjectURL(objectUrl);
+      };
+      audio.onerror = () => {
+        setPreviewPlaying(false);
+        URL.revokeObjectURL(objectUrl);
+      };
+
+      setPreviewLoading(false);
+      setPreviewPlaying(true);
+      await audio.play();
+    } catch {
+      setPreviewLoading(false);
+      setPreviewPlaying(false);
+      toast.error("Failed to preview voice");
+    }
+  }
 
   async function handleSavePrompt() {
     try {
@@ -399,16 +543,47 @@ export function CompanyDetailPage() {
                   System Tools
                 </CardTitle>
                 <CardDescription>
-                  Platform-level tools injected by the system. Only visible to
-                  administrators.
+                  Custom prompts appended to built-in system tool descriptions.
+                  Leave empty to use defaults. Only visible to administrators.
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <EmptyState
-                  icon={Network}
-                  title="No system tools configured"
-                  description="System tools will appear here once configured."
-                />
+              <CardContent className="space-y-5">
+                {SYSTEM_TOOLS.map((tool) => (
+                  <div key={tool.name} className="space-y-2">
+                    <Label htmlFor={`system-tool-${tool.name}`}>
+                      {tool.label}
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      {tool.description}
+                    </p>
+                    <Textarea
+                      id={`system-tool-${tool.name}`}
+                      placeholder="Enter custom instructions for this tool..."
+                      value={systemToolPrompts[tool.name] ?? ""}
+                      onChange={(e) =>
+                        handleSystemToolPromptChange(tool.name, e.target.value)
+                      }
+                      className="min-h-[100px]"
+                    />
+                  </div>
+                ))}
+                <div className="flex justify-end">
+                  <Button
+                    onClick={handleSaveSystemToolPrompts}
+                    disabled={!systemToolPromptsDirty || isUpdating}
+                    size="sm"
+                    className="gap-1.5"
+                  >
+                    {isUpdating ? (
+                      <Loader2 className="size-3.5 animate-spin" />
+                    ) : systemToolPromptsDirty ? (
+                      <Save className="size-3.5" />
+                    ) : (
+                      <Check className="size-3.5" />
+                    )}
+                    {systemToolPromptsDirty ? "Save prompts" : "Saved"}
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           )}
@@ -484,6 +659,91 @@ export function CompanyDetailPage() {
                   <Separator />
                 </>
               )}
+
+              {/* Voice Configuration */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">Voice Configuration</h3>
+                <div className="space-y-2">
+                  <Label htmlFor="voice">Voice</Label>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={voice}
+                      onValueChange={(v) => {
+                        setVoice(v);
+                        setVoiceConfigDirty(true);
+                        if (previewPlaying && previewAudioRef.current) {
+                          previewAudioRef.current.pause();
+                          setPreviewPlaying(false);
+                        }
+                      }}
+                    >
+                      <SelectTrigger id="voice" className="flex-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.values(VoiceEnum).map((v) => (
+                          <SelectItem key={v} value={v}>
+                            {v.charAt(0).toUpperCase() + v.slice(1)}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="size-9 shrink-0"
+                      onClick={handlePreviewVoice}
+                      disabled={previewLoading}
+                    >
+                      {previewLoading ? (
+                        <Loader2 className="size-4 animate-spin" />
+                      ) : previewPlaying ? (
+                        <Pause className="size-4" />
+                      ) : (
+                        <Volume2 className="size-4" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="language">Language</Label>
+                  <Select
+                    value={language}
+                    onValueChange={(v) => {
+                      setLanguage(v);
+                      setVoiceConfigDirty(true);
+                    }}
+                  >
+                    <SelectTrigger id="language">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.values(LanguageEnum).map((l) => (
+                        <SelectItem key={l} value={l}>
+                          {LANGUAGE_LABELS[l] ?? l} ({l})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <Button
+                  onClick={handleSaveVoiceConfig}
+                  disabled={!voiceConfigDirty || isUpdating}
+                  size="sm"
+                  className="w-full gap-1.5"
+                >
+                  {isUpdating ? (
+                    <Loader2 className="size-3.5 animate-spin" />
+                  ) : voiceConfigDirty ? (
+                    <Save className="size-3.5" />
+                  ) : (
+                    <Check className="size-3.5" />
+                  )}
+                  {voiceConfigDirty ? "Save voice config" : "Saved"}
+                </Button>
+              </div>
+
+              <Separator />
 
               {/* Activation — all users */}
               <div className="space-y-3">

@@ -18,6 +18,12 @@ export const ToolConfigsSchema = z
 export type IToolConfig = z.infer<typeof ToolConfigSchema>;
 export type IToolConfigs = z.infer<typeof ToolConfigsSchema>;
 
+export const SystemToolPromptsSchema = z
+  .record(z.string(), z.string())
+  .nullable();
+
+export type ISystemToolPrompts = z.infer<typeof SystemToolPromptsSchema>;
+
 export const CompanyModel = z
   .object({
     name: z.string().openapi({
@@ -43,6 +49,23 @@ export const CompanyModel = z
     toolConfigs: ToolConfigsSchema.openapi({
       description:
         "Per-tool configuration overrides (display name, description, parameter descriptions)",
+    }),
+    systemToolPrompts: SystemToolPromptsSchema.openapi({
+      description:
+        "Per-system-tool custom prompt overrides (e.g. close_call, get_tool_status)",
+    }),
+    voice: z.string().nullable().openapi({
+      description: "The voice used by the AI agent (e.g. marin, cedar, alloy)",
+      example: "marin",
+    }),
+    language: z.string().nullable().openapi({
+      description: "The language code for the AI agent (ISO 639-1)",
+      example: "fr",
+    }),
+    vadEagerness: z.string().nullable().openapi({
+      description:
+        "Voice Activity Detection eagerness level (low, medium, high)",
+      example: "medium",
     }),
     id: z.uuidv7().openapi({
       description: "The unique identifier of the company",

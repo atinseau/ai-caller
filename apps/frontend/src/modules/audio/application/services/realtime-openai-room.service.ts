@@ -2,7 +2,10 @@ import { OpenAI } from "@ai-caller/shared";
 import { api } from "@/infrastructure/http/api";
 
 export interface RealtimeRoomService {
-  createRoom(companyId: string): Promise<{
+  createRoom(
+    companyId: string,
+    isTest?: boolean,
+  ): Promise<{
     pc: RTCPeerConnection;
     dc: RTCDataChannel;
     roomId: string;
@@ -16,8 +19,8 @@ export interface RealtimeRoomService {
 }
 
 export class RealtimeOpenAiRoomService implements RealtimeRoomService {
-  async createRoom(companyId: string) {
-    const roomData = await this.getRoomData(companyId);
+  async createRoom(companyId: string, isTest?: boolean) {
+    const roomData = await this.getRoomData(companyId, isTest);
     const pc = new RTCPeerConnection();
     const dc = pc.createDataChannel("oai-events");
 
@@ -63,12 +66,12 @@ export class RealtimeOpenAiRoomService implements RealtimeRoomService {
     await pc.setRemoteDescription(answer);
   }
 
-  private async getRoomData(companyId: string) {
+  private async getRoomData(companyId: string, isTest?: boolean) {
     const { response, data } = await api.POST("/api/v1/room/create", {
       body: {
         companyId,
         modality: "AUDIO",
-        isTest: false,
+        isTest: isTest ?? false,
       },
     });
     if (!response.ok || !data) {

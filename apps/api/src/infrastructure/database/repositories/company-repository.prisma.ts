@@ -42,6 +42,10 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
         | "systemPrompt"
         | "description"
         | "toolConfigs"
+        | "systemToolPrompts"
+        | "voice"
+        | "language"
+        | "vadEagerness"
       >
     >,
   ) {
@@ -53,6 +57,12 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
           : data.toolConfigs === null
             ? Prisma.DbNull
             : (data.toolConfigs as Prisma.InputJsonValue),
+      systemToolPrompts:
+        data.systemToolPrompts === undefined
+          ? undefined
+          : data.systemToolPrompts === null
+            ? Prisma.DbNull
+            : (data.systemToolPrompts as Prisma.InputJsonValue),
     };
 
     const company = await this.prisma.company.update({

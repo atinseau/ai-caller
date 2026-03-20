@@ -1,6 +1,12 @@
 import { z } from "@hono/zod-openapi";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
-import { ToolConfigsSchema } from "@/domain/models/company.model.ts";
+import { LanguageEnum } from "@/domain/enums/language.enum.ts";
+import { VadEagernessEnum } from "@/domain/enums/vad-eagerness.enum.ts";
+import { VoiceEnum } from "@/domain/enums/voice.enum.ts";
+import {
+  SystemToolPromptsSchema,
+  ToolConfigsSchema,
+} from "@/domain/models/company.model.ts";
 
 export const UpdateCompanyRequestDto = z
   .object({
@@ -27,6 +33,22 @@ export const UpdateCompanyRequestDto = z
     toolConfigs: ToolConfigsSchema.optional().openapi({
       description:
         "Per-tool configuration overrides (display name, description, parameter descriptions)",
+    }),
+    systemToolPrompts: SystemToolPromptsSchema.optional().openapi({
+      description:
+        "Per-system-tool custom prompt overrides (e.g. close_call, get_tool_status)",
+    }),
+    voice: z.nativeEnum(VoiceEnum).nullable().optional().openapi({
+      description: "The voice used by the AI agent",
+      example: VoiceEnum.MARIN,
+    }),
+    language: z.nativeEnum(LanguageEnum).nullable().optional().openapi({
+      description: "The language code (ISO 639-1)",
+      example: LanguageEnum.FR,
+    }),
+    vadEagerness: z.nativeEnum(VadEagernessEnum).nullable().optional().openapi({
+      description: "VAD eagerness level",
+      example: VadEagernessEnum.MEDIUM,
     }),
   })
   .openapi("UpdateCompanyRequestDto", {

@@ -66,6 +66,31 @@ API requires `apps/api/.env` with non-sensitive config (`PORT`, `CLIENT_URL`, `R
 
 Docker Compose provides PostgreSQL, n8n, Redis, and Infisical (secret management).
 
+### OpenAI Realtime API
+
+The platform uses OpenAI's Realtime API for voice conversations. Key integration points:
+
+- **Session creation**: `OpenAICallService.createCall()` creates an ephemeral token via `/realtime/client_secrets`
+- **Backend WebSocket**: `OpenAIRealtimeGateway` opens a server-side WS to OpenAI for each room (proxies events, handles tool calls)
+- **Frontend WebRTC**: The browser connects directly to OpenAI via WebRTC for low-latency audio
+- **Dual channel**: Audio flows client↔OpenAI (WebRTC), events flow backend↔OpenAI (WebSocket). The backend monitors the WS for tool invocations and transcripts.
+- **Voice config**: Set in `clientSecrets` session config. Use latest voices (`marin`, `cedar`) for most natural output.
+- **Turn detection**: Configure `semantic_vad` (preferred) or `server_vad` in the session. `semantic_vad` with `eagerness: "medium"` is the default recommendation.
+- **Audio format**: Output should use `opus` for lowest latency. Input is `pcm16` at 24kHz.
+- **Language**: Set `input_audio_transcription.language` to the company's ISO 639-1 code to improve transcription accuracy and reduce latency.
+
+### Sub-Agent Pattern (MCP Tool Execution)
+
+When the AI agent needs to execute an action (e.g., create a ticket, check inventory):
+
+1. OpenAI sends a `function_call` event via the WebSocket
+2. `RealtimeSessionService` creates a `ToolInvoke` record (RUNNING) and immediately returns a `"processing"` acknowledgment to OpenAI so the conversation continues
+3. `SubAgentService` runs asynchronously: connects to the company's MCP server, executes the tool, then sends the raw result to an LLM for summarization
+4. The summarized result is injected back into the conversation as a user message
+5. All tool events are streamed to the frontend via SSE for real-time debug visibility
+
+This pattern keeps the conversation flowing while tools execute in the background. The AI can check tool status via the `get_tool_status` system tool.
+
 ### Secret Management (Infisical)
 
 Self-hosted Infisical instance for centralized secret management. Secrets are organized by path in Infisical projects.
@@ -104,6 +129,8 @@ Structure:
 - Always update CLAUDE.md when structural modification is made
 - Always update CLAUDE.md when an important discovery is made to improve agentic development (faster coding process, better conversation size optimization)
 - Every time a constant string is used in the project, create an enum to make string typesafe, type === "value" -> type === Enum.VALUE
+- When modifying OpenAI Realtime session config, always verify the change against the OpenAI Realtime API docs — session parameters are validated server-side and silent failures are common
+- Prompts for voice agents must be optimized for spoken output: short sentences, contractions, no URLs/emails spelled out, conversational fillers where natural
 
 ---
 
@@ -120,10 +147,11 @@ Structure:
 
 ### Prompts
 
-- All AI prompts live as `.md` files in the `prompts/` directory.
+- All AI prompts live as `.md` files in the `src/prompts/` directory.
 - Prompts are loaded lazily via `Bun.file()`, compiled with Handlebars, and cached.
 - Access prompts through the `PromptPort` — never read prompt files directly in services.
 - Use `{{variable}}` for HTML-escaped values, `{{{variable}}}` for raw injection (JSON, code, etc.).
+- **Voice prompts** must be written for spoken delivery: short sentences, bullet points over paragraphs, no markdown formatting that won't be spoken. The system prompt directly influences how natural the agent sounds.
 
 ### Database
 
@@ -189,3 +217,11 @@ The `suspicious` rule group is set to `"error"` globally. Respect these rules wh
 - `apps/frontend/**` — `noReactSpecificProps: off`, `noDocumentCookie: warn`
 - `**/scripts/**` — `noConsole: off`
 - `**/openapi-openai.types.ts` — excluded from checks (file exceeds 1 MiB size limit)
+
+### Frontend — Audio & WebRTC
+
+- Audio constraints are configured in `infrastructure/browser/audio-stream.ts`. Always enable `echoCancellation`, `noiseSuppression`, `autoGainControl`, mono channel, 48kHz sample rate.
+- The WebRTC connection to OpenAI is established client-side (`realtime-openai-room.service.ts`). The SDP offer/answer flow goes through OpenAI's `/v1/realtime/calls` endpoint.
+- Call state is managed via `useReducer` in `useRealtimeCall.ts` (states: idle → initializing → connecting → connected).
+- SSE streaming from backend (`useSessionStream.ts`) provides real-time transcripts and tool events for the debug UI.
+- There is currently **no i18n/l10n** — all UI text is hardcoded in English. Dates use `toLocaleTimeString()` for locale-aware formatting.

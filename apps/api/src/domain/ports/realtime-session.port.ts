@@ -6,6 +6,7 @@ export abstract class RealtimeSessionPort {
     roomId: string,
     companyMcpUrl?: string,
     sendToRoom?: (event: Schema["RealtimeClientEvent"]) => void,
+    isTest?: boolean,
   ): void;
   abstract destroySession(roomId: string): void;
   abstract processMessage(

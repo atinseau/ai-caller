@@ -33,6 +33,10 @@ export abstract class CompanyRepositoryPort {
         | "systemPrompt"
         | "description"
         | "toolConfigs"
+        | "systemToolPrompts"
+        | "voice"
+        | "language"
+        | "vadEagerness"
       >
     >,
   ): Promise<ICompanyModel>;

@@ -25,6 +25,9 @@ export class RoomReadyHandler {
     await this.realtimeGateway.openRoomChannel(
       room,
       company?.mcpUrl ?? undefined,
+      room.isTest,
+      company?.language ?? undefined,
+      company?.vadEagerness ?? undefined,
     );
   }
 }

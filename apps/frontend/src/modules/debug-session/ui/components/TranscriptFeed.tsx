@@ -1,7 +1,6 @@
 import { Bot, User } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { EmptyState } from "@/shared/components/feedback/EmptyState";
-import { ScrollArea } from "@/shared/components/ui/scroll-area";
 import type { ITranscriptMessage } from "@/shared/types/session.types";
 import { cn } from "@/shared/utils";
 
@@ -76,13 +75,11 @@ export function TranscriptFeed({ messages }: TranscriptFeedProps) {
   }
 
   return (
-    <ScrollArea className="h-full px-4">
-      <div className="flex flex-col gap-4 py-4">
-        {messages.map((msg) => (
-          <TranscriptMessage key={msg.id} message={msg} />
-        ))}
-        <div ref={bottomRef} />
-      </div>
-    </ScrollArea>
+    <div className="flex flex-col gap-4 py-4">
+      {messages.map((msg) => (
+        <TranscriptMessage key={msg.id} message={msg} />
+      ))}
+      <div ref={bottomRef} />
+    </div>
   );
 }

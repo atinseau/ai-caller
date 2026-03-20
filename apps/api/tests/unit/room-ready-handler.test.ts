@@ -57,6 +57,8 @@ describe("RoomReadyHandler", () => {
         id: "c-1",
         name: "Test",
         mcpUrl: "http://mcp.test",
+        language: "fr",
+        vadEagerness: "medium",
         createdAt: new Date(),
         updatedAt: new Date(),
       })),
@@ -78,6 +80,12 @@ describe("RoomReadyHandler", () => {
     await (subscribeHandler.fn as (e: RoomReadyEvent) => Promise<void>)(event);
 
     expect(roomRepository.findById).toHaveBeenCalledWith("room-1");
-    expect(openRoomChannel).toHaveBeenCalledWith(mockRoom, "http://mcp.test");
+    expect(openRoomChannel).toHaveBeenCalledWith(
+      mockRoom,
+      "http://mcp.test",
+      false,
+      "fr",
+      "medium",
+    );
   });
 });

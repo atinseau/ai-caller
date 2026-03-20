@@ -15,11 +15,23 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     private readonly sessionService: RealtimeSessionPort,
   ) {}
 
-  public openRoomChannel(room: IRoomModel, companyMcpUrl?: string) {
+  public openRoomChannel(
+    room: IRoomModel,
+    companyMcpUrl?: string,
+    isTest?: boolean,
+    companyLanguage?: string,
+    companyVadEagerness?: string,
+  ) {
     if (room.modality === "TEXT") {
-      return this.openTextChannel(room, companyMcpUrl);
+      return this.openTextChannel(room, companyMcpUrl, isTest);
     }
-    return this.openAudioChannel(room, companyMcpUrl);
+    return this.openAudioChannel(
+      room,
+      companyMcpUrl,
+      isTest,
+      companyLanguage,
+      companyVadEagerness,
+    );
   }
 
   public sendToRoom(
@@ -44,7 +56,13 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     }
   }
 
-  private openAudioChannel(room: IRoomModel, companyMcpUrl?: string) {
+  private openAudioChannel(
+    room: IRoomModel,
+    companyMcpUrl?: string,
+    isTest?: boolean,
+    companyLanguage?: string,
+    companyVadEagerness?: string,
+  ) {
     if (!room.callId) {
       logger.error(`Room ${room.id} does not have a call ID.`);
       return;
@@ -55,10 +73,37 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
       room.token,
     );
 
-    this.setupChannel(ws, room, undefined, companyMcpUrl);
+    this.setupChannel(
+      ws,
+      room,
+      () => {
+        // Enable input audio transcription and configure turn detection
+        this.sendToRoom(room.id, {
+          type: "session.update",
+          session: {
+            type: "realtime",
+            input_audio_transcription: {
+              model: "gpt-4o-mini-transcribe",
+              ...(companyLanguage ? { language: companyLanguage } : {}),
+            },
+            turn_detection: {
+              type: "semantic_vad",
+              eagerness: companyVadEagerness ?? "medium",
+              interrupt_response: true,
+            },
+          },
+        } as unknown as Schema["RealtimeClientEvent"]);
+      },
+      companyMcpUrl,
+      isTest,
+    );
   }
 
-  private openTextChannel(room: IRoomModel, companyMcpUrl?: string) {
+  private openTextChannel(
+    room: IRoomModel,
+    companyMcpUrl?: string,
+    isTest?: boolean,
+  ) {
     const ws = this.connectWebSocket(
       "wss://api.openai.com/v1/realtime?model=gpt-realtime-1.5",
       env.get("OPENAI_API_KEY"),
@@ -77,6 +122,7 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
         } as Schema["RealtimeClientEvent"]);
       },
       companyMcpUrl,
+      isTest,
     );
   }
 
@@ -92,9 +138,13 @@ export class OpenAIRealtimeGateway implements RealtimeGatewayPort {
     room: IRoomModel,
     onOpen?: () => void,
     companyMcpUrl?: string,
+    isTest?: boolean,
   ) {
-    this.sessionService.initSession(room.id, companyMcpUrl, (event) =>
-      this.sendToRoom(room.id, event),
+    this.sessionService.initSession(
+      room.id,
+      companyMcpUrl,
+      (event) => this.sendToRoom(room.id, event),
+      isTest,
     );
 
     ws.onopen = () => {

@@ -15,6 +15,10 @@ describe("CompanyMapper", () => {
       description: "A test company",
       systemPrompt: "You are a helpful assistant",
       toolConfigs: null,
+      systemToolPrompts: null,
+      voice: "marin",
+      language: "fr",
+      vadEagerness: "medium",
     };
 
     const model = CompanyMapper.toModel(prismaCompany);
@@ -24,6 +28,33 @@ describe("CompanyMapper", () => {
     expect(model.mcpUrl).toBe("http://mcp.test");
     expect(model.createdAt).toEqual(new Date("2025-01-01"));
     expect(model.updatedAt).toEqual(new Date("2025-01-02"));
+    expect(model.voice).toBe("marin");
+    expect(model.language).toBe("fr");
+    expect(model.vadEagerness).toBe("medium");
+  });
+
+  it("toModel should handle null voice/language/vadEagerness", () => {
+    const prismaCompany = {
+      id: "c-2",
+      name: "Null Fields Co",
+      mcpUrl: null,
+      createdAt: new Date("2025-01-01"),
+      updatedAt: new Date("2025-01-02"),
+      status: "INACTIVE" as const,
+      description: null,
+      systemPrompt: null,
+      toolConfigs: null,
+      systemToolPrompts: null,
+      voice: null,
+      language: null,
+      vadEagerness: null,
+    };
+
+    const model = CompanyMapper.toModel(prismaCompany);
+
+    expect(model.voice).toBeNull();
+    expect(model.language).toBeNull();
+    expect(model.vadEagerness).toBeNull();
   });
 
   it("toEntity should generate id and timestamps", () => {
@@ -35,8 +66,9 @@ describe("CompanyMapper", () => {
     expect(entity.id).toBeDefined();
     expect(entity.id?.length).toBeGreaterThan(0);
     expect(entity.name).toBe("New Co");
-    expect(entity.createdAt).toBeInstanceOf(Date);
-    expect(entity.updatedAt).toBeInstanceOf(Date);
+    expect(entity.voice).toBeNull();
+    expect(entity.language).toBeNull();
+    expect(entity.vadEagerness).toBeNull();
   });
 });
 

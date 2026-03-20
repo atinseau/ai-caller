@@ -1,5 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/infrastructure/http/api";
+import type { LanguageEnum } from "@/shared/enums/language.enum";
+import type { VadEagernessEnum } from "@/shared/enums/vad-eagerness.enum";
+import type { VoiceEnum } from "@/shared/enums/voice.enum";
 
 interface UpdateCompanyDto {
   name?: string;
@@ -15,6 +18,10 @@ interface UpdateCompanyDto {
       parameters?: Record<string, { description?: string }>;
     }
   > | null;
+  systemToolPrompts?: Record<string, string> | null;
+  voice?: VoiceEnum | null;
+  language?: LanguageEnum | null;
+  vadEagerness?: VadEagernessEnum | null;
 }
 
 export function useUpdateCompany(companyId: string) {

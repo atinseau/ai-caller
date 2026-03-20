@@ -1,8 +1,17 @@
 -- CreateEnum
+CREATE TYPE "UserRole" AS ENUM ('ROOT', 'USER');
+
+-- CreateEnum
+CREATE TYPE "CompanyStatus" AS ENUM ('ACTIVE', 'INACTIVE');
+
+-- CreateEnum
 CREATE TYPE "RoomModality" AS ENUM ('AUDIO', 'TEXT');
 
 -- CreateEnum
 CREATE TYPE "ToolInvokeStatus" AS ENUM ('RUNNING', 'COMPLETED', 'FAILED');
+
+-- CreateEnum
+CREATE TYPE "RoomEventType" AS ENUM ('USER_TRANSCRIPT', 'AGENT_TRANSCRIPT', 'TOOL_INVOKE_CREATED', 'TOOL_INVOKE_UPDATED', 'TEXT_DELTA', 'TEXT_DONE');
 
 -- CreateTable
 CREATE TABLE "user" (
@@ -13,6 +22,8 @@ CREATE TABLE "user" (
     "image" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "role" "UserRole" NOT NULL DEFAULT 'USER',
+    "companyId" TEXT,
 
     CONSTRAINT "user_pkey" PRIMARY KEY ("id")
 );
@@ -68,7 +79,12 @@ CREATE TABLE "Company" (
     "name" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "mcpUrl" TEXT NOT NULL,
+    "mcpUrl" TEXT,
+    "status" "CompanyStatus" NOT NULL DEFAULT 'INACTIVE',
+    "systemPrompt" TEXT,
+    "description" TEXT,
+    "toolConfigs" JSONB,
+    "systemToolPrompts" JSONB,
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
 );
@@ -84,8 +100,20 @@ CREATE TABLE "Room" (
     "companyId" TEXT NOT NULL,
     "callId" TEXT,
     "modality" "RoomModality" NOT NULL DEFAULT 'AUDIO',
+    "isTest" BOOLEAN NOT NULL DEFAULT false,
 
     CONSTRAINT "Room_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "RoomEvent" (
+    "id" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "type" "RoomEventType" NOT NULL,
+    "payload" JSONB NOT NULL,
+    "roomId" TEXT NOT NULL,
+
+    CONSTRAINT "RoomEvent_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -124,6 +152,12 @@ CREATE UNIQUE INDEX "Company_name_key" ON "Company"("name");
 -- CreateIndex
 CREATE UNIQUE INDEX "Room_token_key" ON "Room"("token");
 
+-- CreateIndex
+CREATE INDEX "RoomEvent_roomId_idx" ON "RoomEvent"("roomId");
+
+-- AddForeignKey
+ALTER TABLE "user" ADD CONSTRAINT "user_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "session" ADD CONSTRAINT "session_userId_fkey" FOREIGN KEY ("userId") REFERENCES "user"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
@@ -132,6 +166,9 @@ ALTER TABLE "account" ADD CONSTRAINT "account_userId_fkey" FOREIGN KEY ("userId"
 
 -- AddForeignKey
 ALTER TABLE "Room" ADD CONSTRAINT "Room_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "RoomEvent" ADD CONSTRAINT "RoomEvent_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ToolInvoke" ADD CONSTRAINT "ToolInvoke_roomId_fkey" FOREIGN KEY ("roomId") REFERENCES "Room"("id") ON DELETE CASCADE ON UPDATE CASCADE;

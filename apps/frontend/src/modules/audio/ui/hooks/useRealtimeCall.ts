@@ -81,7 +81,7 @@ export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement | null>) {
   const { audioStream: audioStreamService, realtimeRoom } = useServices();
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  const start = async (companyId: string) => {
+  const start = async (companyId: string, isTest?: boolean) => {
     dispatch({ type: "START" });
     try {
       const stream = await audioStreamService.asPromise();
@@ -92,6 +92,7 @@ export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement | null>) {
         audioStream: stream,
         audioRef,
         realtimeRoom,
+        isTest,
       });
 
       dc.addEventListener("close", () => {
