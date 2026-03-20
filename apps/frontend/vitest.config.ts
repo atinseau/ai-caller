@@ -14,7 +14,7 @@ export default defineConfig({
     setupFiles: ["./tests/setup.ts"],
     env: {
       // Matches the default dev API URL — override in CI with env var
-      VITE_API_URL: "http://localhost:3000",
+      VITE_API_URL: "http://localhost:4500",
     },
     coverage: {
       provider: "v8",

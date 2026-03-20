@@ -14,6 +14,7 @@ describe("CompanyMapper", () => {
       status: "INACTIVE" as const,
       description: "A test company",
       systemPrompt: "You are a helpful assistant",
+      toolConfigs: null,
     };
 
     const model = CompanyMapper.toModel(prismaCompany);
@@ -32,7 +33,7 @@ describe("CompanyMapper", () => {
     });
 
     expect(entity.id).toBeDefined();
-    expect(entity.id.length).toBeGreaterThan(0);
+    expect(entity.id?.length).toBeGreaterThan(0);
     expect(entity.name).toBe("New Co");
     expect(entity.createdAt).toBeInstanceOf(Date);
     expect(entity.updatedAt).toBeInstanceOf(Date);

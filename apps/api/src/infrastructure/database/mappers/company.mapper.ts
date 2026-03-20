@@ -1,7 +1,10 @@
 import { randomUUIDv7 } from "bun";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
-import type { ICompanyModel } from "@/domain/models/company.model.ts";
-import type { Company } from "@/generated/prisma/client";
+import type {
+  ICompanyModel,
+  IToolConfigs,
+} from "@/domain/models/company.model.ts";
+import { type Company, Prisma } from "@/generated/prisma/client";
 
 export abstract class CompanyMapper {
   static toModel(prismaCompany: Company): ICompanyModel {
@@ -14,21 +17,19 @@ export abstract class CompanyMapper {
       status: prismaCompany.status as CompanyStatus,
       systemPrompt: prismaCompany.systemPrompt,
       description: prismaCompany.description,
+      toolConfigs: (prismaCompany.toolConfigs as IToolConfigs) ?? null,
     };
   }
 
   static toEntity(
     modelCompany: Pick<ICompanyModel, "name" | "description">,
-  ): Company {
+  ): Prisma.CompanyCreateInput {
     return {
       id: randomUUIDv7(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      mcpUrl: null,
       name: modelCompany.name,
       status: CompanyStatus.INACTIVE,
-      systemPrompt: null,
       description: modelCompany.description ?? null,
+      toolConfigs: Prisma.DbNull,
     };
   }
 }

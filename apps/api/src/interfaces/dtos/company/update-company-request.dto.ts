@@ -1,5 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
+import { ToolConfigsSchema } from "@/domain/models/company.model.ts";
 
 export const UpdateCompanyRequestDto = z
   .object({
@@ -22,6 +23,10 @@ export const UpdateCompanyRequestDto = z
     description: z.string().nullable().optional().openapi({
       description: "A short description of the company",
       example: "Leading provider of innovative solutions",
+    }),
+    toolConfigs: ToolConfigsSchema.optional().openapi({
+      description:
+        "Per-tool configuration overrides (display name, description, parameter descriptions)",
     }),
   })
   .openapi("UpdateCompanyRequestDto", {

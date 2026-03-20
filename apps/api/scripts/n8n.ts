@@ -35,7 +35,7 @@ const _USAGE = `Usage: bun n8n <command> [args]
 
 Commands:
   pull [id] [--from <company>]         Pull workflow(s), sanitize, save (default: all from root)
-  push <company> <file>                Push workflow to company's n8n
+  push [company] <file>                Push workflow to n8n (default: root)
   add --name <n> --key <k>             Register a company's n8n API key in Infisical
   companies                            List companies with n8n API keys
   list [company]                       List workflows (default: root)
@@ -44,6 +44,7 @@ Commands:
 const [command, ...args] = process.argv.slice(2);
 
 if (!command || !Object.values(N8nCommand).includes(command as N8nCommand)) {
+  console.log(_USAGE);
   process.exit(command ? 1 : 0);
 }
 
@@ -71,10 +72,14 @@ try {
     }
 
     case N8nCommand.PUSH: {
-      if (!args[0] || !args[1]) {
+      if (!args[0]) {
+        console.log(_USAGE);
         process.exit(1);
       }
-      const result = await service.push(args[0], args[1]);
+      const company = args[1] ? args[0] : undefined;
+      const file = args[1] ?? args[0];
+      console.log(`Pushing to: ${company ?? "root"}`);
+      const result = await service.push(company, file);
       if (result.created) {
         console.log(`✓ Created workflow "${result.name}" (${result.id})`);
       } else {
@@ -130,6 +135,7 @@ try {
       break;
     }
   }
-} catch (_error) {
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 }

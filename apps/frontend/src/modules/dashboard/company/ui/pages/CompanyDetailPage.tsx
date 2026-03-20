@@ -4,6 +4,7 @@ import {
   CircleAlert,
   Loader2,
   Network,
+  Play,
   Plug,
   Save,
   Settings,
@@ -35,6 +36,11 @@ import { useCompany } from "@/shared/hooks/useCompany";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { useDeleteCompany } from "@/shared/hooks/useDeleteCompany";
 import { useUpdateCompany } from "@/shared/hooks/useUpdateCompany";
+import {
+  formatToolName,
+  type ToolConfig,
+  ToolConfigDialog,
+} from "../components/ToolConfigDialog";
 
 const mcpStatusConfig: Record<
   McpStatusEnum,
@@ -55,7 +61,7 @@ export function CompanyDetailPage() {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
   const state = useCurrentUser();
-  const { data, isLoading } = useCompany(companyId ?? null);
+  const { data, isLoading, isFetching } = useCompany(companyId ?? null);
   const { mutateAsync: deleteCompany, isPending: isDeleting } =
     useDeleteCompany();
   const { mutateAsync: updateCompany, isPending: isUpdating } =
@@ -65,6 +71,7 @@ export function CompanyDetailPage() {
   const mcpStatus =
     (data?.mcpStatus as McpStatusEnum | undefined) ??
     McpStatusEnum.NOT_CONFIGURED;
+  const tools = data?.tools ?? [];
 
   const isRoot =
     state.status === "authenticated" && state.user.role === UserRoleEnum.ROOT;
@@ -75,10 +82,18 @@ export function CompanyDetailPage() {
   const [mcpUrl, setMcpUrl] = useState("");
   const [mcpDirty, setMcpDirty] = useState(false);
 
+  const [toolConfigs, setToolConfigs] = useState<Record<string, ToolConfig>>(
+    {},
+  );
+  const [selectedToolName, setSelectedToolName] = useState<string | null>(null);
+
   useEffect(() => {
     if (company) {
       setSystemPrompt(company.systemPrompt ?? "");
       setMcpUrl(company.mcpUrl ?? "");
+      setToolConfigs(
+        (company.toolConfigs as Record<string, ToolConfig> | null) ?? {},
+      );
     }
   }, [company]);
 
@@ -96,6 +111,35 @@ export function CompanyDetailPage() {
       setMcpDirty(value !== (company?.mcpUrl ?? ""));
     },
     [company?.mcpUrl],
+  );
+
+  const handleNavigateToSession = useCallback(() => {
+    if (isRoot) {
+      navigate(`/dashboard/root/session/${companyId}`);
+    } else {
+      navigate("/dashboard/session");
+    }
+  }, [isRoot, navigate, companyId]);
+
+  const handleToolConfigSave = useCallback(
+    async (toolName: string, config: ToolConfig) => {
+      const next = { ...toolConfigs };
+      if (Object.keys(config).length === 0) {
+        delete next[toolName];
+      } else {
+        next[toolName] = config;
+      }
+      setToolConfigs(next);
+
+      try {
+        const configs = Object.keys(next).length > 0 ? next : null;
+        await updateCompany({ toolConfigs: configs });
+        toast.success("Tool configuration saved");
+      } catch {
+        toast.error("Failed to save tool configuration");
+      }
+    },
+    [toolConfigs, updateCompany],
   );
 
   async function handleSavePrompt() {
@@ -160,11 +204,11 @@ export function CompanyDetailPage() {
     }
   }
 
-  if (isLoading) {
+  if (isLoading || (!company && isFetching)) {
     return (
-      <PageContainer>
-        <LoadingSpinner className="py-12" label="Loading company..." />
-      </PageContainer>
+      <div className="flex h-full items-center justify-center">
+        <LoadingSpinner label="Loading company..." />
+      </div>
     );
   }
 
@@ -200,6 +244,19 @@ export function CompanyDetailPage() {
           </h1>
           <StatusBadge status={company.status} />
           <StatusBadge status={mcpBadge.variant} label={mcpBadge.label} />
+          <div className="ml-auto">
+            <Button
+              size="sm"
+              className="gap-1.5"
+              disabled={
+                mcpStatus === McpStatusEnum.NOT_CONFIGURED && tools.length === 0
+              }
+              onClick={handleNavigateToSession}
+            >
+              <Play className="size-3.5" />
+              Essayer
+            </Button>
+          </div>
         </div>
         {company.description && (
           <p className="text-sm text-muted-foreground">{company.description}</p>
@@ -273,11 +330,52 @@ export function CompanyDetailPage() {
             </CardHeader>
             <CardContent>
               {mcpStatus === McpStatusEnum.CONNECTED ? (
-                <EmptyState
-                  icon={Wrench}
-                  title="No tools discovered"
-                  description="Connect to the MCP server to discover available tools."
-                />
+                tools.length > 0 ? (
+                  <div className="space-y-3">
+                    {tools.map((tool) => {
+                      const cfg = toolConfigs[tool.name];
+                      const paramCount = Object.keys(
+                        (tool.parameters as Record<string, unknown>)
+                          ?.properties ?? {},
+                      ).length;
+                      const isConfigured =
+                        cfg?.description && cfg.description.trim().length > 0;
+                      return (
+                        <div
+                          key={tool.name}
+                          className="rounded-lg border p-3 flex items-center gap-3"
+                        >
+                          {!isConfigured && (
+                            <CircleAlert className="size-4 text-amber-500 shrink-0" />
+                          )}
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <p className="text-sm font-medium">
+                              {cfg?.displayName || formatToolName(tool.name)}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {paramCount}{" "}
+                              {paramCount > 1 ? "parameters" : "parameter"}
+                            </p>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-8 shrink-0"
+                            onClick={() => setSelectedToolName(tool.name)}
+                          >
+                            <Settings className="size-4" />
+                          </Button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={Wrench}
+                    title="No tools discovered"
+                    description="The MCP server is connected but no tools were found."
+                  />
+                )
               ) : (
                 <EmptyState
                   icon={Plug}
@@ -445,6 +543,19 @@ export function CompanyDetailPage() {
           </Card>
         </div>
       </div>
+      <ToolConfigDialog
+        tool={
+          selectedToolName
+            ? (tools.find((t) => t.name === selectedToolName) ?? null)
+            : null
+        }
+        config={selectedToolName ? toolConfigs[selectedToolName] : undefined}
+        onSave={handleToolConfigSave}
+        open={selectedToolName !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedToolName(null);
+        }}
+      />
     </PageContainer>
   );
 }

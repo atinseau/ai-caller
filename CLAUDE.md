@@ -84,7 +84,7 @@ Multi-company n8n workflow management CLI in `apps/api/scripts/n8n/`. Single n8n
 ```bash
 cd apps/api
 bun n8n pull <id>                             # Pull workflow from root n8n, sanitize, save
-bun n8n push <company> <file>                 # Push generic workflow to company's n8n
+bun n8n push [company] <file>                 # Push workflow to n8n (default: root)
 bun n8n add --name <n> --host <h> --key <k>   # Register a new company account
 bun n8n accounts                              # List registered accounts
 bun n8n list <company>                        # List workflows on company's n8n

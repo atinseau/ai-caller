@@ -110,8 +110,9 @@ companyRouter.openapi(getCompanyRoute, async (ctx) => {
   }
 
   const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+  const tools = await companyUseCase.listTools(company.mcpUrl, mcpStatus);
 
-  return ctx.json({ company, mcpStatus }, 200);
+  return ctx.json({ company, mcpStatus, tools }, 200);
 });
 
 const updateCompanyRoute = createRoute({
@@ -163,8 +164,9 @@ companyRouter.openapi(updateCompanyRoute, async (ctx) => {
 
   const company = await companyUseCase.update(id, dto);
   const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+  const tools = await companyUseCase.listTools(company.mcpUrl, mcpStatus);
 
-  return ctx.json({ company, mcpStatus }, 200);
+  return ctx.json({ company, mcpStatus, tools }, 200);
 });
 
 const deleteCompanyRoute = createRoute({

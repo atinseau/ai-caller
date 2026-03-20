@@ -14,7 +14,8 @@ export class N8nWorkflowFileStorageAdapter extends N8nWorkflowStoragePort {
   }
 
   async load(filename: string): Promise<GenericWorkflow> {
-    const name = filename.endsWith(".json") ? filename : `${filename}.json`;
+    const stripped = filename.replace(/^workflows\//, "");
+    const name = stripped.endsWith(".json") ? stripped : `${stripped}.json`;
     const filepath = join(WORKFLOWS_DIR, name);
     const file = Bun.file(filepath);
     if (!(await file.exists())) {

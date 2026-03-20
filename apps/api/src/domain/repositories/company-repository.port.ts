@@ -27,7 +27,12 @@ export abstract class CompanyRepositoryPort {
     data: Partial<
       Pick<
         ICompanyModel,
-        "name" | "mcpUrl" | "status" | "systemPrompt" | "description"
+        | "name"
+        | "mcpUrl"
+        | "status"
+        | "systemPrompt"
+        | "description"
+        | "toolConfigs"
       >
     >,
   ): Promise<ICompanyModel>;

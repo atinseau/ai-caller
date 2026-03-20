@@ -73,7 +73,10 @@ export class N8nService {
     return results;
   }
 
-  async push(companyName: string, file: string): Promise<PushResult> {
+  async push(
+    companyName: string | undefined,
+    file: string,
+  ): Promise<PushResult> {
     const client = await this.resolveClient(companyName);
     const generic = await this.storagePort.load(file);
     const payload = this.sanitize.prepareForPush(generic);

@@ -1,6 +1,23 @@
 import { z } from "@hono/zod-openapi";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 
+export const ToolParameterConfigSchema = z.object({
+  description: z.string().optional(),
+});
+
+export const ToolConfigSchema = z.object({
+  displayName: z.string().optional(),
+  description: z.string().optional(),
+  parameters: z.record(z.string(), ToolParameterConfigSchema).optional(),
+});
+
+export const ToolConfigsSchema = z
+  .record(z.string(), ToolConfigSchema)
+  .nullable();
+
+export type IToolConfig = z.infer<typeof ToolConfigSchema>;
+export type IToolConfigs = z.infer<typeof ToolConfigsSchema>;
+
 export const CompanyModel = z
   .object({
     name: z.string().openapi({
@@ -22,6 +39,10 @@ export const CompanyModel = z
     description: z.string().nullable().openapi({
       description: "A short description of the company",
       example: "Leading provider of innovative solutions",
+    }),
+    toolConfigs: ToolConfigsSchema.openapi({
+      description:
+        "Per-tool configuration overrides (display name, description, parameter descriptions)",
     }),
     id: z.uuidv7().openapi({
       description: "The unique identifier of the company",

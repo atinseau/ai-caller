@@ -104,6 +104,7 @@ model Company {
   status       CompanyStatus @default(INACTIVE)
   systemPrompt String?       @map("system_prompt")
   description  String?
+  toolConfigs  Json?         @map("tool_configs")
 
   rooms     Room[]
   users     User[]

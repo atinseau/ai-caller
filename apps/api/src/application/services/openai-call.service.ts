@@ -1,7 +1,10 @@
 import { OpenAI } from "@ai-caller/shared";
 import dayjs from "dayjs";
 import { inject, injectable } from "inversify";
-import type { ICompanyModel } from "@/domain/models/company.model.ts";
+import type {
+  ICompanyModel,
+  IToolConfigs,
+} from "@/domain/models/company.model.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
 import { LoggerPort } from "@/domain/ports/logger.port.ts";
 import { PromptPort } from "@/domain/ports/prompt.port.ts";
@@ -134,6 +137,7 @@ export class OpenAICallService implements CallServicePort {
         },
       });
 
+      this.applyToolConfigs(mcpFunctions, company.toolConfigs);
       baseTools.push(...mcpFunctions);
     } else {
       // Audio mode: use native MCP (OpenAI connects directly)
@@ -146,5 +150,38 @@ export class OpenAICallService implements CallServicePort {
     }
 
     return baseTools;
+  }
+
+  private applyToolConfigs(
+    tools: {
+      name: string;
+      description: string;
+      parameters: Record<string, unknown>;
+    }[],
+    configs: IToolConfigs | undefined | null,
+  ) {
+    if (!configs) return;
+
+    for (const tool of tools) {
+      const cfg = configs[tool.name];
+      if (!cfg) continue;
+
+      if (cfg.description) {
+        tool.description = cfg.description;
+      }
+
+      if (cfg.parameters) {
+        const props = tool.parameters?.properties as
+          | Record<string, { description?: string }>
+          | undefined;
+        if (props) {
+          for (const [paramName, paramCfg] of Object.entries(cfg.parameters)) {
+            if (props[paramName] && paramCfg.description) {
+              props[paramName].description = paramCfg.description;
+            }
+          }
+        }
+      }
+    }
   }
 }

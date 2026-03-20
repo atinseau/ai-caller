@@ -7,6 +7,14 @@ interface UpdateCompanyDto {
   status?: "ACTIVE" | "INACTIVE";
   systemPrompt?: string | null;
   description?: string | null;
+  toolConfigs?: Record<
+    string,
+    {
+      displayName?: string;
+      description?: string;
+      parameters?: Record<string, { description?: string }>;
+    }
+  > | null;
 }
 
 export function useUpdateCompany(companyId: string) {

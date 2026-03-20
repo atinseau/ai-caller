@@ -60,7 +60,7 @@ export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
       {/* Header */}
       <div className="flex items-center gap-3 border-b px-4 py-3">
         <Button variant="ghost" size="sm" asChild className="-ml-1 gap-1.5">
-          <Link to="/dashboard/root">
+          <Link to={`/dashboard/company/${companyId}`}>
             <ArrowLeft className="size-4" />
             Back
           </Link>

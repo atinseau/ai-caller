@@ -1,7 +1,7 @@
 import { inject, injectable } from "inversify";
 import type { ICompanyModel } from "@/domain/models/company.model.ts";
 import type { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
-import type { PrismaClient } from "@/generated/prisma/client";
+import { Prisma, type PrismaClient } from "@/generated/prisma/client";
 import { CompanyMapper } from "../mappers/company.mapper.ts";
 import { PRISMA_TOKEN } from "../prisma.ts";
 
@@ -36,13 +36,28 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
     data: Partial<
       Pick<
         ICompanyModel,
-        "name" | "mcpUrl" | "status" | "systemPrompt" | "description"
+        | "name"
+        | "mcpUrl"
+        | "status"
+        | "systemPrompt"
+        | "description"
+        | "toolConfigs"
       >
     >,
   ) {
+    const prismaData: Prisma.CompanyUpdateInput = {
+      ...data,
+      toolConfigs:
+        data.toolConfigs === undefined
+          ? undefined
+          : data.toolConfigs === null
+            ? Prisma.DbNull
+            : (data.toolConfigs as Prisma.InputJsonValue),
+    };
+
     const company = await this.prisma.company.update({
       where: { id },
-      data,
+      data: prismaData,
     });
     return CompanyMapper.toModel(company);
   }

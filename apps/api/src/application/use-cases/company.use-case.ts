@@ -3,7 +3,10 @@ import { inject, injectable } from "inversify";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 import { McpStatus } from "@/domain/enums/mcp-status.enum.ts";
 import type { ICompanyModel } from "@/domain/models/company.model.ts";
-import { McpClientPort } from "@/domain/ports/mcp-client.port.ts";
+import {
+  McpClientPort,
+  type McpToolDefinition,
+} from "@/domain/ports/mcp-client.port.ts";
 import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
 import type { ICreateCompanyRequestDto } from "@/interfaces/dtos/company/create-company-request.dto.ts";
 import type { IUpdateCompanyRequestDto } from "@/interfaces/dtos/company/update-company-request.dto.ts";
@@ -37,6 +40,22 @@ export class CompanyUseCase {
 
     const reachable = await this.mcpClient.checkConnectivity(mcpUrl);
     return reachable ? McpStatus.CONNECTED : McpStatus.UNREACHABLE;
+  }
+
+  async listTools(
+    mcpUrl: string | null,
+    mcpStatus: McpStatus,
+  ): Promise<McpToolDefinition[]> {
+    if (mcpStatus !== McpStatus.CONNECTED || !mcpUrl) return [];
+
+    try {
+      await this.mcpClient.connect(mcpUrl);
+      const tools = await this.mcpClient.listTools();
+      await this.mcpClient.disconnect();
+      return tools;
+    } catch {
+      return [];
+    }
   }
 
   async update(id: string, dto: IUpdateCompanyRequestDto) {
