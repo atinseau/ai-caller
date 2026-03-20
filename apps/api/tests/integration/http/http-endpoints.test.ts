@@ -40,6 +40,7 @@ beforeAll(async () => {
       expiresAt: new Date(Date.now() + 60_000),
     }),
     terminateCall: () => Promise.resolve(),
+    buildSessionConfig: async () => ({}),
   });
 
   // Create a test company via the production container

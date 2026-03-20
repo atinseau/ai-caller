@@ -2,6 +2,7 @@ import { randomUUIDv7 } from "bun";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 import type {
   ICompanyModel,
+  ISystemPromptSections,
   ISystemToolPrompts,
   IToolConfigs,
 } from "@/domain/models/company.model.ts";
@@ -16,7 +17,8 @@ export abstract class CompanyMapper {
       name: prismaCompany.name,
       updatedAt: prismaCompany.updatedAt,
       status: prismaCompany.status as CompanyStatus,
-      systemPrompt: prismaCompany.systemPrompt,
+      systemPromptSections:
+        (prismaCompany.systemPromptSections as ISystemPromptSections) ?? null,
       description: prismaCompany.description,
       toolConfigs: (prismaCompany.toolConfigs as IToolConfigs) ?? null,
       systemToolPrompts:

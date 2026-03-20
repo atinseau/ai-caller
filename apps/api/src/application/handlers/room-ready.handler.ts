@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import { CompanyRepositoryPort } from "@/domain/repositories/company-repository.port.ts";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
 import { EventBusPort } from "../../domain/ports/event-bus.port.ts";
@@ -21,6 +22,10 @@ export class RoomReadyHandler {
 
   private async handle(event: RoomReadyEvent) {
     const room = await this.roomRepository.findById(event.roomId);
+
+    // Telephony rooms are already wired by TelephonyGateway — skip
+    if (room.source === RoomSource.TELEPHONY) return;
+
     const company = await this.companyRepository.findById(room.companyId);
     await this.realtimeGateway.openRoomChannel(
       room,

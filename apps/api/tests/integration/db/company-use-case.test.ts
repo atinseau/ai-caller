@@ -60,16 +60,19 @@ describe("CompanyUseCase", () => {
       useCase: CompanyUseCase,
       repo: CompanyRepositoryPort,
       fields: {
-        systemPrompt?: string | null;
+        systemPromptSections?: Record<string, string> | null;
         mcpUrl?: string | null;
       },
     ) {
       const company = await useCase.create({
         name: `activation-test-${Date.now()}-${Math.random()}`,
       });
-      if (fields.systemPrompt !== undefined || fields.mcpUrl !== undefined) {
+      if (
+        fields.systemPromptSections !== undefined ||
+        fields.mcpUrl !== undefined
+      ) {
         return repo.updateCompany(company.id, {
-          systemPrompt: fields.systemPrompt ?? null,
+          systemPromptSections: fields.systemPromptSections ?? null,
           mcpUrl: fields.mcpUrl ?? null,
         });
       }
@@ -100,7 +103,7 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Test prompt",
+        systemPromptSections: { roleObjective: "Test prompt" },
       });
 
       try {
@@ -117,7 +120,7 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Test prompt",
+        systemPromptSections: { roleObjective: "Test prompt" },
         mcpUrl: "http://localhost:1/unreachable",
       });
 
@@ -135,7 +138,7 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Test prompt for activation",
+        systemPromptSections: { roleObjective: "Test prompt for activation" },
         mcpUrl: mockMcpServer.url,
       });
 
@@ -150,14 +153,16 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Active prompt",
+        systemPromptSections: { roleObjective: "Active prompt" },
         mcpUrl: mockMcpServer.url,
       });
 
       await useCase.update(company.id, { status: CompanyStatus.ACTIVE });
 
       try {
-        await useCase.update(company.id, { systemPrompt: "" });
+        await useCase.update(company.id, {
+          systemPromptSections: { roleObjective: "" },
+        });
         expect.unreachable("Should have thrown");
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPException);
@@ -172,14 +177,14 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Active prompt",
+        systemPromptSections: { roleObjective: "Active prompt" },
         mcpUrl: mockMcpServer.url,
       });
 
       await useCase.update(company.id, { status: CompanyStatus.ACTIVE });
 
       try {
-        await useCase.update(company.id, { systemPrompt: null });
+        await useCase.update(company.id, { systemPromptSections: null });
         expect.unreachable("Should have thrown");
       } catch (e) {
         expect(e).toBeInstanceOf(HTTPException);
@@ -194,7 +199,7 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Active prompt",
+        systemPromptSections: { roleObjective: "Active prompt" },
         mcpUrl: mockMcpServer.url,
       });
 
@@ -210,16 +215,18 @@ describe("CompanyUseCase", () => {
       const useCase = ctx.container.get(CompanyUseCase);
       const repo = ctx.container.get(CompanyRepositoryPort);
       const company = await createCompanyWithFields(useCase, repo, {
-        systemPrompt: "Active prompt",
+        systemPromptSections: { roleObjective: "Active prompt" },
         mcpUrl: mockMcpServer.url,
       });
 
       await useCase.update(company.id, { status: CompanyStatus.ACTIVE });
 
       const updated = await useCase.update(company.id, {
-        systemPrompt: "New prompt",
+        systemPromptSections: { roleObjective: "New prompt" },
       });
-      expect(updated.systemPrompt).toBe("New prompt");
+      expect(updated.systemPromptSections).toEqual({
+        roleObjective: "New prompt",
+      });
     });
   });
 });

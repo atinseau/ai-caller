@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
 import type { Schema } from "@ai-caller/shared";
 import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
@@ -97,6 +98,7 @@ const ROOM: IRoomModel = {
   updatedAt: new Date(),
   modality: "TEXT",
   isTest: false,
+  source: RoomSource.WEBRTC,
 };
 
 describe("RealtimeSessionService", () => {

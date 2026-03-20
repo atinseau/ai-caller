@@ -1,6 +1,7 @@
 import { createRoute, OpenAPIHono, z } from "@hono/zod-openapi";
 
 import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
+import { PhoneNumberUseCase } from "@/application/use-cases/phone-number.use-case.ts";
 import { UserRole } from "@/generated/prisma/client";
 import { container } from "@/infrastructure/di/container.ts";
 import { CreateCompanyRequestDto } from "../dtos/company/create-company-request.dto.ts";
@@ -109,10 +110,14 @@ companyRouter.openapi(getCompanyRoute, async (ctx) => {
     return ctx.json({ message: "Company not found" }, 404);
   }
 
-  const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+  const phoneNumberUseCase = container.get(PhoneNumberUseCase);
+  const [mcpStatus, phoneNumber] = await Promise.all([
+    companyUseCase.checkMcpStatus(company.mcpUrl),
+    phoneNumberUseCase.getByCompany(id),
+  ]);
   const tools = await companyUseCase.listTools(company.mcpUrl, mcpStatus);
 
-  return ctx.json({ company, mcpStatus, tools }, 200);
+  return ctx.json({ company, mcpStatus, tools, phoneNumber }, 200);
 });
 
 const updateCompanyRoute = createRoute({
@@ -163,10 +168,14 @@ companyRouter.openapi(updateCompanyRoute, async (ctx) => {
   const dto = ctx.req.valid("json");
 
   const company = await companyUseCase.update(id, dto);
-  const mcpStatus = await companyUseCase.checkMcpStatus(company.mcpUrl);
+  const phoneNumberUseCase = container.get(PhoneNumberUseCase);
+  const [mcpStatus, phoneNumber] = await Promise.all([
+    companyUseCase.checkMcpStatus(company.mcpUrl),
+    phoneNumberUseCase.getByCompany(id),
+  ]);
   const tools = await companyUseCase.listTools(company.mcpUrl, mcpStatus);
 
-  return ctx.json({ company, mcpStatus, tools }, 200);
+  return ctx.json({ company, mcpStatus, tools, phoneNumber }, 200);
 });
 
 const deleteCompanyRoute = createRoute({

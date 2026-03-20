@@ -1,4 +1,5 @@
 import { z } from "@hono/zod-openapi";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 
 export const RoomModel = z
   .object({
@@ -30,6 +31,14 @@ export const RoomModel = z
       .boolean()
       .default(false)
       .openapi({ description: "Whether this room is a test session" }),
+    source: z.nativeEnum(RoomSource).default(RoomSource.WEBRTC).openapi({
+      description: "The call source: WebRTC (browser) or telephony (phone)",
+    }),
+    twilioStreamSid: z
+      .string()
+      .nullable()
+      .optional()
+      .openapi({ description: "The Twilio Media Stream SID, if telephony" }),
   })
   .openapi("RoomModel", {
     description: "Represents a room entity",

@@ -40,6 +40,7 @@ function stubCallService() {
     terminateCall: async () => {
       /* noop */
     },
+    buildSessionConfig: async () => ({}),
   });
 }
 
@@ -116,6 +117,7 @@ describe("RoomUseCase", () => {
         terminateCalled = true;
         await roomRepo.deleteRoom(room.id);
       },
+      buildSessionConfig: async () => ({}),
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);

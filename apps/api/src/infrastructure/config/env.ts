@@ -35,6 +35,11 @@ const envDto = z.object({
   N8N_URL: z.string(),
   N8N_API_KEY: z.string(),
 
+  // TWILIO (optional — telephony is opt-in)
+  TWILIO_ACCOUNT_SID: z.string().optional(),
+  TWILIO_AUTH_TOKEN: z.string().optional(),
+  TWILIO_WEBHOOK_BASE_URL: z.string().optional(),
+
   // INFISICAL (optional)
   INFISICAL_CLIENT_ID: z.string().optional(),
   INFISICAL_CLIENT_SECRET: z.string().optional(),

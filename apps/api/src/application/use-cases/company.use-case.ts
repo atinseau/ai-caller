@@ -72,12 +72,12 @@ export class CompanyUseCase {
       await this.validateActivation(company, dto);
     }
 
-    const isClearingPrompt =
-      dto.systemPrompt !== undefined &&
-      (!dto.systemPrompt || dto.systemPrompt.trim() === "");
+    const isClearingSections =
+      dto.systemPromptSections !== undefined &&
+      !this.hasAnySectionContent(dto.systemPromptSections);
 
     if (
-      isClearingPrompt &&
+      isClearingSections &&
       company.status === CompanyStatus.ACTIVE &&
       !isActivating
     ) {
@@ -94,16 +94,25 @@ export class CompanyUseCase {
     return this.companyRepository.deleteCompany(id);
   }
 
+  private hasAnySectionContent(
+    sections: IUpdateCompanyRequestDto["systemPromptSections"],
+  ): boolean {
+    if (!sections) return false;
+    return Object.values(sections).some((v) => v && v.trim() !== "");
+  }
+
   private async validateActivation(
     company: ICompanyModel,
     dto: IUpdateCompanyRequestDto,
   ): Promise<void> {
-    const effectivePrompt =
-      dto.systemPrompt !== undefined ? dto.systemPrompt : company.systemPrompt;
-    if (!effectivePrompt || effectivePrompt.trim() === "") {
+    const effectiveSections =
+      dto.systemPromptSections !== undefined
+        ? dto.systemPromptSections
+        : company.systemPromptSections;
+    if (!this.hasAnySectionContent(effectiveSections)) {
       throw new HTTPException(400, {
         message:
-          "Cannot activate: the system prompt is required. Configure a system prompt before activating.",
+          "Cannot activate: the system prompt is required. Configure at least the Role & Objective section before activating.",
       });
     }
 

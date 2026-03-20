@@ -61,6 +61,7 @@ describe("SubAgentService (real OpenAI chat + mock MCP)", () => {
       terminateCall: async () => {
         /* noop */
       },
+      buildSessionConfig: async () => ({}),
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);

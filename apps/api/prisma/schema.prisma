@@ -102,7 +102,7 @@ model Company {
 
   mcpUrl       String?
   status       CompanyStatus @default(INACTIVE)
-  systemPrompt      String?
+  systemPromptSections Json?
   description       String?
   toolConfigs       Json?
   systemToolPrompts Json?
@@ -111,13 +111,30 @@ model Company {
   language          String?
   vadEagerness      String?
 
-  rooms     Room[]
-  users     User[]
+  rooms       Room[]
+  users       User[]
+  phoneNumber PhoneNumber?
+}
+
+model PhoneNumber {
+  id          String   @id @default(uuid())
+  phoneNumber String   @unique
+  twilioSid   String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  companyId   String   @unique
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 enum RoomModality {
   AUDIO
   TEXT
+}
+
+enum RoomSource {
+  WEBRTC
+  TELEPHONY
 }
 
 model Room {
@@ -131,9 +148,11 @@ model Room {
     companyId   String
     company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 
-    callId      String?
-    modality    RoomModality @default(AUDIO)
-    isTest      Boolean      @default(false)
+    callId          String?
+    modality        RoomModality @default(AUDIO)
+    isTest          Boolean      @default(false)
+    source          RoomSource   @default(WEBRTC)
+    twilioStreamSid String?
 
     toolInvokes ToolInvoke[]
     events      RoomEvent[]

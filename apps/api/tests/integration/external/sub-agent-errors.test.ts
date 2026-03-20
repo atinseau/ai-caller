@@ -60,6 +60,7 @@ describe("SubAgentService — error paths", () => {
       terminateCall: async () => {
         /* noop */
       },
+      buildSessionConfig: async () => ({}),
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);

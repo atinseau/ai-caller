@@ -13,7 +13,7 @@ describe("CompanyMapper", () => {
       updatedAt: new Date("2025-01-02"),
       status: "INACTIVE" as const,
       description: "A test company",
-      systemPrompt: "You are a helpful assistant",
+      systemPromptSections: { roleObjective: "You are a helpful assistant" },
       toolConfigs: null,
       systemToolPrompts: null,
       voice: "marin",
@@ -42,7 +42,7 @@ describe("CompanyMapper", () => {
       updatedAt: new Date("2025-01-02"),
       status: "INACTIVE" as const,
       description: null,
-      systemPrompt: null,
+      systemPromptSections: null,
       toolConfigs: null,
       systemToolPrompts: null,
       voice: null,
@@ -85,6 +85,8 @@ describe("RoomMapper", () => {
       deletedAt: null,
       modality: "TEXT" as const,
       isTest: false,
+      source: "WEBRTC" as const,
+      twilioStreamSid: null,
     };
 
     const model = RoomMapper.toModel(prismaRoom);

@@ -4,11 +4,21 @@ import type { LanguageEnum } from "@/shared/enums/language.enum";
 import type { VadEagernessEnum } from "@/shared/enums/vad-eagerness.enum";
 import type { VoiceEnum } from "@/shared/enums/voice.enum";
 
+interface SystemPromptSections {
+  roleObjective?: string;
+  personalityTone?: string;
+  context?: string;
+  referencePronunciations?: string;
+  instructionsRules?: string;
+  conversationFlow?: string;
+  safetyEscalation?: string;
+}
+
 interface UpdateCompanyDto {
   name?: string;
   mcpUrl?: string | null;
   status?: "ACTIVE" | "INACTIVE";
-  systemPrompt?: string | null;
+  systemPromptSections?: SystemPromptSections | null;
   description?: string | null;
   toolConfigs?: Record<
     string,

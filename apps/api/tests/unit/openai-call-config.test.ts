@@ -61,7 +61,7 @@ function makeCompany(overrides: Partial<ICompanyModel> = {}): ICompanyModel {
     name: "Test Co",
     mcpUrl: null,
     status: CompanyStatus.INACTIVE,
-    systemPrompt: "Be helpful.",
+    systemPromptSections: { roleObjective: "Be helpful." },
     description: null,
     toolConfigs: null,
     systemToolPrompts: null,
@@ -82,18 +82,16 @@ describe("OpenAICallService — config", () => {
   });
 
   describe("prompt rendering", () => {
-    it("should pass companyName and companySystemPrompt to instructions prompt", async () => {
+    it("should pass section fields to instructions prompt", async () => {
       const company = makeCompany({
         name: "Acme Corp",
-        systemPrompt: "You are the Acme assistant.",
+        systemPromptSections: {
+          roleObjective: "You are the Acme assistant.",
+          context: "Acme sells widgets.",
+        },
       });
 
-      // This will fail because of real OpenAI call, but we can check prompt.render was called
-      try {
-        await service.service.createCall(company, "AUDIO");
-      } catch {
-        /* expected — no real API key in unit tests */
-      }
+      await service.service.buildSessionConfig(company, "AUDIO");
 
       expect(service.prompt.render).toHaveBeenCalledTimes(3);
       const firstCall = service.prompt.render.mock.calls[0];
@@ -101,24 +99,34 @@ describe("OpenAICallService — config", () => {
         "instructions-prompt",
         {
           companyName: "Acme Corp",
-          companySystemPrompt: "You are the Acme assistant.",
+          roleObjective: "You are the Acme assistant.",
+          personalityTone: "",
+          context: "Acme sells widgets.",
+          referencePronunciations: "",
+          instructionsRules: "",
+          conversationFlow: "",
+          safetyEscalation: "",
+          language: "",
         },
       ]);
     });
 
-    it("should pass empty string when systemPrompt is null", async () => {
-      const company = makeCompany({ systemPrompt: null });
+    it("should pass empty strings when systemPromptSections is null", async () => {
+      const company = makeCompany({ systemPromptSections: null });
 
-      try {
-        await service.service.createCall(company, "TEXT");
-      } catch {
-        /* expected */
-      }
+      await service.service.buildSessionConfig(company, "TEXT");
 
       const firstCall = service.prompt.render.mock.calls[0];
       expect(firstCall?.[1]).toEqual({
         companyName: "Test Co",
-        companySystemPrompt: "",
+        roleObjective: "",
+        personalityTone: "",
+        context: "",
+        referencePronunciations: "",
+        instructionsRules: "",
+        conversationFlow: "",
+        safetyEscalation: "",
+        language: "",
       });
     });
   });
@@ -127,11 +135,7 @@ describe("OpenAICallService — config", () => {
     it("should not discover tools when mcpUrl is null", async () => {
       const company = makeCompany({ mcpUrl: null });
 
-      try {
-        await service.service.createCall(company, "AUDIO");
-      } catch {
-        /* expected */
-      }
+      await service.service.buildSessionConfig(company, "AUDIO");
 
       expect(
         service.toolDiscovery.discoverAsRealtimeFunctions,
@@ -141,11 +145,7 @@ describe("OpenAICallService — config", () => {
     it("should discover tools when mcpUrl is set", async () => {
       const company = makeCompany({ mcpUrl: "http://mcp.test" });
 
-      try {
-        await service.service.createCall(company, "AUDIO");
-      } catch {
-        /* expected */
-      }
+      await service.service.buildSessionConfig(company, "AUDIO");
 
       expect(
         service.toolDiscovery.discoverAsRealtimeFunctions,

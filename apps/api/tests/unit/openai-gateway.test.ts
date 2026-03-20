@@ -1,4 +1,5 @@
 import { describe, it } from "bun:test";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 
 describe("OpenAI Realtime Gateway — edge cases", () => {
   it("openRoomChannel should return early when audio room has no callId", async () => {
@@ -31,6 +32,7 @@ describe("OpenAI Realtime Gateway — edge cases", () => {
         createdAt: new Date(),
         updatedAt: new Date(),
         isTest: false,
+        source: RoomSource.WEBRTC,
       },
       "http://mcp.test",
     );

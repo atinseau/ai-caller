@@ -27,20 +27,22 @@ export class OpenAICallService implements CallServicePort {
     private readonly toolDiscovery: McpToolDiscoveryService,
   ) {}
 
-  async createCall(
+  async buildSessionConfig(
     company: ICompanyModel,
     modality: "AUDIO" | "TEXT" = "AUDIO",
-  ) {
-    this.logger.info(company, `Creating OpenAI Realtime call`);
-
-    const openai = new OpenAI({
-      apiKey: env.get("OPENAI_API_KEY"),
-    });
-
+  ): Promise<Record<string, unknown>> {
+    const sections = company.systemPromptSections;
     const [instructions, callClose, getToolStatus] = await Promise.all([
       this.prompt.render("instructions-prompt", {
         companyName: company.name,
-        companySystemPrompt: company.systemPrompt ?? "",
+        roleObjective: sections?.roleObjective ?? "",
+        personalityTone: sections?.personalityTone ?? "",
+        context: sections?.context ?? "",
+        referencePronunciations: sections?.referencePronunciations ?? "",
+        instructionsRules: sections?.instructionsRules ?? "",
+        conversationFlow: sections?.conversationFlow ?? "",
+        safetyEscalation: sections?.safetyEscalation ?? "",
+        language: company.language ?? "",
       }),
       this.prompt.render("call-close-tool-prompt"),
       this.prompt.render("get-tool-status-prompt"),
@@ -55,8 +57,7 @@ export class OpenAICallService implements CallServicePort {
 
     const voice = (company.voice as VoiceEnum) ?? VoiceEnum.MARIN;
 
-    // biome-ignore lint/suspicious/noExplicitAny: session config includes fields (audio.output.format) not yet fully typed in shared OpenAPI schema
-    const sessionConfig: any = {
+    return {
       output_modalities: [modality === "TEXT" ? "text" : "audio"],
       instructions,
       audio: {
@@ -82,13 +83,27 @@ export class OpenAICallService implements CallServicePort {
         },
       },
     };
+  }
+
+  async createCall(
+    company: ICompanyModel,
+    modality: "AUDIO" | "TEXT" = "AUDIO",
+  ) {
+    this.logger.info(company, `Creating OpenAI Realtime call`);
+
+    const openai = new OpenAI({
+      apiKey: env.get("OPENAI_API_KEY"),
+    });
+
+    const sessionConfig = await this.buildSessionConfig(company, modality);
 
     const data = await openai.realtime.clientSecrets({
       expires_after: {
         anchor: "created_at",
         seconds: env.get("ROOM_CALL_DURATION_MINUTE") * 60,
       },
-      session: sessionConfig,
+      // biome-ignore lint/suspicious/noExplicitAny: session config includes fields not yet fully typed in shared OpenAPI schema
+      session: sessionConfig as any,
     });
 
     return {

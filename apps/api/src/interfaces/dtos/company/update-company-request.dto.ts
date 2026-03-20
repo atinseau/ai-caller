@@ -4,6 +4,7 @@ import { LanguageEnum } from "@/domain/enums/language.enum.ts";
 import { VadEagernessEnum } from "@/domain/enums/vad-eagerness.enum.ts";
 import { VoiceEnum } from "@/domain/enums/voice.enum.ts";
 import {
+  SystemPromptSectionsSchema,
   SystemToolPromptsSchema,
   ToolConfigsSchema,
 } from "@/domain/models/company.model.ts";
@@ -22,9 +23,9 @@ export const UpdateCompanyRequestDto = z
       description: "The status of the company",
       example: CompanyStatus.ACTIVE,
     }),
-    systemPrompt: z.string().nullable().optional().openapi({
-      description: "The main system prompt of the company",
-      example: "You are a helpful assistant for Acme Corp.",
+    systemPromptSections: SystemPromptSectionsSchema.optional().openapi({
+      description:
+        "The system prompt sections (role, personality, context, pronunciations, instructions, flow, safety)",
     }),
     description: z.string().nullable().optional().openapi({
       description: "A short description of the company",

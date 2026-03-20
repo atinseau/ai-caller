@@ -34,6 +34,7 @@ beforeAll(async () => {
     terminateCall: async () => {
       /* noop */
     },
+    buildSessionConfig: async () => ({}),
   });
 
   const companyUseCase = container.get(CompanyUseCase);

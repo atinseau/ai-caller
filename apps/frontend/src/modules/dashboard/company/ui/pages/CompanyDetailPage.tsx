@@ -5,6 +5,7 @@ import {
   Loader2,
   Network,
   Pause,
+  Phone,
   Play,
   Plug,
   Save,
@@ -39,14 +40,28 @@ import {
   SelectValue,
 } from "@/shared/components/ui/select";
 import { Separator } from "@/shared/components/ui/separator";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/shared/components/ui/tabs";
 import { Textarea } from "@/shared/components/ui/textarea";
 import { LanguageEnum } from "@/shared/enums/language.enum";
 import { McpStatusEnum } from "@/shared/enums/mcp-status.enum";
+import {
+  PROMPT_SECTION_META,
+  PromptSection,
+} from "@/shared/enums/prompt-section.enum";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
 import { VoiceEnum } from "@/shared/enums/voice.enum";
 import { useCompany } from "@/shared/hooks/useCompany";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { useDeleteCompany } from "@/shared/hooks/useDeleteCompany";
+import {
+  useProvisionPhoneNumber,
+  useReleasePhoneNumber,
+} from "@/shared/hooks/usePhoneNumber";
 import { useUpdateCompany } from "@/shared/hooks/useUpdateCompany";
 import {
   formatToolName,
@@ -101,6 +116,21 @@ const SYSTEM_TOOLS = [
   },
 ] as const;
 
+const COUNTRY_OPTIONS = [
+  { value: "US", label: "United States (+1)" },
+  { value: "GB", label: "United Kingdom (+44)" },
+  { value: "FR", label: "France (+33)" },
+  { value: "DE", label: "Germany (+49)" },
+  { value: "ES", label: "Spain (+34)" },
+  { value: "IT", label: "Italy (+39)" },
+  { value: "NL", label: "Netherlands (+31)" },
+  { value: "PT", label: "Portugal (+351)" },
+  { value: "BE", label: "Belgium (+32)" },
+  { value: "CH", label: "Switzerland (+41)" },
+  { value: "CA", label: "Canada (+1)" },
+  { value: "AU", label: "Australia (+61)" },
+] as const;
+
 export function CompanyDetailPage() {
   const { companyId } = useParams<{ companyId: string }>();
   const navigate = useNavigate();
@@ -110,17 +140,30 @@ export function CompanyDetailPage() {
     useDeleteCompany();
   const { mutateAsync: updateCompany, isPending: isUpdating } =
     useUpdateCompany(companyId ?? "");
+  const { mutateAsync: provisionPhone, isPending: isProvisioning } =
+    useProvisionPhoneNumber(companyId ?? "");
+  const { mutateAsync: releasePhone, isPending: isReleasing } =
+    useReleasePhoneNumber(companyId ?? "");
 
   const company = data?.company;
   const mcpStatus =
     (data?.mcpStatus as McpStatusEnum | undefined) ??
     McpStatusEnum.NOT_CONFIGURED;
   const tools = data?.tools ?? [];
+  const phoneNumber = (data as Record<string, unknown>)?.phoneNumber as
+    | { id: string; phoneNumber: string; companyId: string }
+    | null
+    | undefined;
 
   const isRoot =
     state.status === "authenticated" && state.user.role === UserRoleEnum.ROOT;
 
-  const [systemPrompt, setSystemPrompt] = useState("");
+  const [promptSections, setPromptSections] = useState<Record<string, string>>(
+    {},
+  );
+  const [activeSection, setActiveSection] = useState<PromptSection>(
+    PromptSection.ROLE_OBJECTIVE,
+  );
   const [promptDirty, setPromptDirty] = useState(false);
 
   const [mcpUrl, setMcpUrl] = useState("");
@@ -143,10 +186,14 @@ export function CompanyDetailPage() {
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const [provisionCountry, setProvisionCountry] = useState("US");
 
   useEffect(() => {
     if (company) {
-      setSystemPrompt(company.systemPrompt ?? "");
+      const sections =
+        (company.systemPromptSections as Record<string, string> | null) ?? {};
+      setPromptSections(sections);
+      setPromptDirty(false);
       setMcpUrl(company.mcpUrl ?? "");
       setToolConfigs(
         (company.toolConfigs as Record<string, ToolConfig> | null) ?? {},
@@ -161,12 +208,20 @@ export function CompanyDetailPage() {
     }
   }, [company]);
 
-  const handlePromptChange = useCallback(
+  const handleSectionChange = useCallback(
     (value: string) => {
-      setSystemPrompt(value);
-      setPromptDirty(value !== (company?.systemPrompt ?? ""));
+      setPromptSections((prev) => {
+        const next = { ...prev };
+        if (value.trim()) {
+          next[activeSection] = value;
+        } else {
+          delete next[activeSection];
+        }
+        return next;
+      });
+      setPromptDirty(true);
     },
-    [company?.systemPrompt],
+    [activeSection],
   );
 
   const handleMcpUrlChange = useCallback(
@@ -288,7 +343,12 @@ export function CompanyDetailPage() {
 
   async function handleSavePrompt() {
     try {
-      await updateCompany({ systemPrompt: systemPrompt || null });
+      const hasContent = Object.values(promptSections).some(
+        (v) => v && v.trim() !== "",
+      );
+      await updateCompany({
+        systemPromptSections: hasContent ? promptSections : null,
+      });
       setPromptDirty(false);
       toast.success("System prompt saved");
     } catch (error) {
@@ -429,17 +489,63 @@ export function CompanyDetailPage() {
                 System Prompt
               </CardTitle>
               <CardDescription>
-                The main system prompt defines the AI assistant's identity,
-                instructions, and behavior for this company.
+                Configure each section of the AI agent's prompt. All sections
+                are merged into a single prompt at call time, following OpenAI's
+                recommended structure.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <WysiwygEditor
-                value={systemPrompt}
-                onChange={handlePromptChange}
-                placeholder="Define the AI assistant's personality, instructions, and behavior..."
-                minHeight="250px"
-              />
+            <CardContent className="space-y-4">
+              <Tabs
+                value={activeSection}
+                onValueChange={(v) => setActiveSection(v as PromptSection)}
+                className="gap-6"
+              >
+                <TabsList className="w-auto max-w-full overflow-x-auto overflow-y-hidden h-auto justify-start">
+                  {Object.values(PromptSection).map((section) => {
+                    const meta = PROMPT_SECTION_META[section];
+                    const hasContent = !!promptSections[section]?.trim();
+                    return (
+                      <TabsTrigger
+                        key={section}
+                        value={section}
+                        className="gap-1.5"
+                      >
+                        {hasContent ? (
+                          <Check className="size-3.5 text-emerald-500" />
+                        ) : (
+                          <CircleAlert className="size-3.5 text-amber-500" />
+                        )}
+                        {meta.shortLabel}
+                      </TabsTrigger>
+                    );
+                  })}
+                </TabsList>
+
+                {Object.values(PromptSection).map((section) => {
+                  const meta = PROMPT_SECTION_META[section];
+                  return (
+                    <TabsContent
+                      key={section}
+                      value={section}
+                      className="space-y-3"
+                    >
+                      <div className="space-y-1">
+                        <h4 className="text-sm font-medium">{meta.label}</h4>
+                        <p className="text-xs text-muted-foreground">
+                          {meta.description}
+                        </p>
+                      </div>
+                      <WysiwygEditor
+                        key={section}
+                        value={promptSections[section] ?? ""}
+                        onChange={handleSectionChange}
+                        placeholder={meta.placeholder}
+                        minHeight="200px"
+                      />
+                    </TabsContent>
+                  );
+                })}
+              </Tabs>
               <div className="flex justify-end">
                 <Button
                   onClick={handleSavePrompt}
@@ -741,6 +847,104 @@ export function CompanyDetailPage() {
                   )}
                   {voiceConfigDirty ? "Save voice config" : "Saved"}
                 </Button>
+              </div>
+
+              <Separator />
+
+              {/* Telephony */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">Telephony</h3>
+                {phoneNumber ? (
+                  <div className="rounded-lg border p-3 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Phone className="size-4 text-muted-foreground" />
+                      <p className="text-sm font-medium">
+                        {phoneNumber.phoneNumber}
+                      </p>
+                    </div>
+                    {isRoot && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-1.5"
+                        onClick={async () => {
+                          if (
+                            // biome-ignore lint/suspicious/noAlert: confirmation dialog is intentional UX
+                            !confirm(
+                              `Release ${phoneNumber.phoneNumber}? This will stop receiving calls on this number.`,
+                            )
+                          )
+                            return;
+                          try {
+                            await releasePhone();
+                            toast.success("Phone number released");
+                          } catch {
+                            toast.error("Failed to release phone number");
+                          }
+                        }}
+                        disabled={isReleasing}
+                      >
+                        {isReleasing ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3.5" />
+                        )}
+                        Release number
+                      </Button>
+                    )}
+                  </div>
+                ) : isRoot ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="provisionCountry">Country</Label>
+                    <Select
+                      value={provisionCountry}
+                      onValueChange={setProvisionCountry}
+                    >
+                      <SelectTrigger id="provisionCountry">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {COUNTRY_OPTIONS.map((c) => (
+                          <SelectItem key={c.value} value={c.value}>
+                            {c.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
+                      size="sm"
+                      className="w-full gap-1.5"
+                      onClick={async () => {
+                        try {
+                          const result = await provisionPhone({
+                            country: provisionCountry,
+                          });
+                          toast.success(
+                            `Phone number ${result.phoneNumber} provisioned`,
+                          );
+                        } catch (error) {
+                          toast.error(
+                            error instanceof Error
+                              ? error.message
+                              : "Failed to provision phone number",
+                          );
+                        }
+                      }}
+                      disabled={isProvisioning}
+                    >
+                      {isProvisioning ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : (
+                        <Phone className="size-3.5" />
+                      )}
+                      Provision number
+                    </Button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    No phone number configured.
+                  </p>
+                )}
               </div>
 
               <Separator />

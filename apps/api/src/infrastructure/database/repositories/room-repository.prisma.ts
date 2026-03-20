@@ -1,4 +1,5 @@
 import { inject, injectable } from "inversify";
+import type { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
 import type { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
 import type { PrismaClient } from "@/generated/prisma/client";
@@ -15,6 +16,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     expiresAt?: Date,
     modality?: "AUDIO" | "TEXT",
     isTest?: boolean,
+    source?: RoomSource,
   ) {
     const room = await this.prisma.room.create({
       data: RoomMapper.toEntity({
@@ -23,6 +25,7 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
         expiresAt,
         modality,
         isTest,
+        source,
       }),
     });
     return RoomMapper.toModel(room);
@@ -35,6 +38,17 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     const room = await this.prisma.room.update({
       where: { id: roomId },
       data: { callId },
+    });
+    return RoomMapper.toModel(room);
+  }
+
+  async updateTwilioStreamSid(
+    roomId: string,
+    streamSid: string,
+  ): Promise<IRoomModel> {
+    const room = await this.prisma.room.update({
+      where: { id: roomId },
+      data: { twilioStreamSid: streamSid },
     });
     return RoomMapper.toModel(room);
   }

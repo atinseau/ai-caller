@@ -30,7 +30,7 @@ export abstract class CompanyRepositoryPort {
         | "name"
         | "mcpUrl"
         | "status"
-        | "systemPrompt"
+        | "systemPromptSections"
         | "description"
         | "toolConfigs"
         | "systemToolPrompts"

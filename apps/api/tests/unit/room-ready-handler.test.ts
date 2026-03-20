@@ -1,6 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
 import { RoomReadyEvent } from "@/application/events/room-ready.event.ts";
 import { RoomReadyHandler } from "@/application/handlers/room-ready.handler.ts";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 
 describe("RoomReadyHandler", () => {
   it("should fetch room and open gateway channel on RoomReadyEvent", async () => {
@@ -14,6 +15,7 @@ describe("RoomReadyHandler", () => {
       createdAt: new Date(),
       updatedAt: new Date(),
       isTest: false,
+      source: RoomSource.WEBRTC,
     };
 
     const roomRepository = {

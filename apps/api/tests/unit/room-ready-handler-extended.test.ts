@@ -1,6 +1,7 @@
 import { describe, expect, it, mock } from "bun:test";
 import { RoomReadyEvent } from "@/application/events/room-ready.event.ts";
 import { RoomReadyHandler } from "@/application/handlers/room-ready.handler.ts";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 
 function createMocks(companyOverrides: Record<string, unknown> = {}) {
   const mockRoom = {
@@ -13,6 +14,7 @@ function createMocks(companyOverrides: Record<string, unknown> = {}) {
     createdAt: new Date(),
     updatedAt: new Date(),
     isTest: false,
+    source: RoomSource.WEBRTC,
   };
 
   const roomRepository = {

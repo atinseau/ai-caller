@@ -1,5 +1,6 @@
 import { z } from "@hono/zod-openapi";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
+import { PromptSection } from "@/domain/enums/prompt-section.enum.ts";
 
 export const ToolParameterConfigSchema = z.object({
   description: z.string().optional(),
@@ -24,6 +25,20 @@ export const SystemToolPromptsSchema = z
 
 export type ISystemToolPrompts = z.infer<typeof SystemToolPromptsSchema>;
 
+export const SystemPromptSectionsSchema = z
+  .object({
+    [PromptSection.ROLE_OBJECTIVE]: z.string().optional(),
+    [PromptSection.PERSONALITY_TONE]: z.string().optional(),
+    [PromptSection.CONTEXT]: z.string().optional(),
+    [PromptSection.REFERENCE_PRONUNCIATIONS]: z.string().optional(),
+    [PromptSection.INSTRUCTIONS_RULES]: z.string().optional(),
+    [PromptSection.CONVERSATION_FLOW]: z.string().optional(),
+    [PromptSection.SAFETY_ESCALATION]: z.string().optional(),
+  })
+  .nullable();
+
+export type ISystemPromptSections = z.infer<typeof SystemPromptSectionsSchema>;
+
 export const CompanyModel = z
   .object({
     name: z.string().openapi({
@@ -38,9 +53,9 @@ export const CompanyModel = z
       description: "The status of the company",
       example: CompanyStatus.INACTIVE,
     }),
-    systemPrompt: z.string().nullable().openapi({
-      description: "The main system prompt of the company",
-      example: "You are a helpful assistant for Acme Corp.",
+    systemPromptSections: SystemPromptSectionsSchema.openapi({
+      description:
+        "The system prompt sections following the OpenAI 8-section skeleton (role, personality, context, pronunciations, instructions, flow, safety)",
     }),
     description: z.string().nullable().openapi({
       description: "A short description of the company",

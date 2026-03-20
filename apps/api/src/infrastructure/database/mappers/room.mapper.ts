@@ -1,5 +1,6 @@
 import { randomUUIDv7 } from "bun";
 import dayjs from "dayjs";
+import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
 import type { Room } from "@/generated/prisma/client";
 import { env } from "@/infrastructure/config/env.ts";
@@ -16,17 +17,27 @@ export abstract class RoomMapper {
       token: prismaRoom.token,
       modality: prismaRoom.modality,
       isTest: prismaRoom.isTest,
+      source: prismaRoom.source as RoomSource,
+      twilioStreamSid: prismaRoom.twilioStreamSid,
     };
   }
 
   static toEntity(
     modelRoom: Omit<
       IRoomModel,
-      "id" | "createdAt" | "updatedAt" | "expiresAt" | "modality" | "isTest"
+      | "id"
+      | "createdAt"
+      | "updatedAt"
+      | "expiresAt"
+      | "modality"
+      | "isTest"
+      | "source"
+      | "twilioStreamSid"
     > & {
       expiresAt?: Date;
       modality?: "AUDIO" | "TEXT";
       isTest?: boolean;
+      source?: RoomSource;
     },
   ): Room {
     const now = dayjs();
@@ -51,6 +62,8 @@ export abstract class RoomMapper {
       token: modelRoom.token,
       modality: modelRoom.modality || "AUDIO",
       isTest: modelRoom.isTest ?? false,
+      source: modelRoom.source || RoomSource.WEBRTC,
+      twilioStreamSid: null,
     };
   }
 }

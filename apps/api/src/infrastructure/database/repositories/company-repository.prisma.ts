@@ -39,7 +39,7 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
         | "name"
         | "mcpUrl"
         | "status"
-        | "systemPrompt"
+        | "systemPromptSections"
         | "description"
         | "toolConfigs"
         | "systemToolPrompts"
@@ -51,6 +51,12 @@ export class CompanyRepositoryPrisma implements CompanyRepositoryPort {
   ) {
     const prismaData: Prisma.CompanyUpdateInput = {
       ...data,
+      systemPromptSections:
+        data.systemPromptSections === undefined
+          ? undefined
+          : data.systemPromptSections === null
+            ? Prisma.DbNull
+            : (data.systemPromptSections as Prisma.InputJsonValue),
       toolConfigs:
         data.toolConfigs === undefined
           ? undefined
