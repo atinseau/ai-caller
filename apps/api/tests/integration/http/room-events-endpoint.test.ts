@@ -35,6 +35,11 @@ beforeAll(async () => {
       /* noop */
     },
     buildSessionConfig: async () => ({}),
+    buildAudioProviderConfig: async () => ({
+      instructions: "",
+      tools: [],
+      voice: "marin",
+    }),
   });
 
   const companyUseCase = container.get(CompanyUseCase);

@@ -9,6 +9,79 @@ import type { ICompanyModel } from "@/domain/models/company.model.ts";
  * without making real API calls.
  */
 
+function createServiceWithCache(cacheOverrides: Record<string, unknown> = {}) {
+  const roomRepository = {
+    createRoom: mock(() => Promise.resolve({})),
+    findById: mock(() => Promise.resolve(null)),
+    updateRoomCallId: mock(() => Promise.resolve(null)),
+    findExpiredRooms: mock(() => Promise.resolve([])),
+    deleteRoom: mock(() => Promise.resolve()),
+  };
+
+  const logger = {
+    info: () => {
+      /* noop */
+    },
+    error: () => {
+      /* noop */
+    },
+    warn: () => {
+      /* noop */
+    },
+  };
+
+  const prompt = {
+    render: mock((_name: string) => {
+      if (_name === "instructions-prompt")
+        return Promise.resolve("INSTRUCTIONS");
+      if (_name === "call-close-tool-prompt") return Promise.resolve("CLOSE");
+      if (_name === "get-tool-status-prompt")
+        return Promise.resolve("GET_STATUS");
+      return Promise.resolve("");
+    }),
+  };
+
+  const toolDiscovery = {
+    discoverAsRealtimeFunctions: mock(() => Promise.resolve([])),
+  };
+
+  const contactService = {
+    findOrCreate: mock(() => Promise.resolve({ id: "contact-1" })),
+    linkToRoom: mock(() => Promise.resolve()),
+  };
+
+  const voicePreview = {
+    listVoices: () => [{ id: "eve", label: "Eve", tone: "Energetic" }],
+    generatePreview: mock(() => Promise.resolve(new ReadableStream())),
+  };
+
+  const roomEventRepository = {
+    findByRoomId: mock(() => Promise.resolve([])),
+  };
+
+  const cache = {
+    get: mock(() => Promise.resolve(null)),
+    set: mock(() => Promise.resolve()),
+    delete: mock(() => Promise.resolve()),
+    deletePattern: mock(() => Promise.resolve()),
+    has: mock(() => Promise.resolve(false)),
+    ...cacheOverrides,
+  };
+
+  const service = new OpenAICallService(
+    roomRepository as never,
+    roomEventRepository as never,
+    logger as never,
+    prompt as never,
+    toolDiscovery as never,
+    contactService as never,
+    voicePreview as never,
+    cache as never,
+  );
+
+  return { service, prompt, toolDiscovery, cache };
+}
+
 function createService() {
   const roomRepository = {
     createRoom: mock(() => Promise.resolve({})),
@@ -45,11 +118,37 @@ function createService() {
     discoverAsRealtimeFunctions: mock(() => Promise.resolve([])),
   };
 
+  const contactService = {
+    findOrCreate: mock(() => Promise.resolve({ id: "contact-1" })),
+    linkToRoom: mock(() => Promise.resolve()),
+  };
+
+  const voicePreview = {
+    listVoices: () => [{ id: "eve", label: "Eve", tone: "Energetic" }],
+    generatePreview: mock(() => Promise.resolve(new ReadableStream())),
+  };
+
+  const roomEventRepository = {
+    findByRoomId: mock(() => Promise.resolve([])),
+  };
+
+  const cache = {
+    get: mock(() => Promise.resolve(null)),
+    set: mock(() => Promise.resolve()),
+    delete: mock(() => Promise.resolve()),
+    deletePattern: mock(() => Promise.resolve()),
+    has: mock(() => Promise.resolve(false)),
+  };
+
   const service = new OpenAICallService(
     roomRepository as never,
+    roomEventRepository as never,
     logger as never,
     prompt as never,
     toolDiscovery as never,
+    contactService as never,
+    voicePreview as never,
+    cache as never,
   );
 
   return { service, prompt, toolDiscovery };
@@ -107,6 +206,7 @@ describe("OpenAICallService — config", () => {
           conversationFlow: "",
           safetyEscalation: "",
           language: "",
+          contactSummary: "",
         },
       ]);
     });
@@ -127,6 +227,7 @@ describe("OpenAICallService — config", () => {
         conversationFlow: "",
         safetyEscalation: "",
         language: "",
+        contactSummary: "",
       });
     });
   });
@@ -151,5 +252,69 @@ describe("OpenAICallService — config", () => {
         service.toolDiscovery.discoverAsRealtimeFunctions,
       ).toHaveBeenCalledWith("http://mcp.test");
     });
+  });
+});
+
+describe("OpenAICallService — buildAudioProviderConfig cache", () => {
+  it("should return cached config when cache hit and no contactSummary", async () => {
+    const cachedConfig = {
+      instructions: "CACHED",
+      tools: [],
+      voice: "marin",
+      language: "fr",
+    };
+    const svc = createServiceWithCache({
+      get: mock(() => Promise.resolve(cachedConfig)),
+    });
+    const company = makeCompany();
+
+    const result = await svc.service.buildAudioProviderConfig(company);
+
+    expect(result).toEqual(cachedConfig);
+    // prompt.render should NOT be called since we hit cache
+    expect(svc.prompt.render).not.toHaveBeenCalled();
+  });
+
+  it("should skip cache when contactSummary is provided", async () => {
+    const cachedConfig = {
+      instructions: "CACHED",
+      tools: [],
+      voice: "marin",
+    };
+    const svc = createServiceWithCache({
+      get: mock(() => Promise.resolve(cachedConfig)),
+    });
+    const company = makeCompany();
+
+    const result = await svc.service.buildAudioProviderConfig(
+      company,
+      "User called yesterday about order #123",
+    );
+
+    // Should rebuild even though cache has data, because contactSummary is provided
+    expect(result.instructions).toBe("INSTRUCTIONS");
+    expect(svc.prompt.render).toHaveBeenCalled();
+  });
+
+  it("should cache the config after miss (no contactSummary)", async () => {
+    const svc = createServiceWithCache();
+    const company = makeCompany();
+
+    await svc.service.buildAudioProviderConfig(company);
+
+    expect(svc.cache.set).toHaveBeenCalledWith(
+      `audio-config:${company.id}`,
+      expect.objectContaining({ instructions: "INSTRUCTIONS" }),
+      300,
+    );
+  });
+
+  it("should NOT cache when contactSummary is provided", async () => {
+    const svc = createServiceWithCache();
+    const company = makeCompany();
+
+    await svc.service.buildAudioProviderConfig(company, "Some summary");
+
+    expect(svc.cache.set).not.toHaveBeenCalled();
   });
 });

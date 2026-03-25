@@ -61,6 +61,11 @@ describe("SubAgentService — error paths", () => {
         /* noop */
       },
       buildSessionConfig: async () => ({}),
+      buildAudioProviderConfig: async () => ({
+        instructions: "",
+        tools: [],
+        voice: "marin",
+      }),
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);

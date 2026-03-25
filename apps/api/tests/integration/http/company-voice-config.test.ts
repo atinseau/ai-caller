@@ -95,14 +95,16 @@ describe("Company voice configuration", () => {
     expect(data.company.voice).toBeNull();
   });
 
-  it("should reject invalid voice value", async () => {
+  it("should accept any voice string (provider-specific)", async () => {
     const res = await app.request(`/api/v1/company/${testCompanyId}`, {
       method: "PATCH",
       headers: jsonAuthHeaders(),
-      body: JSON.stringify({ voice: "nonexistent_voice" }),
+      body: JSON.stringify({ voice: "eve" }),
     });
 
-    expect(res.ok).toBe(false);
+    expect(res.ok).toBe(true);
+    const data = (await res.json()) as { company: { voice: string } };
+    expect(data.company.voice).toBe("eve");
   });
 
   it("should reject invalid language value", async () => {

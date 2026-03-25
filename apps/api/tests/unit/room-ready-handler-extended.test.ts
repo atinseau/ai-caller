@@ -32,7 +32,10 @@ function createMocks(companyOverrides: Record<string, unknown> = {}) {
   });
   const realtimeGateway = {
     openRoomChannel,
-    sendToRoom: mock(() => {
+    forwardAudioToProvider: mock(() => {
+      /* noop */
+    }),
+    sendTextToProvider: mock(() => {
       /* noop */
     }),
     closeRoomChannel: mock(() => {
@@ -53,19 +56,40 @@ function createMocks(companyOverrides: Record<string, unknown> = {}) {
     }),
   };
 
+  const company = {
+    id: "c-1",
+    name: "Test",
+    mcpUrl: "http://mcp.test",
+    language: null,
+    vadEagerness: null,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    ...companyOverrides,
+  };
+
   const companyRepository = {
-    findById: mock(async () => ({
-      id: "c-1",
-      name: "Test",
-      mcpUrl: "http://mcp.test",
-      language: null,
-      vadEagerness: null,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      ...companyOverrides,
-    })),
+    findById: mock(async () => company),
     createCompany: mock(async () => ({})),
     getAllCompanies: mock(async () => []),
+  };
+
+  const mockConfig = {
+    instructions: "test",
+    tools: [],
+    voice: "marin",
+    mcpUrl: company.mcpUrl ?? undefined,
+  };
+
+  const callService = {
+    createCall: mock(async () => ({
+      token: "tok",
+      expiresAt: new Date(),
+    })),
+    terminateCall: mock(async () => {
+      /* noop */
+    }),
+    buildSessionConfig: mock(async () => ({})),
+    buildAudioProviderConfig: mock(async () => mockConfig),
   };
 
   new RoomReadyHandler(
@@ -73,49 +97,46 @@ function createMocks(companyOverrides: Record<string, unknown> = {}) {
     companyRepository as never,
     eventBus as never,
     realtimeGateway as never,
+    callService as never,
   );
 
-  return { mockRoom, openRoomChannel, subscribeHandler };
+  return { mockRoom, openRoomChannel, subscribeHandler, callService };
 }
 
 describe("RoomReadyHandler — extended", () => {
-  it("should pass undefined for null language and vadEagerness", async () => {
-    const { mockRoom, openRoomChannel, subscribeHandler } = createMocks({
-      language: null,
-      vadEagerness: null,
-    });
+  it("should build audio provider config and open channel", async () => {
+    const { mockRoom, openRoomChannel, subscribeHandler, callService } =
+      createMocks({
+        language: null,
+        vadEagerness: null,
+      });
 
     const event = new RoomReadyEvent(mockRoom);
     await (subscribeHandler.fn as (e: RoomReadyEvent) => Promise<void>)(event);
 
-    expect(openRoomChannel).toHaveBeenCalledWith(
-      mockRoom,
-      "http://mcp.test",
-      false,
-      undefined,
-      undefined,
-    );
+    expect(callService.buildAudioProviderConfig).toHaveBeenCalled();
+    expect(openRoomChannel).toHaveBeenCalled();
   });
 
-  it("should pass company language and vadEagerness when set", async () => {
+  it("should set isTest from room on the config", async () => {
     const { mockRoom, openRoomChannel, subscribeHandler } = createMocks({
       language: "es",
       vadEagerness: "high",
     });
 
+    mockRoom.isTest = true;
+
     const event = new RoomReadyEvent(mockRoom);
     await (subscribeHandler.fn as (e: RoomReadyEvent) => Promise<void>)(event);
 
-    expect(openRoomChannel).toHaveBeenCalledWith(
-      mockRoom,
-      "http://mcp.test",
-      false,
-      "es",
-      "high",
-    );
+    const [, config] = openRoomChannel.mock.calls[0] as unknown as [
+      unknown,
+      { isTest: boolean },
+    ];
+    expect(config.isTest).toBe(true);
   });
 
-  it("should pass undefined mcpUrl when company has no mcpUrl", async () => {
+  it("should handle company with no mcpUrl", async () => {
     const { mockRoom, openRoomChannel, subscribeHandler } = createMocks({
       mcpUrl: null,
       language: "fr",
@@ -125,12 +146,6 @@ describe("RoomReadyHandler — extended", () => {
     const event = new RoomReadyEvent(mockRoom);
     await (subscribeHandler.fn as (e: RoomReadyEvent) => Promise<void>)(event);
 
-    expect(openRoomChannel).toHaveBeenCalledWith(
-      mockRoom,
-      undefined,
-      false,
-      "fr",
-      "low",
-    );
+    expect(openRoomChannel).toHaveBeenCalled();
   });
 });

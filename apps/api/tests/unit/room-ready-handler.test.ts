@@ -4,7 +4,7 @@ import { RoomReadyHandler } from "@/application/handlers/room-ready.handler.ts";
 import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 
 describe("RoomReadyHandler", () => {
-  it("should fetch room and open gateway channel on RoomReadyEvent", async () => {
+  it("should fetch room, build config, and open gateway channel on RoomReadyEvent", async () => {
     const mockRoom = {
       id: "room-1",
       companyId: "c-1",
@@ -33,7 +33,10 @@ describe("RoomReadyHandler", () => {
     });
     const realtimeGateway = {
       openRoomChannel,
-      sendToRoom: mock(() => {
+      forwardAudioToProvider: mock(() => {
+        /* noop */
+      }),
+      sendTextToProvider: mock(() => {
         /* noop */
       }),
       closeRoomChannel: mock(() => {
@@ -68,11 +71,31 @@ describe("RoomReadyHandler", () => {
       getAllCompanies: mock(async () => []),
     };
 
+    const mockConfig = {
+      instructions: "test",
+      tools: [],
+      voice: "marin",
+      mcpUrl: "http://mcp.test",
+    };
+
+    const callService = {
+      createCall: mock(async () => ({
+        token: "tok",
+        expiresAt: new Date(),
+      })),
+      terminateCall: mock(async () => {
+        /* noop */
+      }),
+      buildSessionConfig: mock(async () => ({})),
+      buildAudioProviderConfig: mock(async () => mockConfig),
+    };
+
     new RoomReadyHandler(
       roomRepository as never,
       companyRepository as never,
       eventBus as never,
       realtimeGateway as never,
+      callService as never,
     );
 
     expect(eventBus.subscribe).toHaveBeenCalledTimes(1);
@@ -82,12 +105,10 @@ describe("RoomReadyHandler", () => {
     await (subscribeHandler.fn as (e: RoomReadyEvent) => Promise<void>)(event);
 
     expect(roomRepository.findById).toHaveBeenCalledWith("room-1");
-    expect(openRoomChannel).toHaveBeenCalledWith(
-      mockRoom,
-      "http://mcp.test",
-      false,
-      "fr",
-      "medium",
-    );
+    expect(callService.buildAudioProviderConfig).toHaveBeenCalled();
+    expect(openRoomChannel).toHaveBeenCalledWith(mockRoom, {
+      ...mockConfig,
+      isTest: false,
+    });
   });
 });

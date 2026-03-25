@@ -19,6 +19,7 @@ export abstract class RoomMapper {
       isTest: prismaRoom.isTest,
       source: prismaRoom.source as RoomSource,
       twilioStreamSid: prismaRoom.twilioStreamSid,
+      contactId: prismaRoom.contactId,
     };
   }
 
@@ -33,6 +34,7 @@ export abstract class RoomMapper {
       | "isTest"
       | "source"
       | "twilioStreamSid"
+      | "contactId"
     > & {
       expiresAt?: Date;
       modality?: "AUDIO" | "TEXT";
@@ -64,6 +66,7 @@ export abstract class RoomMapper {
       isTest: modelRoom.isTest ?? false,
       source: modelRoom.source || RoomSource.WEBRTC,
       twilioStreamSid: null,
+      contactId: null,
     };
   }
 }

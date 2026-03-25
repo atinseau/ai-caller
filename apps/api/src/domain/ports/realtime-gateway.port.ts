@@ -1,17 +1,16 @@
-import type { Schema } from "@ai-caller/shared";
 import type { IRoomModel } from "../models/room.model.ts";
+import type { AudioProviderConfig } from "./audio-provider.port.ts";
+
+export type ClientSender = (message: Record<string, unknown>) => void;
 
 export abstract class RealtimeGatewayPort {
   abstract openRoomChannel(
     room: IRoomModel,
-    companyMcpUrl?: string,
-    isTest?: boolean,
-    companyLanguage?: string,
-    companyVadEagerness?: string,
+    config: AudioProviderConfig,
   ): void | Promise<void>;
-  abstract sendToRoom(
-    roomId: string,
-    event: Schema["RealtimeClientEvent"],
-  ): void;
+  abstract forwardAudioToProvider(roomId: string, base64Audio: string): void;
+  abstract sendTextToProvider(roomId: string, text: string): void;
   abstract closeRoomChannel(roomId: string): void;
+  abstract registerClientSender(roomId: string, sender: ClientSender): void;
+  abstract unregisterClientSender(roomId: string): void;
 }

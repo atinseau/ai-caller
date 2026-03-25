@@ -15,6 +15,7 @@ export const telephonyRouter = new Hono();
 telephonyRouter.post("/incoming", async (ctx) => {
   const body = await ctx.req.parseBody();
   const toNumber = body.To as string;
+  const callerNumber = body.From as string | undefined;
 
   const phoneNumberRepo = container.get(PhoneNumberRepositoryPort);
   const phoneNumber = await phoneNumberRepo.findByPhoneNumber(toNumber);
@@ -29,7 +30,7 @@ telephonyRouter.post("/incoming", async (ctx) => {
 
   const webhookBaseUrl = env.get("TWILIO_WEBHOOK_BASE_URL") ?? "";
 
-  const twiml = `<Response><Connect><Stream url="wss://${new URL(webhookBaseUrl).host}/api/telephony/ws"><Parameter name="companyId" value="${phoneNumber.companyId}" /></Stream></Connect></Response>`;
+  const twiml = `<Response><Connect><Stream url="wss://${new URL(webhookBaseUrl).host}/api/telephony/ws"><Parameter name="companyId" value="${phoneNumber.companyId}" /><Parameter name="callerNumber" value="${callerNumber ?? ""}" /></Stream></Connect></Response>`;
 
   return ctx.text(twiml, 200, { "Content-Type": "text/xml" });
 });
@@ -51,6 +52,8 @@ telephonyRouter.get(
           if (msg.event === "start") {
             const companyId = msg.start?.customParameters?.companyId;
             const streamSid = msg.start?.streamSid;
+            const callerNumber =
+              msg.start?.customParameters?.callerNumber || undefined;
 
             if (!companyId || !streamSid) {
               ws.close(1008, "Missing companyId or streamSid");
@@ -67,7 +70,12 @@ telephonyRouter.get(
 
             const telephonyUseCase = container.get(TelephonyUseCase);
             telephonyUseCase
-              .handleIncomingCall(companyId, streamSid, sendToTwilio)
+              .handleIncomingCall(
+                companyId,
+                streamSid,
+                sendToTwilio,
+                callerNumber,
+              )
               .then((id) => {
                 roomId = id;
               })
@@ -80,10 +88,7 @@ telephonyRouter.get(
 
           if (msg.event === "media" && roomId) {
             const telephonyGateway = container.get(TelephonyGatewayPort);
-            telephonyGateway.forwardAudioToOpenAI(
-              roomId,
-              msg.media?.payload ?? "",
-            );
+            telephonyGateway.forwardAudio(roomId, msg.media?.payload ?? "");
             return;
           }
 

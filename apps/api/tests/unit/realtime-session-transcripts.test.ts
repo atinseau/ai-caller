@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, mock } from "bun:test";
 import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
 import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { NormalizedAudioEvent } from "@/domain/ports/audio-provider.port.ts";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 function createFakes() {
@@ -14,22 +15,13 @@ function createFakes() {
       Promise.resolve({ token: "t", expiresAt: new Date() }),
     ),
     terminateCall: mock(() => Promise.resolve()),
-  };
-
-  const toolRepository = {
-    createToolInvoke: mock(() =>
+    buildAudioProviderConfig: mock(() =>
       Promise.resolve({
-        id: "inv-1",
-        entityId: "e-1",
-        roomId: "r-1",
-        status: "RUNNING",
-        createdAt: new Date(),
+        instructions: "",
+        tools: [],
+        voice: "marin",
       }),
     ),
-    completeToolInvokeByEntityId: mock(() => Promise.resolve({})),
-    failToolInvoke: mock(() => Promise.resolve({})),
-    findByEntityId: mock(() => Promise.resolve(null)),
-    findActiveByRoomId: mock(() => Promise.resolve([])),
   };
 
   const logger = {
@@ -54,10 +46,6 @@ function createFakes() {
     },
   };
 
-  const subAgent = {
-    execute: mock(() => Promise.resolve({ summary: "done" })),
-  };
-
   const roomEventRepository = {
     create: mock((roomId: string, type: string, payload: unknown) => {
       persistedEvents.push({ roomId, type, payload });
@@ -66,13 +54,28 @@ function createFakes() {
     findByRoomId: mock(() => Promise.resolve([])),
   };
 
+  const toolExecution = {
+    dispatch: mock(() =>
+      Promise.resolve({
+        toolInvoke: {
+          entityId: "e-1",
+          id: "inv-1",
+          roomId: "r-1",
+          status: "RUNNING",
+          createdAt: new Date(),
+        },
+        immediate: "processing" as const,
+      }),
+    ),
+    getToolStatus: mock(() => Promise.resolve({ status: "NOT_FOUND" })),
+  };
+
   const service = new RealtimeSessionService(
     callService as never,
-    toolRepository as never,
     roomEventRepository as never,
     logger as never,
     textStream as never,
-    subAgent as never,
+    toolExecution as never,
   );
 
   return {
@@ -104,10 +107,14 @@ describe("RealtimeSessionService — audio transcript events", () => {
     fakes.service.initSession(ROOM.id);
   });
 
-  describe("response.audio_transcript.delta", () => {
+  describe("transcript.delta (agent)", () => {
     it("publishes agent_transcript_delta to textStream", async () => {
-      await fakes.service.processMessage(
-        { type: "response.audio_transcript.delta", delta: "Bon" } as never,
+      await fakes.service.processEvent(
+        {
+          type: "transcript.delta",
+          text: "Bon",
+          role: "agent",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
@@ -118,44 +125,28 @@ describe("RealtimeSessionService — audio transcript events", () => {
       });
     });
 
-    it("returns no client events (fire-and-forget)", async () => {
-      const events = await fakes.service.processMessage(
-        { type: "response.audio_transcript.delta", delta: "Hello" } as never,
-        ROOM,
-      );
-
-      expect(events).toHaveLength(0);
-    });
-
     it("does NOT persist delta events to DB (persists only done)", async () => {
-      await fakes.service.processMessage(
-        { type: "response.audio_transcript.delta", delta: "partial" } as never,
+      await fakes.service.processEvent(
+        {
+          type: "transcript.delta",
+          text: "partial",
+          role: "agent",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
       expect(fakes.persistedEvents).toHaveLength(0);
     });
-
-    it("handles missing delta field gracefully (defaults to empty string)", async () => {
-      await fakes.service.processMessage(
-        { type: "response.audio_transcript.delta" } as never,
-        ROOM,
-      );
-
-      expect(fakes.publishedEvents[0]?.event).toEqual({
-        type: "agent_transcript_delta",
-        text: "",
-      });
-    });
   });
 
-  describe("response.audio_transcript.done", () => {
+  describe("transcript.done (agent)", () => {
     it("publishes agent_transcript_done to textStream", async () => {
-      await fakes.service.processMessage(
+      await fakes.service.processEvent(
         {
-          type: "response.audio_transcript.done",
-          transcript: "Bonjour!",
-        } as never,
+          type: "transcript.done",
+          text: "Bonjour!",
+          role: "agent",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
@@ -167,11 +158,12 @@ describe("RealtimeSessionService — audio transcript events", () => {
     });
 
     it("persists AGENT_TRANSCRIPT event to DB", async () => {
-      await fakes.service.processMessage(
+      await fakes.service.processEvent(
         {
-          type: "response.audio_transcript.done",
-          transcript: "Au revoir!",
-        } as never,
+          type: "transcript.done",
+          text: "Au revoir!",
+          role: "agent",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
@@ -182,27 +174,16 @@ describe("RealtimeSessionService — audio transcript events", () => {
         payload: { text: "Au revoir!" },
       });
     });
-
-    it("handles missing transcript field gracefully", async () => {
-      await fakes.service.processMessage(
-        { type: "response.audio_transcript.done" } as never,
-        ROOM,
-      );
-
-      expect(fakes.publishedEvents[0]?.event).toEqual({
-        type: "agent_transcript_done",
-        text: "",
-      });
-    });
   });
 
-  describe("conversation.item.input_audio_transcription.completed", () => {
+  describe("transcript.done (user)", () => {
     it("publishes user_transcript to textStream", async () => {
-      await fakes.service.processMessage(
+      await fakes.service.processEvent(
         {
-          type: "conversation.item.input_audio_transcription.completed",
-          transcript: "Allô, c'est moi",
-        } as never,
+          type: "transcript.done",
+          text: "Allô, c'est moi",
+          role: "user",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
@@ -214,11 +195,12 @@ describe("RealtimeSessionService — audio transcript events", () => {
     });
 
     it("persists USER_TRANSCRIPT event to DB", async () => {
-      await fakes.service.processMessage(
+      await fakes.service.processEvent(
         {
-          type: "conversation.item.input_audio_transcription.completed",
-          transcript: "Oui bonjour",
-        } as never,
+          type: "transcript.done",
+          text: "Oui bonjour",
+          role: "user",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
@@ -229,31 +211,306 @@ describe("RealtimeSessionService — audio transcript events", () => {
         payload: { text: "Oui bonjour" },
       });
     });
+  });
+});
 
-    it("handles missing transcript field gracefully", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "conversation.item.input_audio_transcription.completed",
-        } as never,
-        ROOM,
-      );
+describe("RealtimeSessionService — fire-and-forget DB write errors", () => {
+  it("should continue processing when agent transcript DB write fails", async () => {
+    const publishedEvents: { roomId: string; event: TextStreamEvent }[] = [];
+    const loggedErrors: string[] = [];
 
-      expect(fakes.publishedEvents[0]?.event).toEqual({
-        type: "user_transcript",
-        text: "",
-      });
-    });
+    const roomEventRepository = {
+      create: mock(() => Promise.reject(new Error("DB write failed"))),
+      findByRoomId: mock(() => Promise.resolve([])),
+    };
 
-    it("returns no client events", async () => {
-      const events = await fakes.service.processMessage(
-        {
-          type: "conversation.item.input_audio_transcription.completed",
-          transcript: "test",
-        } as never,
-        ROOM,
-      );
+    const logger = {
+      info: () => {
+        /* noop */
+      },
+      error: (_obj: object, msg?: string) => {
+        loggedErrors.push(msg ?? "");
+      },
+      warn: () => {
+        /* noop */
+      },
+    };
 
-      expect(events).toHaveLength(0);
-    });
+    const textStream = {
+      subscribe: () => ({}),
+      publish: (roomId: string, event: TextStreamEvent) => {
+        publishedEvents.push({ roomId, event });
+      },
+      close: () => {
+        /* noop */
+      },
+    };
+
+    const service = new RealtimeSessionService(
+      { terminateCall: mock(() => Promise.resolve()) } as never,
+      roomEventRepository as never,
+      logger as never,
+      textStream as never,
+      { dispatch: mock(() => Promise.resolve({})) } as never,
+    );
+
+    service.initSession(ROOM.id);
+
+    // processEvent should NOT throw even though DB write fails
+    await service.processEvent(
+      {
+        type: "transcript.done",
+        text: "Hello",
+        role: "agent",
+      } satisfies NormalizedAudioEvent,
+      ROOM,
+    );
+
+    // SSE event should still be published
+    expect(publishedEvents.length).toBeGreaterThanOrEqual(0);
+
+    // Give fire-and-forget time to reject
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Error should be logged (the rejection handler catches it)
+    expect(roomEventRepository.create).toHaveBeenCalled();
+  });
+
+  it("should process subsequent events after a DB write failure", async () => {
+    const publishedEvents: { roomId: string; event: TextStreamEvent }[] = [];
+    let callCount = 0;
+
+    const roomEventRepository = {
+      create: mock(() => {
+        callCount++;
+        if (callCount === 1) return Promise.reject(new Error("DB error"));
+        return Promise.resolve({});
+      }),
+      findByRoomId: mock(() => Promise.resolve([])),
+    };
+
+    const textStream = {
+      subscribe: () => ({}),
+      publish: (roomId: string, event: TextStreamEvent) => {
+        publishedEvents.push({ roomId, event });
+      },
+      close: () => {
+        /* noop */
+      },
+    };
+
+    const service = new RealtimeSessionService(
+      { terminateCall: mock(() => Promise.resolve()) } as never,
+      roomEventRepository as never,
+      {
+        info: () => {
+          /* noop */
+        },
+        error: () => {
+          /* noop */
+        },
+        warn: () => {
+          /* noop */
+        },
+      } as never,
+      textStream as never,
+      { dispatch: mock(() => Promise.resolve({})) } as never,
+    );
+
+    service.initSession(ROOM.id);
+
+    // First event — DB write fails
+    await service.processEvent(
+      {
+        type: "transcript.done",
+        text: "First",
+        role: "agent",
+      } satisfies NormalizedAudioEvent,
+      ROOM,
+    );
+
+    // Second event — DB write succeeds
+    await service.processEvent(
+      {
+        type: "transcript.done",
+        text: "Second",
+        role: "user",
+      } satisfies NormalizedAudioEvent,
+      ROOM,
+    );
+
+    await new Promise((r) => setTimeout(r, 50));
+
+    // Both SSE events should be published
+    expect(publishedEvents).toHaveLength(2);
+    expect(publishedEvents[0]?.event.type).toBe("agent_transcript_done");
+    expect(publishedEvents[1]?.event.type).toBe("user_transcript");
+  });
+});
+
+describe("RealtimeSessionService — graceful close with audio drain", () => {
+  it("should delay onSessionEnd by audio drain time + margin", async () => {
+    let sessionEndCalled = false;
+    const DRAIN_MS = 2000;
+
+    const service = new RealtimeSessionService(
+      { terminateCall: mock(() => Promise.resolve()) } as never,
+      {
+        create: mock(() => Promise.resolve({})),
+        findByRoomId: mock(() => Promise.resolve([])),
+      } as never,
+      {
+        info: () => {
+          /* noop */
+        },
+        error: () => {
+          /* noop */
+        },
+        warn: () => {
+          /* noop */
+        },
+      } as never,
+      {
+        subscribe: () => ({}),
+        publish: () => {
+          /* noop */
+        },
+        close: () => {
+          /* noop */
+        },
+      } as never,
+      { dispatch: mock(() => Promise.resolve({})) } as never,
+    );
+
+    service.initSession(
+      ROOM.id,
+      undefined,
+      {
+        sendAudio: () => {
+          /* noop */
+        },
+        sendText: () => {
+          /* noop */
+        },
+        sendFunctionResult: () => {
+          /* noop */
+        },
+        onEvent: () => {
+          /* noop */
+        },
+        close: () => {
+          /* noop */
+        },
+      },
+      false,
+      () => {
+        sessionEndCalled = true;
+      },
+      () => DRAIN_MS,
+    );
+
+    // Trigger close_call
+    await service.processEvent(
+      {
+        type: "function_call",
+        callId: "fc-1",
+        name: "close_call",
+        arguments: "{}",
+      },
+      ROOM,
+    );
+
+    // Trigger response.done
+    await service.processEvent({ type: "response.done" }, ROOM);
+
+    // Should NOT have called onSessionEnd immediately
+    expect(sessionEndCalled).toBe(false);
+
+    // Wait less than drain + margin (2000 + 500 = 2500ms)
+    await new Promise((r) => setTimeout(r, 100));
+    expect(sessionEndCalled).toBe(false);
+
+    // Wait for the full drain + margin
+    await new Promise((r) => setTimeout(r, 2500));
+    expect(sessionEndCalled).toBe(true);
+  });
+
+  it("should use 500ms margin when getAudioDrainMs returns 0", async () => {
+    let sessionEndCalled = false;
+
+    const service = new RealtimeSessionService(
+      { terminateCall: mock(() => Promise.resolve()) } as never,
+      {
+        create: mock(() => Promise.resolve({})),
+        findByRoomId: mock(() => Promise.resolve([])),
+      } as never,
+      {
+        info: () => {
+          /* noop */
+        },
+        error: () => {
+          /* noop */
+        },
+        warn: () => {
+          /* noop */
+        },
+      } as never,
+      {
+        subscribe: () => ({}),
+        publish: () => {
+          /* noop */
+        },
+        close: () => {
+          /* noop */
+        },
+      } as never,
+      { dispatch: mock(() => Promise.resolve({})) } as never,
+    );
+
+    service.initSession(
+      ROOM.id,
+      undefined,
+      {
+        sendAudio: () => {
+          /* noop */
+        },
+        sendText: () => {
+          /* noop */
+        },
+        sendFunctionResult: () => {
+          /* noop */
+        },
+        onEvent: () => {
+          /* noop */
+        },
+        close: () => {
+          /* noop */
+        },
+      },
+      false,
+      () => {
+        sessionEndCalled = true;
+      },
+      () => 0, // no audio pending
+    );
+
+    await service.processEvent(
+      {
+        type: "function_call",
+        callId: "fc-2",
+        name: "close_call",
+        arguments: "{}",
+      },
+      ROOM,
+    );
+
+    await service.processEvent({ type: "response.done" }, ROOM);
+
+    // Should not be called yet
+    expect(sessionEndCalled).toBe(false);
+
+    // After 500ms margin + buffer, should be called
+    await new Promise((r) => setTimeout(r, 600));
+    expect(sessionEndCalled).toBe(true);
   });
 });

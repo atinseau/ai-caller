@@ -31,7 +31,7 @@ export const RoomModel = z
       .boolean()
       .default(false)
       .openapi({ description: "Whether this room is a test session" }),
-    source: z.nativeEnum(RoomSource).default(RoomSource.WEBRTC).openapi({
+    source: z.enum(RoomSource).default(RoomSource.WEBRTC).openapi({
       description: "The call source: WebRTC (browser) or telephony (phone)",
     }),
     twilioStreamSid: z
@@ -39,6 +39,11 @@ export const RoomModel = z
       .nullable()
       .optional()
       .openapi({ description: "The Twilio Media Stream SID, if telephony" }),
+    contactId: z
+      .string()
+      .nullable()
+      .optional()
+      .openapi({ description: "The linked contact profile ID" }),
   })
   .openapi("RoomModel", {
     description: "Represents a room entity",

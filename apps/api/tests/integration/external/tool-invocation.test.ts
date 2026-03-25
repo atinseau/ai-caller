@@ -23,9 +23,23 @@ describe("Tool Invocation", () => {
 
       try {
         const mcpClient = new McpClientAdapter();
+        const mockCache = {
+          get: async () => null,
+          set: async () => {
+            /* noop */
+          },
+          delete: async () => {
+            /* noop */
+          },
+          deletePattern: async () => {
+            /* noop */
+          },
+          has: async () => false,
+        };
         const discovery = new McpToolDiscoveryService(
           mcpClient,
           mockLogger as never,
+          mockCache as never,
         );
 
         const functions = await discovery.discoverAsRealtimeFunctions(

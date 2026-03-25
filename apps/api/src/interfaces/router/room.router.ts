@@ -35,7 +35,13 @@ const createRoomRoute = createRoute({
 
 roomRouter.openapi(createRoomRoute, async (ctx) => {
   const roomUseCase = container.get(RoomUseCase);
-  const room = await roomUseCase.createRoom(ctx.req.valid("json"));
+  const clientInfo = {
+    ipAddress:
+      ctx.req.header("x-forwarded-for")?.split(",")[0]?.trim() ??
+      ctx.req.header("x-real-ip"),
+    userAgent: ctx.req.header("user-agent"),
+  };
+  const room = await roomUseCase.createRoom(ctx.req.valid("json"), clientInfo);
 
   return ctx.json({
     message: "Room created successfully",

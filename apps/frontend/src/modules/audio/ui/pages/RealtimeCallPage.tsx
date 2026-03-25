@@ -1,4 +1,3 @@
-import { type RefObject, useRef } from "react";
 import { Button } from "@/shared/components/ui/button";
 import { useCompanies } from "@/shared/hooks/useCompanies";
 import { MuteToggleButton } from "../components/MuteToggleButton";
@@ -7,10 +6,7 @@ import { useRealtimeCall } from "../hooks/useRealtimeCall";
 export function RealtimeCallPage() {
   const { companies, isLoading } = useCompanies();
 
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const { start, stop, state, sendMessage, toggleMute } = useRealtimeCall(
-    audioRef as RefObject<HTMLAudioElement>,
-  );
+  const { start, stop, state, sendMessage, toggleMute } = useRealtimeCall();
 
   const handleMessageSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -85,10 +81,6 @@ export function RealtimeCallPage() {
           End Call
         </Button>
       ) : null}
-
-      <audio ref={audioRef} autoPlay className="hidden">
-        <track kind="captions" />
-      </audio>
 
       <p>{state.status}</p>
 

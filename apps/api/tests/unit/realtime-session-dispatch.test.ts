@@ -1,47 +1,28 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import type { Schema } from "@ai-caller/shared";
 import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
 import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type {
+  AudioProviderConnection,
+  NormalizedAudioEvent,
+} from "@/domain/ports/audio-provider.port.ts";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 function createFakes() {
   const publishedEvents: TextStreamEvent[] = [];
-  const createdInvokes: unknown[][] = [];
 
   const callService = {
     createCall: mock(() =>
       Promise.resolve({ token: "t", expiresAt: new Date() }),
     ),
     terminateCall: mock(() => Promise.resolve()),
-  };
-
-  const toolRepository = {
-    createToolInvoke: mock((...args: unknown[]) => {
-      createdInvokes.push(args);
-      return Promise.resolve({
-        id: "inv-1",
-        entityId: args[1],
-        roomId: args[0],
-        toolName: args[2],
-        status: "RUNNING",
-        createdAt: new Date(),
-      });
-    }),
-    completeToolInvokeByEntityId: mock(() => Promise.resolve({})),
-    failToolInvoke: mock(() => Promise.resolve({})),
-    findByEntityId: mock((entityId: string) =>
+    buildAudioProviderConfig: mock(() =>
       Promise.resolve({
-        id: "inv-1",
-        entityId,
-        roomId: "room-1",
-        toolName: "search_customer",
-        status: "COMPLETED",
-        results: { data: "found" },
-        createdAt: new Date(),
+        instructions: "",
+        tools: [],
+        voice: "marin",
       }),
     ),
-    findActiveByRoomId: mock(() => Promise.resolve([])),
   };
 
   const logger = {
@@ -66,37 +47,47 @@ function createFakes() {
     }),
   };
 
-  const subAgent = {
-    execute: mock(() =>
-      Promise.resolve({
-        toolInvokeId: "e-1",
-        summary: "Customer found",
-        rawResult: {},
-      }),
-    ),
-  };
-
   const roomEventRepository = {
     create: mock(() => Promise.resolve({})),
     findByRoomId: mock(() => Promise.resolve([])),
   };
 
+  const toolExecution = {
+    dispatch: mock(() =>
+      Promise.resolve({
+        toolInvoke: {
+          id: "inv-1",
+          entityId: "e-1",
+          roomId: "room-1",
+          toolName: "search_customer",
+          status: "RUNNING",
+          createdAt: new Date(),
+        },
+        immediate: "processing" as const,
+      }),
+    ),
+    getToolStatus: mock(() =>
+      Promise.resolve({
+        status: "COMPLETED",
+        toolName: "search_customer",
+        results: { data: "found" },
+      }),
+    ),
+  };
+
   const service = new RealtimeSessionService(
     callService as never,
-    toolRepository as never,
     roomEventRepository as never,
     logger as never,
     textStream as never,
-    subAgent as never,
+    toolExecution as never,
   );
 
   return {
     service,
     callService,
-    toolRepository,
-    subAgent,
+    toolExecution,
     publishedEvents,
-    createdInvokes,
   };
 }
 
@@ -113,165 +104,186 @@ const ROOM: IRoomModel = {
   source: RoomSource.WEBRTC,
 };
 
-const sendToRoom = mock(() => {
-  /* noop */
-});
+function createMockConnection(): AudioProviderConnection & {
+  sendFunctionResult: ReturnType<typeof mock>;
+  sendText: ReturnType<typeof mock>;
+} {
+  return {
+    sendAudio: () => {
+      /* noop */
+    },
+    sendText: mock(() => {
+      /* noop */
+    }),
+    sendFunctionResult: mock(() => {
+      /* noop */
+    }),
+    onEvent: () => {
+      /* noop */
+    },
+    close: () => {
+      /* noop */
+    },
+  };
+}
 
 describe("RealtimeSessionService — sub-agent dispatch", () => {
   let fakes: ReturnType<typeof createFakes>;
+  let connection: ReturnType<typeof createMockConnection>;
 
   beforeEach(() => {
     fakes = createFakes();
-    sendToRoom.mockClear();
-    fakes.service.initSession(ROOM.id, "http://mcp.test", sendToRoom);
+    connection = createMockConnection();
+    fakes.service.initSession(ROOM.id, "http://mcp.test", connection);
   });
 
   it("should set shouldCloseCall on close_call function", async () => {
-    const events = await fakes.service.processMessage(
+    await fakes.service.processEvent(
       {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-close",
-          call_id: "cid-1",
-          name: "close_call",
-          status: "completed",
-          arguments: "{}",
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
+        type: "function_call",
+        callId: "fc-close",
+        name: "close_call",
+        arguments: "{}",
+      } satisfies NormalizedAudioEvent,
       ROOM,
     );
 
-    expect(events.length).toBeGreaterThan(0);
-
-    // Verify close flag by triggering audio buffer stopped
-    await fakes.service.processMessage(
-      { type: "output_audio_buffer.stopped" } as Schema["RealtimeServerEvent"],
+    // Verify close flag by triggering response.done
+    await fakes.service.processEvent(
+      { type: "response.done" } satisfies NormalizedAudioEvent,
       ROOM,
     );
     expect(fakes.callService.terminateCall).toHaveBeenCalled();
   });
 
-  it("should return tool status on get_tool_status function call", async () => {
-    const events = await fakes.service.processMessage(
+  it("should send tool status via connection on get_tool_status function call", async () => {
+    await fakes.service.processEvent(
       {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-status",
-          call_id: "cid-2",
-          name: "get_tool_status",
-          status: "completed",
-          arguments: '{"tool_invoke_id":"e-1"}',
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
+        type: "function_call",
+        callId: "cid-2",
+        name: "get_tool_status",
+        arguments: '{"tool_invoke_id":"e-1"}',
+      } satisfies NormalizedAudioEvent,
       ROOM,
     );
 
-    expect(events).toHaveLength(2);
-    // First event should be function_call_output with status
-    const outputEvent = events[0] as unknown as {
-      item: { output: string };
-    };
-    const output = JSON.parse(outputEvent.item.output);
-    expect(output.status).toBe("COMPLETED");
-    expect(output.toolName).toBe("search_customer");
+    expect(connection.sendFunctionResult).toHaveBeenCalled();
+    const [callId, output] = connection.sendFunctionResult.mock.calls[0] as [
+      string,
+      string,
+    ];
+    expect(callId).toBe("cid-2");
+    const parsed = JSON.parse(output);
+    expect(parsed.status).toBe("COMPLETED");
+    expect(parsed.toolName).toBe("search_customer");
   });
 
   it("should dispatch sub-agent for MCP-backed function calls", async () => {
-    const events = await fakes.service.processMessage(
+    await fakes.service.processEvent(
       {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-search",
-          call_id: "cid-3",
-          name: "search_customer",
-          status: "completed",
-          arguments: '{"name":"John"}',
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
+        type: "function_call",
+        callId: "cid-3",
+        name: "search_customer",
+        arguments: '{"name":"John"}',
+      } satisfies NormalizedAudioEvent,
       ROOM,
     );
 
-    // Should return function_call_output { processing } + response.create
-    expect(events).toHaveLength(2);
-    const outputEvent = events[0] as unknown as {
-      item: { output: string };
+    // Should send processing response via connection
+    expect(connection.sendFunctionResult).toHaveBeenCalled();
+    const [, output] = connection.sendFunctionResult.mock.calls[0] as [
+      string,
+      string,
+    ];
+    const parsed = JSON.parse(output);
+    expect(parsed.status).toBe("processing");
+    expect(parsed.tool_invoke_id).toBeDefined();
+  });
+
+  it("should dispatch toolExecution for MCP-backed function calls", async () => {
+    await fakes.service.processEvent(
+      {
+        type: "function_call",
+        callId: "cid-4",
+        name: "search_customer",
+        arguments: '{"name":"Jane"}',
+      } satisfies NormalizedAudioEvent,
+      ROOM,
+    );
+
+    expect(fakes.toolExecution.dispatch).toHaveBeenCalled();
+    const params = (
+      fakes.toolExecution.dispatch.mock.calls[0] as unknown[]
+    )?.[0] as {
+      toolName: string;
+      mcpUrl: string;
+      args: Record<string, unknown>;
     };
-    const output = JSON.parse(outputEvent.item.output);
-    expect(output.status).toBe("processing");
-    expect(output.tool_invoke_id).toBeDefined();
+    expect(params.toolName).toBe("search_customer");
+    expect(params.mcpUrl).toBe("http://mcp.test");
+    expect(params.args).toEqual({ name: "Jane" });
   });
 
-  it("should create ToolInvoke for MCP-backed function calls", async () => {
-    await fakes.service.processMessage(
+  it("should pass correct params to toolExecution.dispatch", async () => {
+    await fakes.service.processEvent(
       {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-track",
-          call_id: "cid-4",
-          name: "search_customer",
-          status: "completed",
-          arguments: '{"name":"Jane"}',
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
+        type: "function_call",
+        callId: "cid-5",
+        name: "get_weather",
+        arguments: '{"city":"Paris"}',
+      } satisfies NormalizedAudioEvent,
       ROOM,
     );
 
-    expect(fakes.toolRepository.createToolInvoke).toHaveBeenCalled();
-    expect(fakes.createdInvokes[0]?.[2]).toBe("search_customer");
-  });
-
-  it("should call subAgent.execute for MCP-backed function calls", async () => {
-    await fakes.service.processMessage(
-      {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-dispatch",
-          call_id: "cid-5",
-          name: "get_weather",
-          status: "completed",
-          arguments: '{"city":"Paris"}',
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
-      ROOM,
-    );
-
-    // Sub-agent is fire-and-forget, wait a tick
-    await new Promise((r) => setTimeout(r, 50));
-
-    expect(fakes.subAgent.execute).toHaveBeenCalled();
-    const config = (fakes.subAgent.execute.mock.calls[0] as unknown[])?.[0] as {
-      functionName: string;
-      mcpServerUrl: string;
+    expect(fakes.toolExecution.dispatch).toHaveBeenCalled();
+    const params = (
+      fakes.toolExecution.dispatch.mock.calls[0] as unknown[]
+    )?.[0] as {
+      toolName: string;
+      roomId: string;
+      callId: string;
     };
-    expect(config.functionName).toBe("get_weather");
-    expect(config.mcpServerUrl).toBe("http://mcp.test");
+    expect(params.toolName).toBe("get_weather");
+    expect(params.roomId).toBe(ROOM.id);
+    expect(params.callId).toBe("cid-5");
   });
 
-  it("should inject result via sendToRoom after sub-agent completes", async () => {
-    await fakes.service.processMessage(
+  it("should inject result via connection after dispatch completes", async () => {
+    // Override dispatch to call onResult synchronously
+    // biome-ignore lint/suspicious/noExplicitAny: mock override needs flexible typing
+    (fakes.toolExecution.dispatch as any).mockImplementation(
+      (params: { onResult: (toolName: string, summary: string) => void }) => {
+        setTimeout(
+          () => params.onResult("search_customer", "Customer found"),
+          10,
+        );
+        return Promise.resolve({
+          toolInvoke: {
+            id: "inv-1",
+            entityId: "e-1",
+            roomId: "room-1",
+            status: "RUNNING",
+            createdAt: new Date(),
+          },
+          immediate: "processing" as const,
+        });
+      },
+    );
+
+    await fakes.service.processEvent(
       {
-        type: "response.output_item.done",
-        item: {
-          type: "function_call",
-          id: "fc-inject",
-          call_id: "cid-6",
-          name: "search_customer",
-          status: "completed",
-          arguments: '{"name":"John"}',
-        },
-      } as unknown as Schema["RealtimeServerEvent"],
+        type: "function_call",
+        callId: "cid-6",
+        name: "search_customer",
+        arguments: '{"name":"John"}',
+      } satisfies NormalizedAudioEvent,
       ROOM,
     );
 
-    // Wait for fire-and-forget to resolve
+    // Wait for the async onResult callback
     await new Promise((r) => setTimeout(r, 100));
 
-    // sendToRoom should have been called with the result injection
-    expect(sendToRoom).toHaveBeenCalled();
+    // connection.sendText should have been called with the result injection
+    expect(connection.sendText).toHaveBeenCalled();
   });
 });

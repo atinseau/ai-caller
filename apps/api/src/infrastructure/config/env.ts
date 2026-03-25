@@ -1,5 +1,7 @@
 import process from "node:process";
 import z from "zod";
+import { AudioProviderEnum } from "@/domain/enums/audio-provider.enum.ts";
+import { ChatModelEnum } from "@/domain/enums/chat-model.enum.ts";
 import { Environment } from "@/domain/enums/environment.enum.ts";
 
 // Load .env only in non-production environments
@@ -17,7 +19,7 @@ if (environment !== Environment.PROD) {
 
 const envDto = z.object({
   // SERVER
-  ENVIRONMENT: z.nativeEnum(Environment).default(Environment.LOCAL),
+  ENVIRONMENT: z.enum(Environment).default(Environment.LOCAL),
   PORT: z.coerce.number(),
   CLIENT_URL: z.url(),
 
@@ -40,6 +42,14 @@ const envDto = z.object({
   TWILIO_AUTH_TOKEN: z.string().optional(),
   TWILIO_WEBHOOK_BASE_URL: z.string().optional(),
 
+  // XAI (optional — Grok voice is opt-in)
+  XAI_API_KEY: z.string().optional(),
+
+  // WHATSAPP (optional — WhatsApp is opt-in)
+  WHATSAPP_ACCESS_TOKEN: z.string().optional(),
+  WHATSAPP_BUSINESS_ID: z.string().optional(),
+  WHATSAPP_VERIFY_TOKEN: z.string().optional(),
+
   // INFISICAL (optional)
   INFISICAL_CLIENT_ID: z.string().optional(),
   INFISICAL_CLIENT_SECRET: z.string().optional(),
@@ -47,9 +57,14 @@ const envDto = z.object({
   INFISICAL_SITE_URL: z.string().optional(),
   INFISICAL_ENVIRONMENT: z.string().default("dev"),
 
+  // REDIS (optional — used for caching)
+  REDIS_URL: z.string().optional(),
+
   // CONFIG
   ROOM_CALL_DURATION_MINUTE: z.coerce.number().positive(),
-  SUB_AGENT_MODEL: z.string().default("gpt-4o-mini"),
+  SUB_AGENT_MODEL: z.enum(ChatModelEnum).default(ChatModelEnum.GPT_4O_MINI),
+  TEXT_MODEL: z.enum(ChatModelEnum).default(ChatModelEnum.GPT_5_2),
+  AUDIO_PROVIDER: z.enum(AudioProviderEnum).default(AudioProviderEnum.GROK),
   ROOT_EMAIL: z.email(),
 });
 

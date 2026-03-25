@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/infrastructure/http/api";
 import type { LanguageEnum } from "@/shared/enums/language.enum";
 import type { VadEagernessEnum } from "@/shared/enums/vad-eagerness.enum";
-import type { VoiceEnum } from "@/shared/enums/voice.enum";
 
 interface SystemPromptSections {
   roleObjective?: string;
@@ -29,7 +28,7 @@ interface UpdateCompanyDto {
     }
   > | null;
   systemToolPrompts?: Record<string, string> | null;
-  voice?: VoiceEnum | null;
+  voice?: string | null;
   language?: LanguageEnum | null;
   vadEagerness?: VadEagernessEnum | null;
 }
@@ -39,9 +38,11 @@ export function useUpdateCompany(companyId: string) {
 
   return useMutation({
     mutationFn: async (dto: UpdateCompanyDto) => {
+      // Cast body to allow dynamic voice IDs — voices are fetched from the backend
+      // and may not match the statically generated OpenAPI voice union
       const res = await api.PATCH("/api/v1/company/{id}", {
         params: { path: { id: companyId } },
-        body: dto,
+        body: dto as Record<string, unknown>,
       });
       if (res.error) {
         const message =

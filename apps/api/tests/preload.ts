@@ -1,5 +1,11 @@
 import { beforeAll, mock } from "bun:test";
+import process from "node:process";
 import { env } from "../src/infrastructure/config/env.ts";
+
+// Set dummy keys for providers that may not be configured in test env
+if (!process.env.XAI_API_KEY) {
+  process.env.XAI_API_KEY = "test-xai-key";
+}
 
 await env.init();
 

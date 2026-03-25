@@ -1,5 +1,6 @@
 import { HTTPException } from "hono/http-exception";
 import { inject, injectable } from "inversify";
+import { ContactService } from "@/application/services/contact.service.ts";
 import { CompanyStatus } from "@/domain/enums/company-status.enum.ts";
 import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import { LoggerPort } from "@/domain/ports/logger.port.ts";
@@ -23,6 +24,7 @@ export class TelephonyUseCase {
     @inject(TelephonyGatewayPort)
     private readonly telephonyGateway: TelephonyGatewayPort,
     @inject(LoggerPort) private readonly logger: LoggerPort,
+    @inject(ContactService) private readonly contactService: ContactService,
   ) {}
 
   /**
@@ -33,6 +35,7 @@ export class TelephonyUseCase {
     companyId: string,
     streamSid: string,
     sendToTwilio: (message: Record<string, unknown>) => void,
+    callerNumber?: string,
   ): Promise<string> {
     const company = await this.companyRepo.findById(companyId);
     if (!company) {
@@ -51,10 +54,18 @@ export class TelephonyUseCase {
       `[Telephony] Incoming call for company ${company.name} (${companyId})`,
     );
 
-    // Build session config (same as WebRTC but without clientSecrets)
-    const sessionConfig = await this.callService.buildSessionConfig(
+    // Resolve contact from caller number
+    let contact: { id: string; summary?: string | null } | undefined;
+    if (callerNumber) {
+      contact = await this.contactService.findOrCreate(companyId, {
+        phoneNumber: callerNumber,
+      });
+    }
+
+    // Build normalized audio provider config
+    const config = await this.callService.buildAudioProviderConfig(
       company,
-      "AUDIO",
+      contact?.summary ?? undefined,
     );
 
     // Create a telephony room (no ephemeral token needed — we use API key)
@@ -70,15 +81,13 @@ export class TelephonyUseCase {
     // Store the streamSid on the room
     await this.roomRepo.updateTwilioStreamSid(room.id, streamSid);
 
-    // Wire up the telephony gateway (OpenAI WS bridge)
-    await this.telephonyGateway.initCall(
-      room.id,
-      company,
-      sessionConfig,
-      sendToTwilio,
-      company.mcpUrl ?? undefined,
-      false,
-    );
+    // Link contact to room
+    if (contact) {
+      await this.contactService.linkToRoom(contact.id, room.id);
+    }
+
+    // Wire up the telephony gateway (audio provider bridge)
+    await this.telephonyGateway.initCall(room.id, config, sendToTwilio);
 
     this.logger.info(
       `[Telephony] Room ${room.id} created for company ${company.name}`,

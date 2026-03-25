@@ -1,5 +1,5 @@
 import { Info } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/shared/components/ui/button";
 import {
   Dialog,
@@ -85,6 +85,20 @@ export function ToolConfigDialog({
       setParamOverrides(initialOverrides);
     }
   }, [tool, config]);
+
+  const isDirty = useMemo(() => {
+    if (!tool) return false;
+    const origDisplayName = config?.displayName ?? "";
+    const origDescription = config?.description ?? "";
+    if (displayName !== origDisplayName) return true;
+    if (description !== origDescription) return true;
+    const params = extractParameters(tool.parameters);
+    for (const param of params) {
+      const origValue = config?.parameters?.[param.name]?.description ?? "";
+      if ((paramOverrides[param.name] ?? "") !== origValue) return true;
+    }
+    return false;
+  }, [tool, config, displayName, description, paramOverrides]);
 
   if (!tool) return null;
 
@@ -226,7 +240,12 @@ export function ToolConfigDialog({
           >
             Cancel
           </Button>
-          <Button type="button" size="sm" onClick={handleSave}>
+          <Button
+            type="button"
+            size="sm"
+            onClick={handleSave}
+            disabled={!isDirty}
+          >
             Save
           </Button>
         </DialogFooter>

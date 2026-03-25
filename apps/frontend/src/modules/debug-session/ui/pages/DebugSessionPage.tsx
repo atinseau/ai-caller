@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Building2, FlaskConical } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Link } from "react-router";
 import { api } from "@/infrastructure/http/api";
 import { useRealtimeCall } from "@/modules/audio/ui/hooks/useRealtimeCall";
@@ -11,20 +11,13 @@ import { useSessionStream } from "../../application/hooks/useSessionStream";
 import { AudioControls } from "../components/AudioControls";
 import { LogsSidebar } from "../components/LogsSidebar";
 import { TranscriptFeed } from "../components/TranscriptFeed";
-import { WebRtcStats } from "../components/WebRtcStats";
 
 interface DebugSessionPageProps {
   companyId: string;
 }
 
 export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const {
-    state: callState,
-    start,
-    stop,
-    toggleMute,
-  } = useRealtimeCall(audioRef);
+  const { state: callState, start, stop, toggleMute } = useRealtimeCall();
   const { transcripts, toolInvokes, sseStatus, connect, disconnect } =
     useSessionStream({ roomId: callState.roomId });
 
@@ -106,18 +99,13 @@ export function DebugSessionPage({ companyId }: DebugSessionPageProps) {
         {/* Divider */}
         <div className="w-px bg-border" />
 
-        {/* Right: Logs + stats — fixed, own scroll if needed */}
+        {/* Right: Logs sidebar */}
         <div className="w-72 shrink-0 flex flex-col">
           <div className="flex-1 overflow-y-auto">
             <LogsSidebar toolInvokes={toolInvokes} />
           </div>
-          <WebRtcStats peerConnection={callState.peerConnection} />
         </div>
       </div>
-
-      {/* Hidden audio element for WebRTC playback */}
-      {/* biome-ignore lint/a11y/useMediaCaption: audio is for WebRTC playback, captions not applicable */}
-      <audio ref={audioRef} autoPlay className="hidden" />
     </div>
   );
 }

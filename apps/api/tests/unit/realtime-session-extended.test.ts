@@ -1,36 +1,25 @@
 import { beforeEach, describe, expect, it, mock } from "bun:test";
-import type { Schema } from "@ai-caller/shared";
 import { RealtimeSessionService } from "@/application/services/realtime-session.service.ts";
 import { RoomSource } from "@/domain/enums/room-source.enum.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type { NormalizedAudioEvent } from "@/domain/ports/audio-provider.port.ts";
 import type { TextStreamEvent } from "@/domain/ports/text-stream.port.ts";
 
 function createFakes() {
   const publishedEvents: TextStreamEvent[] = [];
-  const createdInvokes: unknown[] = [];
 
   const callService = {
     createCall: mock(() =>
       Promise.resolve({ token: "t", expiresAt: new Date() }),
     ),
     terminateCall: mock(() => Promise.resolve()),
-  };
-
-  const toolRepository = {
-    createToolInvoke: mock((...args: unknown[]) => {
-      createdInvokes.push(args);
-      return Promise.resolve({
-        id: "inv-1",
-        entityId: "e-1",
-        roomId: "r-1",
-        status: "RUNNING",
-        createdAt: new Date(),
-      });
-    }),
-    completeToolInvokeByEntityId: mock(() => Promise.resolve({})),
-    failToolInvoke: mock(() => Promise.resolve({})),
-    findByEntityId: mock(() => Promise.resolve(null)),
-    findActiveByRoomId: mock(() => Promise.resolve([])),
+    buildAudioProviderConfig: mock(() =>
+      Promise.resolve({
+        instructions: "",
+        tools: [],
+        voice: "marin",
+      }),
+    ),
   };
 
   const logger = {
@@ -55,29 +44,40 @@ function createFakes() {
     }),
   };
 
-  const subAgent = { execute: mock(() => Promise.resolve({})) };
-
   const roomEventRepository = {
     create: mock(() => Promise.resolve({})),
     findByRoomId: mock(() => Promise.resolve([])),
   };
 
+  const toolExecution = {
+    dispatch: mock(() =>
+      Promise.resolve({
+        toolInvoke: {
+          entityId: "e-1",
+          id: "inv-1",
+          roomId: "r-1",
+          status: "RUNNING",
+          createdAt: new Date(),
+        },
+        immediate: "processing" as const,
+      }),
+    ),
+    getToolStatus: mock(() => Promise.resolve({ status: "NOT_FOUND" })),
+  };
+
   const service = new RealtimeSessionService(
     callService as never,
-    toolRepository as never,
     roomEventRepository as never,
     logger as never,
     textStream as never,
-    subAgent as never,
+    toolExecution as never,
   );
 
   return {
     service,
     callService,
-    toolRepository,
     textStream,
     publishedEvents,
-    createdInvokes,
   };
 }
 
@@ -109,63 +109,35 @@ describe("RealtimeSessionService — extended", () => {
     });
   });
 
-  describe("unknown message types", () => {
-    it("should return empty array for unhandled event types", async () => {
-      const events = await fakes.service.processMessage(
-        { type: "session.created" } as Schema["RealtimeServerEvent"],
+  describe("unhandled event types", () => {
+    it("should not throw for speech_started event", async () => {
+      await fakes.service.processEvent(
+        { type: "speech_started" } satisfies NormalizedAudioEvent,
         ROOM,
       );
-      expect(events).toHaveLength(0);
+      // No assertion needed — just should not throw
     });
 
-    it("should return empty array for response.done", async () => {
-      const events = await fakes.service.processMessage(
-        { type: "response.done" } as Schema["RealtimeServerEvent"],
+    it("should not throw for audio.delta event", async () => {
+      await fakes.service.processEvent(
+        {
+          type: "audio.delta",
+          base64: "AAAA",
+        } satisfies NormalizedAudioEvent,
         ROOM,
       );
-      expect(events).toHaveLength(0);
+      // No assertion needed — just should not throw
     });
   });
 
-  describe("audio_buffer.stopped without shouldCloseCall", () => {
+  describe("response.done without shouldCloseCall", () => {
     it("should NOT terminate when shouldCloseCall is false", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "output_audio_buffer.stopped",
-        } as Schema["RealtimeServerEvent"],
+      await fakes.service.processEvent(
+        { type: "response.done" } satisfies NormalizedAudioEvent,
         ROOM,
       );
 
       expect(fakes.callService.terminateCall).not.toHaveBeenCalled();
-    });
-  });
-
-  describe("multiple text deltas", () => {
-    it("should publish each delta independently", async () => {
-      await fakes.service.processMessage(
-        {
-          type: "response.output_text.delta",
-          delta: "Hel",
-        } as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-      await fakes.service.processMessage(
-        {
-          type: "response.output_text.delta",
-          delta: "lo",
-        } as Schema["RealtimeServerEvent"],
-        ROOM,
-      );
-
-      expect(fakes.publishedEvents).toHaveLength(2);
-      expect(fakes.publishedEvents[0]).toEqual({
-        type: "text_delta",
-        text: "Hel",
-      });
-      expect(fakes.publishedEvents[1]).toEqual({
-        type: "text_delta",
-        text: "lo",
-      });
     });
   });
 });

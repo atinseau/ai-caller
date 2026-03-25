@@ -5,13 +5,17 @@ import { env } from "@/infrastructure/config/env.ts";
 import { globalErrorHandler } from "@/infrastructure/error/global-error-handler.ts";
 import { authMiddleware } from "@/infrastructure/middleware/auth.middleware.ts";
 import { loggerMiddleware } from "@/infrastructure/middleware/logger.middleware.ts";
+import { audioWsRouter } from "./router/audio-ws.router.ts";
 import { companyRouter } from "./router/company.router.ts";
+import { generateRouter } from "./router/generate.router.ts";
 import { messageRouter } from "./router/message.router.ts";
 import { phoneNumberRouter } from "./router/phone-number.router.ts";
 import { roomRouter } from "./router/room.router.ts";
 import { telephonyRouter } from "./router/telephony.router.ts";
 import { userRouter } from "./router/user.router.ts";
 import { voiceRouter } from "./router/voice.router.ts";
+import { whatsappRouter } from "./router/whatsapp.router.ts";
+import { whatsappWebhookRouter } from "./router/whatsapp-webhook.router.ts";
 
 const app = new OpenAPIHono();
 
@@ -31,6 +35,9 @@ app.on(["POST", "GET"], "/api/auth/*", (c) => auth.handler(c.req.raw));
 // Telephony routes (public — Twilio webhooks cannot authenticate with session cookies)
 app.route("/api/telephony", telephonyRouter);
 
+// WhatsApp webhook routes (public — Meta webhooks cannot authenticate with session cookies)
+app.route("/api/whatsapp", whatsappWebhookRouter);
+
 // Protected API routes
 app.use("/api/v1/*", authMiddleware);
 
@@ -40,6 +47,9 @@ app.route("/api/v1/room", messageRouter);
 app.route("/api/v1/company", companyRouter);
 app.route("/api/v1/company", phoneNumberRouter);
 app.route("/api/v1/voice", voiceRouter);
+app.route("/api/v1/generate", generateRouter);
+app.route("/api/v1/company", whatsappRouter);
+app.route("/api/v1/room", audioWsRouter);
 
 app.get("/", (c) => c.json({ message: "API is running", docs: "/docs" }));
 

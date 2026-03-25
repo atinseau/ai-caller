@@ -1,12 +1,21 @@
 import { createContext, type ReactNode, useContext, useMemo } from "react";
-import type { AudioStreamService } from "@/infrastructure/browser/audio-stream";
-import { AudioStream } from "@/infrastructure/browser/audio-stream";
-import type { RealtimeRoomService } from "@/modules/audio/application/services/realtime-openai-room.service";
-import { RealtimeOpenAiRoomService } from "@/modules/audio/application/services/realtime-openai-room.service";
+import {
+  type AudioCapturePort,
+  AudioCaptureService,
+} from "@/modules/audio/application/services/audio-capture.service";
+import {
+  type AudioPlaybackPort,
+  AudioPlaybackService,
+} from "@/modules/audio/application/services/audio-playback.service";
+import {
+  RealtimeWsRoomService,
+  type WsRoomService,
+} from "@/modules/audio/application/services/realtime-ws-room.service";
 
 interface AppServices {
-  audioStream: AudioStreamService;
-  realtimeRoom: RealtimeRoomService;
+  audioCapture: AudioCapturePort;
+  audioPlayback: AudioPlaybackPort;
+  realtimeWsRoom: WsRoomService;
 }
 
 const ServicesContext = createContext<AppServices | null>(null);
@@ -14,8 +23,9 @@ const ServicesContext = createContext<AppServices | null>(null);
 export function ServicesProvider({ children }: { children: ReactNode }) {
   const services = useMemo(
     () => ({
-      audioStream: new AudioStream(),
-      realtimeRoom: new RealtimeOpenAiRoomService(),
+      audioCapture: new AudioCaptureService(),
+      audioPlayback: new AudioPlaybackService(),
+      realtimeWsRoom: new RealtimeWsRoomService(),
     }),
     [],
   );

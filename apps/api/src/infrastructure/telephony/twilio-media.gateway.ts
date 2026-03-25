@@ -1,18 +1,21 @@
 import { inject, injectable } from "inversify";
-import type { ICompanyModel } from "@/domain/models/company.model.ts";
 import type { IRoomModel } from "@/domain/models/room.model.ts";
+import type {
+  AudioProviderConfig,
+  AudioProviderConnection,
+} from "@/domain/ports/audio-provider.port.ts";
+import { AudioProviderPort } from "@/domain/ports/audio-provider.port.ts";
 import { LoggerPort } from "@/domain/ports/logger.port.ts";
 import { RealtimeSessionPort } from "@/domain/ports/realtime-session.port.ts";
 import type { TelephonyGatewayPort } from "@/domain/ports/telephony-gateway.port.ts";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
-import { env } from "@/infrastructure/config/env.ts";
 
 type TelephonySession = {
-  openaiWs: WebSocket;
+  connection: AudioProviderConnection;
   sendToTwilio: (message: Record<string, unknown>) => void;
   streamSid: string;
   room: IRoomModel;
-  /** Tracks how many audio bytes we've sent to Twilio for interruption handling */
+  /** Tracks base64 string length of audio sent to Twilio */
   audioBytesSent: number;
   /** Counter for mark labels */
   markCounter: number;
@@ -25,6 +28,8 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
   private readonly sessions: Map<string, TelephonySession> = new Map();
 
   constructor(
+    @inject(AudioProviderPort)
+    private readonly audioProvider: AudioProviderPort,
     @inject(RealtimeSessionPort)
     private readonly sessionService: RealtimeSessionPort,
     @inject(RoomRepositoryPort)
@@ -34,30 +39,22 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
 
   async initCall(
     roomId: string,
-    _company: ICompanyModel,
-    sessionConfig: Record<string, unknown>,
+    config: AudioProviderConfig,
     sendToTwilio: (message: Record<string, unknown>) => void,
-    mcpUrl?: string,
-    isTest?: boolean,
   ): Promise<void> {
-    const apiKey = env.get("OPENAI_API_KEY");
-
-    const wsOptions = {
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "OpenAI-Beta": "realtime=v1",
-      },
+    // Force g711_ulaw format for telephony
+    const telephonyConfig: AudioProviderConfig = {
+      ...config,
+      inputAudioFormat: { type: "audio/pcmu", rate: 8000 },
+      outputAudioFormat: { type: "audio/pcmu", rate: 8000 },
     };
-    const openaiWs = new WebSocket(
-      "wss://api.openai.com/v1/realtime?model=gpt-realtime-1.5",
-      // biome-ignore lint/suspicious/noExplicitAny: Bun WebSocket typings don't include headers option
-      wsOptions as any,
-    );
+
+    const connection = await this.audioProvider.connect(telephonyConfig);
 
     const room = await this.roomRepository.findById(roomId);
 
     const session: TelephonySession = {
-      openaiWs,
+      connection,
       sendToTwilio,
       streamSid: room.twilioStreamSid ?? "",
       room,
@@ -68,49 +65,26 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
 
     this.sessions.set(roomId, session);
 
-    // Initialize RealtimeSessionService with sendToOpenAI callback
-    const sendToOpenAI = (event: Record<string, unknown>) => {
-      if (openaiWs.readyState === WebSocket.OPEN) {
-        openaiWs.send(JSON.stringify(event));
-      }
-    };
-
+    // Initialize RealtimeSessionService with the connection
     this.sessionService.initSession(
       roomId,
-      mcpUrl,
-      sendToOpenAI as never,
-      isTest,
+      config.mcpUrl,
+      connection,
+      config.isTest,
+      () => this.closeCall(roomId),
+      () => this.getAudioDrainMs(roomId),
     );
 
-    openaiWs.onopen = () => {
-      this.logger.info(`[Telephony] OpenAI WS opened for room ${roomId}`);
-
-      // Configure session for telephony audio format (g711_ulaw)
-      const telephonyConfig = {
-        ...sessionConfig,
-        input_audio_format: "g711_ulaw",
-        output_audio_format: "g711_ulaw",
-      };
-
-      openaiWs.send(
-        JSON.stringify({
-          type: "session.update",
-          session: telephonyConfig,
-        }),
-      );
-    };
-
-    openaiWs.onmessage = async (event) => {
-      const data = JSON.parse(typeof event.data === "string" ? event.data : "");
-
+    // Subscribe to normalized events
+    connection.onEvent((event) => {
       // Handle audio output → forward to Twilio
-      if (data.type === "response.audio.delta" && data.delta) {
+      if (event.type === "audio.delta") {
         sendToTwilio({
           event: "media",
           streamSid: session.streamSid,
-          media: { payload: data.delta },
+          media: { payload: event.base64 },
         });
-        session.audioBytesSent += data.delta.length;
+        session.audioBytesSent += event.base64.length;
 
         // Send a mark after each audio chunk for playback tracking
         session.markCounter++;
@@ -124,7 +98,7 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
       }
 
       // Handle interruptions
-      if (data.type === "input_audio_buffer.speech_started") {
+      if (event.type === "speech_started") {
         // Clear Twilio playback buffer
         sendToTwilio({
           event: "clear",
@@ -135,43 +109,20 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
       }
 
       // All other events → process via RealtimeSessionService
-      try {
-        const responses = await this.sessionService.processMessage(
-          data,
-          session.room,
-        );
-        for (const response of responses) {
-          sendToOpenAI(response as Record<string, unknown>);
-        }
-      } catch (error) {
+      this.sessionService.processEvent(event, session.room).catch((error) => {
         this.logger.error(
-          `[Telephony] Error processing message for room ${roomId}: ${error}`,
+          `[Telephony] Error processing event for room ${roomId}: ${error}`,
         );
-      }
-    };
+      });
+    });
 
-    openaiWs.onerror = (event) => {
-      this.logger.error(
-        `[Telephony] OpenAI WS error for room ${roomId}: ${event}`,
-      );
-    };
-
-    openaiWs.onclose = () => {
-      this.logger.info(`[Telephony] OpenAI WS closed for room ${roomId}`);
-      this.cleanup(roomId);
-    };
+    this.logger.info(`[Telephony] Audio provider connected for room ${roomId}`);
   }
 
-  forwardAudioToOpenAI(roomId: string, base64Audio: string): void {
+  forwardAudio(roomId: string, base64Audio: string): void {
     const session = this.sessions.get(roomId);
-    if (!session || session.openaiWs.readyState !== WebSocket.OPEN) return;
-
-    session.openaiWs.send(
-      JSON.stringify({
-        type: "input_audio_buffer.append",
-        audio: base64Audio,
-      }),
-    );
+    if (!session) return;
+    session.connection.sendAudio(base64Audio);
   }
 
   handleMark(roomId: string, _markName: string): void {
@@ -186,11 +137,18 @@ export class TwilioMediaGateway implements TelephonyGatewayPort {
     const session = this.sessions.get(roomId);
     if (!session) return;
 
-    if (session.openaiWs.readyState === WebSocket.OPEN) {
-      session.openaiWs.close();
-    }
-
+    session.connection.close();
     this.cleanup(roomId);
+  }
+
+  /** Calculate remaining audio playback time in ms based on bytes sent to Twilio */
+  private getAudioDrainMs(roomId: string): number {
+    const session = this.sessions.get(roomId);
+    if (!session) return 0;
+    // audioBytesSent is base64 string length; decode to actual bytes
+    const decodedBytes = (session.audioBytesSent / 4) * 3;
+    // PCMU = 1 byte per sample, 8kHz
+    return (decodedBytes / 1 / 8000) * 1000;
   }
 
   private cleanup(roomId: string): void {

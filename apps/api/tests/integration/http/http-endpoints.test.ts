@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
 import { CompanyUseCase } from "@/application/use-cases/company.use-case.ts";
+import { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port.ts";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
 import { CallServicePort } from "@/domain/services/call-service.port.ts";
 import { container } from "@/infrastructure/di/container.ts";
@@ -40,7 +41,37 @@ beforeAll(async () => {
       expiresAt: new Date(Date.now() + 60_000),
     }),
     terminateCall: () => Promise.resolve(),
-    buildSessionConfig: async () => ({}),
+    buildSessionConfig: async () => ({
+      instructions: "test instructions",
+      tools: [],
+    }),
+    buildAudioProviderConfig: async () => ({
+      instructions: "test instructions",
+      tools: [],
+      voice: "marin",
+    }),
+  });
+
+  // Stub RealtimeGatewayPort to avoid real WebSocket connections
+  container.rebind(RealtimeGatewayPort).toConstantValue({
+    openRoomChannel: async () => {
+      /* noop */
+    },
+    forwardAudioToProvider: () => {
+      /* noop */
+    },
+    sendTextToProvider: () => {
+      /* noop */
+    },
+    closeRoomChannel: () => {
+      /* noop */
+    },
+    registerClientSender: () => {
+      /* noop */
+    },
+    unregisterClientSender: () => {
+      /* noop */
+    },
   });
 
   // Create a test company via the production container
@@ -193,6 +224,7 @@ describe("HTTP Endpoints", () => {
         headers: jsonAuthHeaders(),
         body: JSON.stringify({ companyId: testCompanyId, modality: "TEXT" }),
       });
+      expect(createRes.ok).toBe(true);
       const { data: room } = (await createRes.json()) as {
         data: { id: string };
       };

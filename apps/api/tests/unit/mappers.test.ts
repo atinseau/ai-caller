@@ -87,6 +87,7 @@ describe("RoomMapper", () => {
       isTest: false,
       source: "WEBRTC" as const,
       twilioStreamSid: null,
+      contactId: null,
     };
 
     const model = RoomMapper.toModel(prismaRoom);

@@ -22,5 +22,10 @@ export abstract class RoomRepositoryPort {
 
   abstract findById(roomId: string): Promise<IRoomModel>;
 
+  abstract updateContactId(
+    roomId: string,
+    contactId: string,
+  ): Promise<IRoomModel>;
+
   abstract deleteRoom(roomId: string): Promise<void>;
 }

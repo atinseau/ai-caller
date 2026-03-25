@@ -1,5 +1,6 @@
 import type { ICompanyModel } from "../models/company.model.ts";
 import type { IRoomModel } from "../models/room.model.ts";
+import type { AudioProviderConfig } from "../ports/audio-provider.port.ts";
 
 export abstract class CallServicePort {
   /**
@@ -8,6 +9,7 @@ export abstract class CallServicePort {
   abstract createCall(
     company: ICompanyModel,
     modality: "AUDIO" | "TEXT",
+    contactSummary?: string,
   ): Promise<{
     token: string;
     expiresAt: Date;
@@ -20,7 +22,16 @@ export abstract class CallServicePort {
   abstract buildSessionConfig(
     company: ICompanyModel,
     modality: "AUDIO" | "TEXT",
+    contactSummary?: string,
   ): Promise<Record<string, unknown>>;
+
+  /**
+   * Build a normalized AudioProviderConfig for the unified audio gateway.
+   */
+  abstract buildAudioProviderConfig(
+    company: ICompanyModel,
+    contactSummary?: string,
+  ): Promise<AudioProviderConfig>;
 
   abstract terminateCall(room: IRoomModel): Promise<void>;
 }

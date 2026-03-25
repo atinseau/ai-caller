@@ -1,6 +1,5 @@
-import { type RefObject, useReducer } from "react";
+import { useReducer, useRef } from "react";
 import { useServices } from "@/app/providers/ServicesProvider";
-import { connectWebRtc } from "../../application/connect-webrtc";
 
 export type CallStatus = "idle" | "initializing" | "connecting" | "connected";
 
@@ -8,20 +7,12 @@ type CallState = {
   status: CallStatus;
   muted: boolean;
   roomId: string | null;
-  audioStream: MediaStream | null;
-  peerConnection: RTCPeerConnection | null;
-  dataChannel: RTCDataChannel | null;
 };
 
 type CallAction =
   | { type: "START" }
-  | { type: "AUDIO_READY"; audioStream: MediaStream }
-  | {
-      type: "CONNECTED";
-      pc: RTCPeerConnection;
-      dc: RTCDataChannel;
-      roomId: string;
-    }
+  | { type: "CONNECTING"; roomId: string }
+  | { type: "CONNECTED" }
   | { type: "STOP" }
   | { type: "ERROR" }
   | { type: "MUTE_TOGGLE" };
@@ -30,111 +21,108 @@ const initialState: CallState = {
   status: "idle",
   muted: false,
   roomId: null,
-  audioStream: null,
-  peerConnection: null,
-  dataChannel: null,
 };
 
 function reducer(state: CallState, action: CallAction): CallState {
   switch (action.type) {
     case "START":
       return { ...state, status: "initializing" };
-    case "AUDIO_READY":
-      return {
-        ...state,
-        status: "connecting",
-        audioStream: action.audioStream,
-      };
+    case "CONNECTING":
+      return { ...state, status: "connecting", roomId: action.roomId };
     case "CONNECTED":
-      return {
-        ...state,
-        status: "connected",
-        peerConnection: action.pc,
-        dataChannel: action.dc,
-        roomId: action.roomId,
-      };
+      return { ...state, status: "connected" };
     case "STOP":
     case "ERROR":
       return initialState;
-    case "MUTE_TOGGLE": {
-      const muted = !state.muted;
-      for (const t of state.audioStream?.getAudioTracks() ?? [])
-        t.enabled = !muted;
-      return { ...state, muted };
-    }
+    case "MUTE_TOGGLE":
+      return { ...state, muted: !state.muted };
     default:
       return state;
   }
 }
 
-function cleanup(
-  audioStream: MediaStream | null,
-  peerConnection: RTCPeerConnection | null,
-  dataChannel: RTCDataChannel | null,
-) {
-  for (const t of audioStream?.getTracks() ?? []) t.stop();
-  dataChannel?.close();
-  peerConnection?.close();
-}
-
-export function useRealtimeCall(audioRef: RefObject<HTMLAudioElement | null>) {
-  const { audioStream: audioStreamService, realtimeRoom } = useServices();
+export function useRealtimeCall() {
+  const { audioCapture, audioPlayback, realtimeWsRoom } = useServices();
   const [state, dispatch] = useReducer(reducer, initialState);
+  const wsRef = useRef<WebSocket | null>(null);
 
   const start = async (companyId: string, isTest?: boolean) => {
     dispatch({ type: "START" });
     try {
-      const stream = await audioStreamService.asPromise();
-      dispatch({ type: "AUDIO_READY", audioStream: stream });
+      // Initialize playback context
+      audioPlayback.init();
 
-      const { pc, dc, roomId } = await connectWebRtc({
-        companyId,
-        audioStream: stream,
-        audioRef,
-        realtimeRoom,
-        isTest,
+      // Create room on backend — triggers provider connection
+      const { roomId } = await realtimeWsRoom.createRoom(companyId, isTest);
+      dispatch({ type: "CONNECTING", roomId });
+
+      // Connect WebSocket for audio relay
+      const ws = realtimeWsRoom.connectAudioWs(
+        roomId,
+        (base64) => {
+          audioPlayback.playChunk(base64);
+        },
+        () => {
+          // Provider detected user speech — clear pending playback
+          audioPlayback.clearBuffer();
+        },
+        () => {
+          // Server closed the WS — clean up
+          audioCapture.stop();
+          audioPlayback.close();
+          wsRef.current = null;
+          dispatch({ type: "STOP" });
+        },
+      );
+      wsRef.current = ws;
+
+      // Wait for WS open before starting capture
+      await new Promise<void>((resolve, reject) => {
+        ws.onopen = () => resolve();
+        ws.onerror = () => reject(new Error("WebSocket connection failed"));
       });
 
-      dc.addEventListener("close", () => {
-        cleanup(stream, pc, dc);
-        dispatch({ type: "STOP" });
+      // Start mic capture — send chunks over WS
+      await audioCapture.start((base64) => {
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.send(JSON.stringify({ type: "audio", audio: base64 }));
+        }
       });
 
-      dispatch({ type: "CONNECTED", pc, dc, roomId });
-    } catch (_error) {
+      dispatch({ type: "CONNECTED" });
+    } catch {
+      audioCapture.stop();
+      audioPlayback.close();
+      wsRef.current?.close();
+      wsRef.current = null;
       dispatch({ type: "ERROR" });
     }
   };
 
   const stop = () => {
-    cleanup(state.audioStream, state.peerConnection, state.dataChannel);
+    audioCapture.stop();
+    audioPlayback.close();
+    wsRef.current?.close();
+    wsRef.current = null;
     dispatch({ type: "STOP" });
   };
 
-  const toggleMute = () => dispatch({ type: "MUTE_TOGGLE" });
+  const toggleMute = () => {
+    const newMuted = !state.muted;
+    audioCapture.setMuted(newMuted);
+    dispatch({ type: "MUTE_TOGGLE" });
+  };
 
   const sendMessage = (message: string) => {
-    if (!state.dataChannel || state.dataChannel.readyState !== "open") return;
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
 
     if (message === "stop") {
-      state.dataChannel.send(
-        JSON.stringify({ type: "output_audio_buffer.clear" }),
-      );
-      state.dataChannel.send(JSON.stringify({}));
+      audioPlayback.clearBuffer();
       return;
     }
 
-    state.dataChannel.send(
-      JSON.stringify({
-        type: "conversation.item.create",
-        item: {
-          type: "message",
-          role: "user",
-          content: [{ type: "input_text", text: message }],
-        },
-      }),
-    );
-    state.dataChannel.send(JSON.stringify({ type: "response.create" }));
+    ws.send(JSON.stringify({ type: "text", text: message }));
   };
 
   return { state, start, stop, toggleMute, sendMessage };

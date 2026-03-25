@@ -8,6 +8,8 @@ import {
   it,
 } from "bun:test";
 import { RoomUseCase } from "@/application/use-cases/room.use-case.ts";
+import { ChatServicePort } from "@/domain/ports/chat-service.port.ts";
+import { RealtimeGatewayPort } from "@/domain/ports/realtime-gateway.port.ts";
 import { RoomRepositoryPort } from "@/domain/repositories/room-repository.port.ts";
 import { CallServicePort } from "@/domain/services/call-service.port.ts";
 import {
@@ -30,8 +32,8 @@ const ctx = createTestContext();
 beforeEach(ctx.setup);
 afterEach(ctx.teardown);
 
-/** Rebind CallService to avoid real OpenAI calls in use-case tests. */
-function stubCallService() {
+/** Rebind CallService and ChatService to avoid real OpenAI calls in use-case tests. */
+function stubServices() {
   ctx.container.rebind(CallServicePort).toConstantValue({
     createCall: async () => ({
       token: `test-token-${Date.now()}`,
@@ -40,13 +42,52 @@ function stubCallService() {
     terminateCall: async () => {
       /* noop */
     },
-    buildSessionConfig: async () => ({}),
+    buildSessionConfig: async () => ({
+      instructions: "test instructions",
+      tools: [],
+    }),
+    buildAudioProviderConfig: async () => ({
+      instructions: "test instructions",
+      tools: [],
+      voice: "marin",
+    }),
+  });
+  ctx.container.rebind(RealtimeGatewayPort).toConstantValue({
+    openRoomChannel: async () => {
+      /* noop */
+    },
+    forwardAudioToProvider: () => {
+      /* noop */
+    },
+    sendTextToProvider: () => {
+      /* noop */
+    },
+    closeRoomChannel: () => {
+      /* noop */
+    },
+    registerClientSender: () => {
+      /* noop */
+    },
+    unregisterClientSender: () => {
+      /* noop */
+    },
+  });
+  ctx.container.rebind(ChatServicePort).toConstantValue({
+    initSession: () => {
+      /* noop */
+    },
+    sendMessage: async function* () {
+      /* noop */
+    },
+    destroySession: () => {
+      /* noop */
+    },
   });
 }
 
 describe("RoomUseCase", () => {
   it("should create a room with AUDIO modality", async () => {
-    stubCallService();
+    stubServices();
     const company = await createTestCompany(ctx.container, mcpUrl);
     const useCase = ctx.container.get(RoomUseCase);
 
@@ -57,11 +98,11 @@ describe("RoomUseCase", () => {
 
     expect(room.modality).toBe("AUDIO");
     expect(room.companyId).toBe(company.id);
-    expect(room.token).toContain("test-token-");
+    expect(room.token).toStartWith("audio-");
   });
 
-  it("should create a room with TEXT modality and persist it", async () => {
-    stubCallService();
+  it("should create a room with TEXT modality using ChatService", async () => {
+    stubServices();
     const company = await createTestCompany(ctx.container, mcpUrl);
     const useCase = ctx.container.get(RoomUseCase);
 
@@ -71,13 +112,14 @@ describe("RoomUseCase", () => {
     });
 
     expect(room.modality).toBe("TEXT");
+    expect(room.token).toStartWith("chat-"); // TEXT rooms use placeholder token
     const roomRepo = ctx.container.get(RoomRepositoryPort);
     const found = await roomRepo.findById(room.id);
     expect(found.id).toBe(room.id);
   });
 
   it("should throw when company is not found", async () => {
-    stubCallService();
+    stubServices();
     const useCase = ctx.container.get(RoomUseCase);
 
     await expect(
@@ -88,7 +130,7 @@ describe("RoomUseCase", () => {
   });
 
   it("should attach call ID to room", async () => {
-    stubCallService();
+    stubServices();
     const company = await createTestCompany(ctx.container, mcpUrl);
     const useCase = ctx.container.get(RoomUseCase);
 
@@ -117,13 +159,60 @@ describe("RoomUseCase", () => {
         terminateCalled = true;
         await roomRepo.deleteRoom(room.id);
       },
-      buildSessionConfig: async () => ({}),
+      buildSessionConfig: async () => ({
+        instructions: "test",
+        tools: [],
+      }),
+      buildAudioProviderConfig: async () => ({
+        instructions: "test",
+        tools: [],
+        voice: "marin",
+      }),
+    });
+    ctx.container.rebind(RealtimeGatewayPort).toConstantValue({
+      openRoomChannel: async () => {
+        /* noop */
+      },
+      forwardAudioToProvider: () => {
+        /* noop */
+      },
+      sendTextToProvider: () => {
+        /* noop */
+      },
+      closeRoomChannel: () => {
+        /* noop */
+      },
+      registerClientSender: () => {
+        /* noop */
+      },
+      unregisterClientSender: () => {
+        /* noop */
+      },
+    });
+    ctx.container.rebind(ChatServicePort).toConstantValue({
+      initSession: () => {
+        /* noop */
+      },
+      sendMessage: async function* () {
+        /* noop */
+      },
+      destroySession: () => {
+        /* noop */
+      },
     });
 
     const company = await createTestCompany(ctx.container, mcpUrl);
     const useCase = ctx.container.get(RoomUseCase);
 
-    await useCase.createRoom({ companyId: company.id, modality: "AUDIO" });
+    // Create an expired room directly via repo (createRoom uses future expiresAt)
+    await roomRepo.createRoom(
+      company.id,
+      `expired-${Date.now()}`,
+      new Date(Date.now() - 1000),
+      "AUDIO",
+      false,
+    );
+
     await useCase.flushExpiredRooms();
 
     expect(terminateCalled).toBe(true);

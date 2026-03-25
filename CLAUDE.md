@@ -34,7 +34,7 @@ bun run shadcn             # Add Shadcn components
 
 ## Architecture
 
-This is an **AI-powered real-time voice calling platform** using OpenAI's Realtime API.
+This is an **AI-powered real-time voice & text calling platform** using OpenAI's Realtime API (AUDIO) and Chat Completions API (TEXT).
 
 ### Monorepo Layout
 
@@ -66,7 +66,34 @@ API requires `apps/api/.env` with non-sensitive config (`PORT`, `CLIENT_URL`, `R
 
 Docker Compose provides PostgreSQL, n8n, Redis, and Infisical (secret management).
 
-### OpenAI Realtime API
+### Modality Architecture
+
+The platform supports two modalities with different APIs:
+
+| Modality | API | Model | Use case |
+|----------|-----|-------|----------|
+| AUDIO | Provider-agnostic via `AudioProviderPort` | Configurable via `AUDIO_PROVIDER` env (default: Grok) | Voice calls, telephony |
+| TEXT | OpenAI Chat Completions (HTTP streaming) | Configurable via `TEXT_MODEL` env (default `gpt-4.1`) | Web chat, WhatsApp |
+
+- **`AudioProviderPort`**: Abstract port for audio AI providers. Each provider implements `connect(config) → AudioProviderConnection`. Events are normalized to `NormalizedAudioEvent` (transcript.delta/done, audio.delta/done, function_call, speech_started/stopped).
+- **`AudioProviderEnum`**: `GROK` (default), `OPENAI`. Set via `AUDIO_PROVIDER` env var.
+- **`GrokAudioProviderAdapter`**: Connects to `wss://api.x.ai/v1/realtime`. Uses `XAI_API_KEY`.
+- **`OpenAIAudioProviderAdapter`**: Connects to `wss://api.openai.com/v1/realtime`. Uses `OPENAI_API_KEY`.
+- **`RealtimeAudioGateway`**: Unified gateway that uses `AudioProviderPort`. Replaces the old `OpenAIRealtimeGateway`.
+- **`ChatServicePort` / `OpenAIChatService`**: Manages TEXT conversations via Chat Completions with streaming, message history, and tool calls.
+- **`ToolExecutionService`**: Shared service for tool execution logic (create ToolInvoke, dispatch SubAgent, publish events). Used by both `RealtimeSessionService` (AUDIO) and `OpenAIChatService` (TEXT). Transport-agnostic via callback pattern (`onResult`/`onError`).
+- **`ChatModelEnum`**: Enum for chat models (`gpt-4.1`, `gpt-4o-mini`). Used in env validation for `TEXT_MODEL` and `SUB_AGENT_MODEL`.
+- **Adding a new audio provider**: Create a single adapter class implementing `AudioProviderPort`, register it in `gateway.module.ts`. No other changes needed.
+
+### Audio Transport (WebSocket-based)
+
+All audio channels (WebRTC browser, telephony) now route through the backend:
+- **Browser → Backend**: WebSocket at `/api/v1/room/{roomId}/audio` carries base64 PCM16 audio chunks
+- **Backend → Provider**: `AudioProviderPort.connect()` opens provider-specific WebSocket
+- **Frontend**: `AudioCaptureService` (mic → PCM16 base64) + `AudioPlaybackService` (PCM16 → speaker via AudioContext)
+- **No WebRTC**: The old WebRTC direct-to-OpenAI flow has been replaced. All audio transits the backend.
+
+### OpenAI Realtime API (legacy, available via AUDIO_PROVIDER=openai)
 
 The platform uses OpenAI's Realtime API for voice conversations. Key integration points:
 
@@ -111,6 +138,33 @@ When the AI agent needs to execute an action (e.g., create a ticket, check inven
 5. All tool events are streamed to the frontend via SSE for real-time debug visibility
 
 This pattern keeps the conversation flowing while tools execute in the background. The AI can check tool status via the `get_tool_status` system tool.
+
+### Contact Profiles
+
+End-users are tracked across sessions via the `Contact` model, scoped per company.
+
+- **Identifiers** (all optional): `phoneNumber` (telephony/WhatsApp), `email`, `ipAddress` (WebRTC), `userAgent` (enrichment only, not used for matching)
+- **Matching**: OR on `phoneNumber`, `email`, `ipAddress` within the same `companyId`
+- **Summary**: Compacted LLM summary of all past interactions, stored on `Contact.summary`
+- **Session start** (prod only): `ContactService.findOrCreate()` resolves a contact by identifiers. If the contact has a `summary`, it's injected into the prompt via `{{contactSummary}}` in `instructions-prompt.md`
+- **Session end**: `ContactService.compactSession()` is called in `terminateCall()` BEFORE room deletion. Collects all transcript events, sends to LLM (`session-summary-prompt.md`), merges with existing summary
+- **Room link**: `Room.contactId` FK to Contact (SetNull on delete)
+- **Test sessions**: Skip contact resolution and compaction entirely
+
+### WhatsApp Integration
+
+WhatsApp Business channel using Meta Cloud API directly (no Twilio).
+
+- **Config model**: `WhatsAppConfig` (Prisma) — one per company. Stores `phoneNumberId`, `whatsappBusinessId`, `accessToken`, `verifyToken`.
+- **Port**: `WhatsAppClientPort` → `MetaWhatsAppClientAdapter` — sends messages via Meta Graph API v21.0.
+- **Use case**: `WhatsAppUseCase` — handles incoming messages, outbound conversations, config CRUD.
+- **Webhook**: `POST /api/whatsapp/webhook` (public) — receives Meta webhook events, validates signature.
+- **Verification**: `GET /api/whatsapp/webhook` — Meta webhook verification (challenge/response).
+- **Config API**: `GET/POST/PATCH/DELETE /api/v1/company/{companyId}/whatsapp` (auth required).
+- **Start conversation**: `POST /api/v1/company/{companyId}/whatsapp/start` — trigger outbound WhatsApp conversation.
+- **Session management**: In-memory `Map<whatsappPhone, roomId>` for routing. Rooms created with `source: WHATSAPP`, `modality: TEXT`. Uses `ChatServicePort` for AI responses.
+- **Room sources**: `WEBRTC` (browser), `TELEPHONY` (phone), `WHATSAPP` (Meta).
+- **24h window**: WhatsApp Business API limits: can only reply within 24h of user's last message. Outside this window, must use pre-approved message templates.
 
 ### Secret Management (Infisical)
 

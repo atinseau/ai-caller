@@ -111,9 +111,11 @@ model Company {
   language          String?
   vadEagerness      String?
 
-  rooms       Room[]
-  users       User[]
-  phoneNumber PhoneNumber?
+  rooms          Room[]
+  users          User[]
+  phoneNumber    PhoneNumber?
+  whatsappConfig WhatsAppConfig?
+  contacts       Contact[]
 }
 
 model PhoneNumber {
@@ -135,6 +137,18 @@ enum RoomModality {
 enum RoomSource {
   WEBRTC
   TELEPHONY
+  WHATSAPP
+}
+
+model WhatsAppConfig {
+  id            String   @id @default(uuid())
+  phoneNumberId String   @unique
+  active        Boolean  @default(true)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  companyId     String   @unique
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
 }
 
 model Room {
@@ -153,9 +167,34 @@ model Room {
     isTest          Boolean      @default(false)
     source          RoomSource   @default(WEBRTC)
     twilioStreamSid String?
+    contactId       String?
+    contact         Contact?     @relation(fields: [contactId], references: [id], onDelete: SetNull)
 
     toolInvokes ToolInvoke[]
     events      RoomEvent[]
+}
+
+model Contact {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  phoneNumber String?
+  email       String?
+  ipAddress   String?
+  userAgent   String?
+
+  summary     String?  @db.Text
+  metadata    Json?    @default("{}")
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  rooms       Room[]
+
+  @@index([companyId, phoneNumber])
+  @@index([companyId, email])
+  @@index([companyId, ipAddress])
 }
 
 enum ToolInvokeStatus {

@@ -2,7 +2,9 @@ import {
   ArrowLeft,
   Check,
   CircleAlert,
+  Copy,
   Loader2,
+  MessageCircle,
   Network,
   Pause,
   Phone,
@@ -54,20 +56,27 @@ import {
   PromptSection,
 } from "@/shared/enums/prompt-section.enum";
 import { UserRoleEnum } from "@/shared/enums/user-role.enum";
-import { VoiceEnum } from "@/shared/enums/voice.enum";
 import { useCompany } from "@/shared/hooks/useCompany";
 import { useCurrentUser } from "@/shared/hooks/useCurrentUser";
 import { useDeleteCompany } from "@/shared/hooks/useDeleteCompany";
+import { useGenerateText } from "@/shared/hooks/useGenerateText";
 import {
   useProvisionPhoneNumber,
   useReleasePhoneNumber,
 } from "@/shared/hooks/usePhoneNumber";
 import { useUpdateCompany } from "@/shared/hooks/useUpdateCompany";
+import { useVoices } from "@/shared/hooks/useVoices";
+import {
+  useDeleteWhatsAppConfig,
+  useUpdateWhatsAppConfig,
+  useWhatsAppConfig,
+} from "@/shared/hooks/useWhatsAppConfig";
 import {
   formatToolName,
   type ToolConfig,
   ToolConfigDialog,
 } from "../components/ToolConfigDialog";
+import { WhatsAppConfigDialog } from "../components/WhatsAppConfigDialog";
 
 const mcpStatusConfig: Record<
   McpStatusEnum,
@@ -144,6 +153,14 @@ export function CompanyDetailPage() {
     useProvisionPhoneNumber(companyId ?? "");
   const { mutateAsync: releasePhone, isPending: isReleasing } =
     useReleasePhoneNumber(companyId ?? "");
+  const { data: whatsAppConfig } = useWhatsAppConfig(companyId ?? null);
+  const { data: voices = [] } = useVoices();
+  const { mutateAsync: updateWhatsApp, isPending: isUpdatingWhatsApp } =
+    useUpdateWhatsAppConfig(companyId ?? "");
+  const { mutateAsync: deleteWhatsApp, isPending: isDeletingWhatsApp } =
+    useDeleteWhatsAppConfig(companyId ?? "");
+  const { mutateAsync: generateText, isPending: isGenerating } =
+    useGenerateText();
 
   const company = data?.company;
   const mcpStatus =
@@ -165,6 +182,7 @@ export function CompanyDetailPage() {
     PromptSection.ROLE_OBJECTIVE,
   );
   const [promptDirty, setPromptDirty] = useState(false);
+  const originalSectionsRef = useRef<Record<string, string>>({});
 
   const [mcpUrl, setMcpUrl] = useState("");
   const [mcpDirty, setMcpDirty] = useState(false);
@@ -178,15 +196,19 @@ export function CompanyDetailPage() {
     Record<string, string>
   >({});
   const [systemToolPromptsDirty, setSystemToolPromptsDirty] = useState(false);
+  const originalSystemToolPromptsRef = useRef<Record<string, string>>({});
 
-  const [voice, setVoice] = useState<string>(VoiceEnum.MARIN);
+  const [voice, setVoice] = useState<string>("");
   const [language, setLanguage] = useState<string>(LanguageEnum.FR);
   const [voiceConfigDirty, setVoiceConfigDirty] = useState(false);
+  const originalVoiceRef = useRef<string>("");
+  const originalLanguageRef = useRef<string>(LanguageEnum.FR);
 
   const [previewPlaying, setPreviewPlaying] = useState(false);
   const [previewLoading, setPreviewLoading] = useState(false);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const [provisionCountry, setProvisionCountry] = useState("US");
+  const [whatsAppDialogOpen, setWhatsAppDialogOpen] = useState(false);
 
   useEffect(() => {
     if (company) {
@@ -194,19 +216,28 @@ export function CompanyDetailPage() {
         (company.systemPromptSections as Record<string, string> | null) ?? {};
       setPromptSections(sections);
       setPromptDirty(false);
+      originalSectionsRef.current = sections;
       setMcpUrl(company.mcpUrl ?? "");
       setToolConfigs(
         (company.toolConfigs as Record<string, ToolConfig> | null) ?? {},
       );
-      setSystemToolPrompts(
-        (company.systemToolPrompts as Record<string, string> | null) ?? {},
-      );
+      const sysToolPrompts =
+        (company.systemToolPrompts as Record<string, string> | null) ?? {};
+      setSystemToolPrompts(sysToolPrompts);
       setSystemToolPromptsDirty(false);
-      setVoice(company.voice ?? VoiceEnum.MARIN);
-      setLanguage(company.language ?? LanguageEnum.FR);
+      originalSystemToolPromptsRef.current = sysToolPrompts;
+      const companyVoiceExists = voices.some((vi) => vi.id === company.voice);
+      const v = companyVoiceExists
+        ? (company.voice ?? "")
+        : (voices[0]?.id ?? "");
+      const l = company.language ?? LanguageEnum.FR;
+      setVoice(v);
+      setLanguage(l);
       setVoiceConfigDirty(false);
+      originalVoiceRef.current = v;
+      originalLanguageRef.current = l;
     }
-  }, [company]);
+  }, [company, voices]);
 
   const handleSectionChange = useCallback(
     (value: string) => {
@@ -217,11 +248,36 @@ export function CompanyDetailPage() {
         } else {
           delete next[activeSection];
         }
+        setPromptDirty(
+          JSON.stringify(next) !== JSON.stringify(originalSectionsRef.current),
+        );
         return next;
       });
-      setPromptDirty(true);
     },
     [activeSection],
+  );
+
+  const handleAiGenerate = useCallback(
+    async (userMessage: string): Promise<string> => {
+      const content = await generateText({
+        type: "SYSTEM_PROMPT_SECTION",
+        companyId: companyId as string,
+        section: activeSection,
+        promptSections: promptSections as Partial<
+          Record<PromptSection, string>
+        >,
+        userMessage,
+      });
+      handleSectionChange(content);
+      return content;
+    },
+    [
+      activeSection,
+      companyId,
+      generateText,
+      handleSectionChange,
+      promptSections,
+    ],
   );
 
   const handleMcpUrlChange = useCallback(
@@ -270,9 +326,12 @@ export function CompanyDetailPage() {
         } else {
           delete next[toolName];
         }
+        setSystemToolPromptsDirty(
+          JSON.stringify(next) !==
+            JSON.stringify(originalSystemToolPromptsRef.current),
+        );
         return next;
       });
-      setSystemToolPromptsDirty(true);
     },
     [],
   );
@@ -282,6 +341,7 @@ export function CompanyDetailPage() {
       const prompts =
         Object.keys(systemToolPrompts).length > 0 ? systemToolPrompts : null;
       await updateCompany({ systemToolPrompts: prompts });
+      originalSystemToolPromptsRef.current = prompts ?? {};
       setSystemToolPromptsDirty(false);
       toast.success("System tool prompts saved");
     } catch {
@@ -292,9 +352,11 @@ export function CompanyDetailPage() {
   async function handleSaveVoiceConfig() {
     try {
       await updateCompany({
-        voice: voice as VoiceEnum,
+        voice: voice,
         language: language as LanguageEnum,
       });
+      originalVoiceRef.current = voice;
+      originalLanguageRef.current = language;
       setVoiceConfigDirty(false);
       toast.success("Voice configuration saved");
     } catch {
@@ -313,7 +375,7 @@ export function CompanyDetailPage() {
     setPreviewLoading(true);
     try {
       const apiUrl = import.meta.env.VITE_API_URL;
-      const url = `${apiUrl}/api/v1/voice/preview?voice=${encodeURIComponent(voice)}&language=${encodeURIComponent(language)}`;
+      const url = `${apiUrl}/api/v1/voice/preview?voice=${encodeURIComponent(voice)}&language=${encodeURIComponent(language)}&companyId=${encodeURIComponent(companyId ?? "")}`;
       const res = await fetch(url, { credentials: "include" });
       if (!res.ok) throw new Error("Failed to fetch preview");
 
@@ -346,9 +408,9 @@ export function CompanyDetailPage() {
       const hasContent = Object.values(promptSections).some(
         (v) => v && v.trim() !== "",
       );
-      await updateCompany({
-        systemPromptSections: hasContent ? promptSections : null,
-      });
+      const payload = hasContent ? promptSections : null;
+      await updateCompany({ systemPromptSections: payload });
+      originalSectionsRef.current = payload ?? {};
       setPromptDirty(false);
       toast.success("System prompt saved");
     } catch (error) {
@@ -541,6 +603,10 @@ export function CompanyDetailPage() {
                         onChange={handleSectionChange}
                         placeholder={meta.placeholder}
                         minHeight="200px"
+                        aiGenerate={{
+                          onGenerate: handleAiGenerate,
+                          isLoading: isGenerating,
+                        }}
                       />
                     </TabsContent>
                   );
@@ -772,28 +838,38 @@ export function CompanyDetailPage() {
                 <div className="space-y-2">
                   <Label htmlFor="voice">Voice</Label>
                   <div className="flex items-center gap-2">
-                    <Select
-                      value={voice}
-                      onValueChange={(v) => {
-                        setVoice(v);
-                        setVoiceConfigDirty(true);
-                        if (previewPlaying && previewAudioRef.current) {
-                          previewAudioRef.current.pause();
-                          setPreviewPlaying(false);
-                        }
-                      }}
-                    >
-                      <SelectTrigger id="voice" className="flex-1">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.values(VoiceEnum).map((v) => (
-                          <SelectItem key={v} value={v}>
-                            {v.charAt(0).toUpperCase() + v.slice(1)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    {voices.length > 0 ? (
+                      <Select
+                        value={voice || voices[0]?.id}
+                        onValueChange={(v) => {
+                          setVoice(v);
+                          setVoiceConfigDirty(
+                            v !== originalVoiceRef.current ||
+                              language !== originalLanguageRef.current,
+                          );
+                          if (previewPlaying && previewAudioRef.current) {
+                            previewAudioRef.current.pause();
+                            setPreviewPlaying(false);
+                          }
+                        }}
+                      >
+                        <SelectTrigger id="voice" className="flex-1">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {voices.map((v) => (
+                            <SelectItem key={v.id} value={v.id}>
+                              {v.label}
+                              <span className="ml-1 text-muted-foreground text-xs">
+                                — {v.tone}
+                              </span>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    ) : (
+                      <div className="flex-1 h-9 rounded-md border bg-muted animate-pulse" />
+                    )}
                     <Button
                       variant="outline"
                       size="icon"
@@ -817,7 +893,10 @@ export function CompanyDetailPage() {
                     value={language}
                     onValueChange={(v) => {
                       setLanguage(v);
-                      setVoiceConfigDirty(true);
+                      setVoiceConfigDirty(
+                        voice !== originalVoiceRef.current ||
+                          v !== originalLanguageRef.current,
+                      );
                     }}
                   >
                     <SelectTrigger id="language">
@@ -949,6 +1028,128 @@ export function CompanyDetailPage() {
 
               <Separator />
 
+              {/* WhatsApp */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-medium">WhatsApp</h3>
+                {whatsAppConfig ? (
+                  <div className="rounded-lg border p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <MessageCircle className="size-4 text-muted-foreground" />
+                        <p className="text-sm font-medium">
+                          {whatsAppConfig.phoneNumberId}
+                        </p>
+                      </div>
+                      <StatusBadge
+                        status={whatsAppConfig.active ? "ACTIVE" : "INACTIVE"}
+                      />
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <Label className="text-xs text-muted-foreground">
+                        Webhook URL
+                      </Label>
+                      <div className="flex items-center gap-1.5">
+                        <Input
+                          readOnly
+                          value={`${import.meta.env.VITE_API_URL}/api/whatsapp/webhook`}
+                          className="text-xs h-7"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 shrink-0"
+                          onClick={() => {
+                            navigator.clipboard.writeText(
+                              `${import.meta.env.VITE_API_URL}/api/whatsapp/webhook`,
+                            );
+                            toast.success("Webhook URL copied");
+                          }}
+                        >
+                          <Copy className="size-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={async () => {
+                        try {
+                          await updateWhatsApp({
+                            active: !whatsAppConfig.active,
+                          });
+                          toast.success(
+                            whatsAppConfig.active
+                              ? "WhatsApp deactivated"
+                              : "WhatsApp activated",
+                          );
+                        } catch {
+                          toast.error("Failed to update WhatsApp config");
+                        }
+                      }}
+                      disabled={isUpdatingWhatsApp}
+                    >
+                      {isUpdatingWhatsApp ? (
+                        <Loader2 className="size-3.5 animate-spin" />
+                      ) : whatsAppConfig.active ? (
+                        "Deactivate"
+                      ) : (
+                        "Activate"
+                      )}
+                    </Button>
+
+                    {isRoot && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-1.5"
+                        onClick={async () => {
+                          if (
+                            // biome-ignore lint/suspicious/noAlert: confirmation dialog is intentional UX
+                            !confirm(
+                              "Delete WhatsApp configuration? This cannot be undone.",
+                            )
+                          )
+                            return;
+                          try {
+                            await deleteWhatsApp();
+                            toast.success("WhatsApp config deleted");
+                          } catch {
+                            toast.error("Failed to delete WhatsApp config");
+                          }
+                        }}
+                        disabled={isDeletingWhatsApp}
+                      >
+                        {isDeletingWhatsApp ? (
+                          <Loader2 className="size-3.5 animate-spin" />
+                        ) : (
+                          <Trash2 className="size-3.5" />
+                        )}
+                        Delete config
+                      </Button>
+                    )}
+                  </div>
+                ) : isRoot ? (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full gap-1.5"
+                    onClick={() => setWhatsAppDialogOpen(true)}
+                  >
+                    <MessageCircle className="size-3.5" />
+                    Configure WhatsApp
+                  </Button>
+                ) : (
+                  <p className="text-xs text-muted-foreground">
+                    WhatsApp not configured.
+                  </p>
+                )}
+              </div>
+
+              <Separator />
+
               {/* Activation — all users */}
               <div className="space-y-3">
                 <h3 className="text-sm font-medium">Activation</h3>
@@ -1019,6 +1220,11 @@ export function CompanyDetailPage() {
         onOpenChange={(open) => {
           if (!open) setSelectedToolName(null);
         }}
+      />
+      <WhatsAppConfigDialog
+        companyId={companyId ?? ""}
+        open={whatsAppDialogOpen}
+        onOpenChange={setWhatsAppDialogOpen}
       />
     </PageContainer>
   );

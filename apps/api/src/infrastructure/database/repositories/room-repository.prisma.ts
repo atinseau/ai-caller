@@ -53,6 +53,17 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
     return RoomMapper.toModel(room);
   }
 
+  async updateContactId(
+    roomId: string,
+    contactId: string,
+  ): Promise<IRoomModel> {
+    const room = await this.prisma.room.update({
+      where: { id: roomId },
+      data: { contactId },
+    });
+    return RoomMapper.toModel(room);
+  }
+
   async findExpiredRooms(): Promise<IRoomModel[]> {
     const rooms = await this.prisma.room.findMany({
       where: {
@@ -64,9 +75,21 @@ export class RoomRepositoryPrisma implements RoomRepositoryPort {
   }
 
   async deleteRoom(roomId: string): Promise<void> {
-    await this.prisma.room.delete({
-      where: { id: roomId },
-    });
+    try {
+      await this.prisma.room.delete({
+        where: { id: roomId },
+      });
+    } catch (error) {
+      // P2025: record not found — room already deleted (idempotent)
+      if (
+        error instanceof Error &&
+        "code" in error &&
+        (error as { code: string }).code === "P2025"
+      ) {
+        return;
+      }
+      throw error;
+    }
   }
 
   async findById(roomId: string): Promise<IRoomModel> {
